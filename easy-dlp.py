@@ -1,26 +1,32 @@
-import os, subprocess, tkinter
+import os, sys, subprocess, tkinter
 from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedialog, ttk
 
 cache_path = ''
-icon_path_const = "assets/EasyDLP.png"
 cachetxt_const = "cache.txt"
 logtxt_const = "log.txt"
 
 # Globals
-app_icon = None
+
 cache_entry = None
 cacheroot = None
 final_cookie_selection = None
 
-def icon_verification():
-    global app_icon
+def set_window_icon(root):
+    """Runtime icon loading for Nuitka"""
     try:
-        app_icon = tkinter.PhotoImage(file=icon_path_const)
-        return app_icon
-    except tkinter.TclError:
-        print(f"Error loading icon file: {icon_path_const} Proceeding without an icon.")
-        app_icon = None
-        return app_icon
+        if getattr(sys, 'frozen', False):  # Checks if the application is running as a frozen executable
+            icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.ico') # noqa
+            if not os.path.exists(icon_path):
+                icon_path = os.path.join(os.getcwd(), 'icon.ico')
+        else:
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets/EasyDLP.ico')
+
+        if os.path.exists(icon_path):
+            root.iconbitmap(icon_path)
+    except Exception as e:
+        print(f"Error, icon not available: {e}")
+
+
 
 def dynamic_resolution(d_root, d_width, d_height):
     screen_height = d_root.winfo_screenheight()
@@ -46,12 +52,20 @@ def download():
             file.write(f'cd /d {path_from_cache}\n')
             selected_browser = final_cookie_selection.get()
             if selected_browser == 'None':
-                file.write(f'yt-dlp.exe {download_link}\n')
+                file.write(f'yt-dlp.exe --quiet --no-warnings {download_link}\n')
             else:
-                file.write(f'yt-dlp.exe --cookies-from-browser {selected_browser} {download_link}\n')
+                file.write(f'yt-dlp.exe --quiet --no-warnings --cookies-from-browser {selected_browser} {download_link}\n')
             file.write('exit\n')
     download_abs_path = os.path.abspath('download.bat')
-    process = subprocess.Popen([download_abs_path], stderr=subprocess.PIPE)
+
+    startupinfo = None
+    if sys.platform.startswith("win"):
+        startupinfo = subprocess.STARTUPINFO()
+        # startupinfo.dwFlags != subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = subprocess.SW_HIDE
+
+    process = subprocess.Popen([download_abs_path], startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0)
+    
     _, stderr = process.communicate()
     proc_success = process.returncode == 0
     process.wait()
@@ -92,17 +106,15 @@ def search_button():
         cache_entry.insert(0, path)
 
 def cache_window():
-    global app_icon
     global cache_entry
     global cacheroot
     cacheroot = Tk()
-    icon_verification()
+    cacheroot.withdraw()
+
+    set_window_icon(cacheroot)
     cacheroot.title('YT-DLP Path Directory Cache')
     dynamic_resolution(cacheroot, 500, 150)
     cacheroot.resizable(False,False)
-    
-    if app_icon:
-        cacheroot.iconphoto(False, app_icon)
 
     cache_main_lb = Label(cacheroot, text='Insert the path to your YT-DLP file', font=('', 20))
     cache_main_lb.pack(pady=(15, 0))
@@ -120,11 +132,11 @@ def cache_window():
     cache_enter_b.grid(row=0, column=0, padx=(0, 10))
     file_search_b.grid(row=0, column=1)
 
+    cacheroot.deiconify()
     cacheroot.mainloop()
 
 def cookie_import_window():
     global final_cookie_selection
-    global app_icon
 
     def cookie_next_button():
         selected_value = cookie_import_menu.get()
@@ -134,17 +146,13 @@ def cookie_import_window():
         cookieroot.destroy()
 
     cookieroot = Tk()
-    
-    icon_verification()
-    
+    cookieroot.withdraw()
+    set_window_icon(cookieroot)
     final_cookie_selection = tkinter.StringVar()
     cookieroot.title('Cookie importation')
     dynamic_resolution(cookieroot, 500, 280)
     cookieroot.resizable(False,False)
     
-    if app_icon:
-        cookieroot.iconphoto(False, app_icon)
-
     cookie_ntc2_label = Label(cookieroot, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
     cookie_ntc2_label.pack(pady=(0, 5))
 
@@ -164,6 +172,7 @@ def cookie_import_window():
     cookie_button = Button(cookieroot, text='Save', font=('', 20), command=cookie_next_button)
     cookie_button.pack(pady=15)
 
+    cookieroot.deiconify()
     cookieroot.mainloop()
 
 
@@ -176,13 +185,12 @@ if __name__ == "__main__":
 
     # Main instance
     mainroot = Tk()
-    icon_verification()
+    mainroot.withdraw()
+
+    set_window_icon(mainroot)
     mainroot.title('Easy-DLP')
     dynamic_resolution(mainroot, 500, 320)
     mainroot.resizable(False,False)
-    
-    if app_icon:
-        mainroot.iconphoto(False, app_icon)
 
     main_label = Label(mainroot, text='Insert URL', font=('', 35))
     main_label.pack(pady=(25, 0))
@@ -196,4 +204,5 @@ if __name__ == "__main__":
     main_clear_dir = Button(mainroot, text='Clear path', font=('', 13), command=clear_cache)
     main_clear_dir.pack(pady=0)
 
+    mainroot.deiconify()
     mainroot.mainloop()
