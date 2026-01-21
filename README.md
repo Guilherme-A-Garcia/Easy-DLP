@@ -31,7 +31,7 @@ This application is but a humble wrapper coded in Python, using only three Pytho
 - No external libraries required
 
 ## Requirements
-For now, you need Windows 8 or newer as it is the minimum requirement to run YT-DLP. Do not fret if you are a Linux user and want to use this tool, I intend to add compatibility in the future.<br><br>
+For now, you need Windows 8 or newer as it is the minimum requirement to run YT-DLP. For Linux users, check the [roadmap](#roadmap).<br><br>
 More importantly, you will also need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary.<br><br>
 If you plan on using the source code version, you must install the [latest Python version](https://www.python.org/downloads/). 🐍
 
@@ -49,7 +49,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 
 ## Roadmap
 - Migrate to CustomTkinter;
-- Add threading;
+- Add threading and a progress bar;
 - Linux support;
 - Playlist support;
 - Add a settings tab;
