@@ -5,8 +5,8 @@
 
 # Easy-DLP
 Easy-DLP is a clean and simple GUI wrapper for **YT-DLP**. Download videos easily with browser cookie support.<br>
-
-This application is but a humble wrapper coded in Python, using only four Python standard libraries: Tkinter, Subprocess, OS and Sys.
+This application is but a humble wrapper coded in Python, using only four Python standard libraries: Tkinter, Subprocess, OS and Sys.<br>
+The [binary](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) was compiled using [Nuitka](https://nuitka.net/).
 
 >[!CAUTION]
 >By using this GUI, you agree to abide by local copyright laws. This project does not condone or encourage the unauthorized distribution of copyrighted material.
