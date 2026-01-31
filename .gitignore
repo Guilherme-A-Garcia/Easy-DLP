@@ -34,6 +34,11 @@ MANIFEST
 
 # Nuitka
 binaries/
+*.dist/
+*.build/
+*.onefile-build/
+icon.ico
+*.exe
 
 # Installer logs
 pip-log.txt
@@ -208,3 +213,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Misc.
+cache.txt
