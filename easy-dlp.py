@@ -18,14 +18,15 @@ def simple_handling(widget, key, event):
 
 def set_window_icon(root):
     """Runtime icon loading for Nuitka"""
+    icon = 'icon.ico'
     try:
         if getattr(sys, 'frozen', False):
-            icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.ico')
+            icon_path = os.path.join(os.path.dirname(sys.executable), icon)
             if not os.path.exists(icon_path):
-                icon_path = os.path.join(os.getcwd(), 'icon.ico')
+                icon_path = os.path.join(os.getcwd(), icon)
         else:
-            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets/EasyDLP.ico')
-
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), )
+     
         if os.path.exists(icon_path):
             root.iconbitmap(icon_path)
     except Exception as e:
