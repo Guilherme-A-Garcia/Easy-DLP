@@ -11,11 +11,16 @@ cache_entry = None
 cacheroot = None
 final_cookie_selection = None
 
+# Functions
+
+def simple_handling(widget, key, event):
+    widget.bind(key, lambda e: event())
+
 def set_window_icon(root):
     """Runtime icon loading for Nuitka"""
     try:
-        if getattr(sys, 'frozen', False):  # Checks if the application is running as a frozen executable
-            icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.ico') # noqa
+        if getattr(sys, 'frozen', False):
+            icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.ico')
             if not os.path.exists(icon_path):
                 icon_path = os.path.join(os.getcwd(), 'icon.ico')
         else:
@@ -25,8 +30,6 @@ def set_window_icon(root):
             root.iconbitmap(icon_path)
     except Exception as e:
         print(f"Error, icon not available: {e}")
-
-
 
 def dynamic_resolution(d_root, d_width, d_height):
     screen_height = d_root.winfo_screenheight()
@@ -61,7 +64,6 @@ def download():
     startupinfo = None
     if sys.platform.startswith("win"):
         startupinfo = subprocess.STARTUPINFO()
-        # startupinfo.dwFlags != subprocess.STARTF_USESHOWWINDOW
         startupinfo.wShowWindow = subprocess.SW_HIDE
 
     process = subprocess.Popen([download_abs_path], startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0)
@@ -72,7 +74,7 @@ def download():
     if proc_success:
         info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".')
     else:
-        if not os.path.exists(logtxt_const):  # Log file generation in case of errors
+        if not os.path.exists(logtxt_const):
             with open(logtxt_const, 'w', encoding='utf-8') as file:
                 file.write(stderr.decode('utf-8', errors='ignore'))
             log_path = os.path.abspath(logtxt_const)
@@ -100,15 +102,19 @@ def cache_enter():
                 cacheroot.destroy()
         except Exception as e:
             err_msg(f"Error: {e}")
+
 def search_button():
     path = tkinter.filedialog.askdirectory(title='Select your YT-DLP folder')
     if path:
         cache_entry.insert(0, path)
 
+# Tkinter instance functions
+
 def cache_window():
     global cache_entry
     global cacheroot
     cacheroot = Tk()
+    cacheroot.bind("<Button-1>", lambda e: e.widget.focus())
     cacheroot.withdraw()
 
     set_window_icon(cacheroot)
@@ -121,6 +127,7 @@ def cache_window():
 
     cache_entry = Entry(cacheroot, font=('', 14))
     cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
+    simple_handling(cache_entry, "<Return>", cache_enter)
 
     cache_frame = Frame(cacheroot)
     cache_frame.pack()
@@ -131,7 +138,11 @@ def cache_window():
     file_search_b = Button(cache_frame, text='Search', font=('', 15), command=search_button)
     cache_enter_b.grid(row=0, column=0, padx=(0, 10))
     file_search_b.grid(row=0, column=1)
+    simple_handling(cache_enter_b, "<Return>", cache_enter)
+    simple_handling(file_search_b, "<Return>", search_button)
+    
 
+    cache_entry.focus_set()
     cacheroot.deiconify()
     cacheroot.mainloop()
 
@@ -146,6 +157,7 @@ def cookie_import_window():
         cookieroot.destroy()
 
     cookieroot = Tk()
+    cookieroot.bind("<Button-1>", lambda e: e.widget.focus())
     cookieroot.withdraw()
     set_window_icon(cookieroot)
     final_cookie_selection = tkinter.StringVar()
@@ -171,10 +183,14 @@ def cookie_import_window():
 
     cookie_button = Button(cookieroot, text='Save', font=('', 20), command=cookie_next_button)
     cookie_button.pack(pady=15)
+    simple_handling(cookie_button, "<Return>", cookie_next_button)
+    
 
+    cookie_import_menu.focus_set()
     cookieroot.deiconify()
     cookieroot.mainloop()
 
+# Main tkinter instance and loose code
 
 if __name__ == "__main__":
     
@@ -183,8 +199,8 @@ if __name__ == "__main__":
 
     cookie_import_window()
 
-    # Main instance
     mainroot = Tk()
+    mainroot.bind("<Button-1>", lambda e: e.widget.focus())
     mainroot.withdraw()
 
     set_window_icon(mainroot)
@@ -197,12 +213,16 @@ if __name__ == "__main__":
 
     main_entry = Entry(mainroot, font=('', 14))
     main_entry.pack(pady=10, fill=X, padx=20)
+    simple_handling(main_entry, "<Return>", download)
 
     main_download = Button(mainroot, text='Download', font=('', 20), command=download)
     main_download.pack(pady=10)
+    simple_handling(main_download, "<Return>", download)
 
     main_clear_dir = Button(mainroot, text='Clear path', font=('', 13), command=clear_cache)
     main_clear_dir.pack(pady=0)
+    
 
+    main_entry.focus_set()
     mainroot.deiconify()
     mainroot.mainloop()
