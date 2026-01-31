@@ -20,8 +20,8 @@ The [binary](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) was compil
 - [Contributing](#contributing)
 
 ## Preview
-![Main interface](assets/screenshots/Main.png)<br>
-![Importing cookies interface](assets/screenshots/Cookie.png)
+![Main interface](assets/previews/Main.png)<br>
+![Importing cookies interface](assets/previews/Cookie.png)
 
 ## Current Features
 - Simple and easily manageable GUI
