@@ -126,7 +126,7 @@ def cache_window():
     cache_main_lb = Label(cacheroot, text='Insert the path to your YT-DLP file', font=('', 20))
     cache_main_lb.pack(pady=(15, 0))
 
-    cache_entry = Entry(cacheroot, font=('', 14))
+    cache_entry = Entry(cacheroot, font=('', 14), insertwidth=1)
     cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
     simple_handling(cache_entry, "<Return>", cache_enter)
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     main_label = Label(mainroot, text='Insert URL', font=('', 35))
     main_label.pack(pady=(25, 0))
 
-    main_entry = Entry(mainroot, font=('', 14))
+    main_entry = Entry(mainroot, font=('', 14), insertwidth=1)
     main_entry.pack(pady=10, fill=X, padx=20)
     simple_handling(main_entry, "<Return>", download)
 
