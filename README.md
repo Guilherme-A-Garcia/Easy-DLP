@@ -49,12 +49,13 @@ If you plan on using the source code version, you must install the [latest Pytho
 
 ## Roadmap
 - Migrate to CustomTkinter;
+- Themes;
+- Additional path verification for better integrity;
 - Add threading and a progress bar;
 - Linux support;
 - Playlist support;
 - Add a settings tab;
-- Themes;
-- Additional path verification for better integrity;
+- Add an auto-update system.
 
 ## Contributing
 ✨ Contributions are always welcome! ✨<br><br>
