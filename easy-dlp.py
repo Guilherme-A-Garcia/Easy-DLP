@@ -1,7 +1,6 @@
 import os, sys, subprocess, tkinter
 from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedialog, ttk
 
-cache_path = ''
 cachetxt_const = "cache.txt"
 logtxt_const = "log.txt"
 
