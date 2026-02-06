@@ -48,6 +48,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 > If you are importing cookies, it MIGHT be preferable to close your browser before downloading any video.
 
 ## Roadmap
+- Refactor to use classes instead of functions;
 - Migrate to CustomTkinter;
 - Themes;
 - Additional path verification for better integrity;
