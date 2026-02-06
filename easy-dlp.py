@@ -39,9 +39,9 @@ def dynamic_resolution(d_root, d_width, d_height):
     d_root.geometry(f"{d_width}x{d_height}+{x}+{y}")
     
 def err_msg(text):
-    tkinter.messagebox.showwarning(title='Error', message=text)
+    messagebox.showwarning(title='Error', message=text)
 def info_msg(text):
-    tkinter.messagebox.showinfo(title='Information', message=text)
+    messagebox.showinfo(title='Information', message=text)
 
 def download():
     if not main_entry.get():
@@ -87,7 +87,7 @@ def download():
     os.remove(download_abs_path)
 
 def clear_cache():
-    result = tkinter.messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?')
+    result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?')
     if result:
         os.remove(cachetxt_const)
         mainroot.quit()
@@ -104,7 +104,7 @@ def cache_enter():
             err_msg(f"Error: {e}")
 
 def search_button():
-    path = tkinter.filedialog.askdirectory(title='Select your YT-DLP folder')
+    path = filedialog.askdirectory(title='Select your YT-DLP folder')
     if path:
         cache_entry.insert(0, path)
 
