@@ -1,4 +1,4 @@
-import os, sys, subprocess, tkinter
+import os, sys, subprocess, tkinter as tk
 from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedialog, ttk
 
 cachetxt_const = "cache.txt"
@@ -113,7 +113,7 @@ def search_button():
 def cache_window():
     global cache_entry
     global cacheroot
-    cacheroot = Tk()
+    cacheroot = tk.Tk()
     cacheroot.bind("<Button-1>", lambda e: e.widget.focus())
     cacheroot.withdraw()
 
@@ -156,11 +156,11 @@ def cookie_import_window():
         final_cookie_selection.set(selected_value)
         cookieroot.destroy()
 
-    cookieroot = Tk()
+    cookieroot = tk.Tk()
     cookieroot.bind("<Button-1>", lambda e: e.widget.focus())
     cookieroot.withdraw()
     set_window_icon(cookieroot)
-    final_cookie_selection = tkinter.StringVar()
+    final_cookie_selection = tk.StringVar()
     cookieroot.title('Cookie importation')
     dynamic_resolution(cookieroot, 500, 280)
     cookieroot.resizable(False,False)
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
     cookie_import_window()
 
-    mainroot = Tk()
+    mainroot = tk.Tk()
     mainroot.bind("<Button-1>", lambda e: e.widget.focus())
     mainroot.withdraw()
 
