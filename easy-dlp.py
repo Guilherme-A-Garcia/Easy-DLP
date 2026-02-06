@@ -46,6 +46,7 @@ def info_msg(text):
 def download():
     if not main_entry.get():
         err_msg('Please, insert a webpage link')
+        return
     else:
         download_link = main_entry.get()
         with open(cachetxt_const, 'r') as file:
