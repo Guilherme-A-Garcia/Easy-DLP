@@ -113,38 +113,40 @@ def search_button():
 def cache_window():
     global cache_entry
     global cacheroot
-    cacheroot = tk.Tk()
-    cacheroot.bind("<Button-1>", lambda e: e.widget.focus())
-    cacheroot.withdraw()
 
-    set_window_icon(cacheroot)
-    cacheroot.title('YT-DLP Path Directory Cache')
-    dynamic_resolution(cacheroot, 500, 150)
-    cacheroot.resizable(False,False)
+    if not os.path.exists('cache.txt'):
+        cacheroot = tk.Tk()
+        cacheroot.bind("<Button-1>", lambda e: e.widget.focus())
+        cacheroot.withdraw()
 
-    cache_main_lb = Label(cacheroot, text='Insert the path to your YT-DLP file', font=('', 20))
-    cache_main_lb.pack(pady=(15, 0))
+        set_window_icon(cacheroot)
+        cacheroot.title('YT-DLP Path Directory Cache')
+        dynamic_resolution(cacheroot, 500, 150)
+        cacheroot.resizable(False,False)
 
-    cache_entry = Entry(cacheroot, font=('', 14), insertwidth=1)
-    cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
-    simple_handling(cache_entry, "<Return>", cache_enter)
+        cache_main_lb = Label(cacheroot, text='Insert the path to your YT-DLP file', font=('', 20))
+        cache_main_lb.pack(pady=(15, 0))
 
-    cache_frame = Frame(cacheroot)
-    cache_frame.pack()
-    cache_frame.grid_rowconfigure(0, weight=1)
-    cache_frame.grid_columnconfigure(0, weight=1)
+        cache_entry = Entry(cacheroot, font=('', 14), insertwidth=1)
+        cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
+        simple_handling(cache_entry, "<Return>", cache_enter)
 
-    cache_enter_b = Button(cache_frame, text='Enter', font=('', 15), command=cache_enter)
-    file_search_b = Button(cache_frame, text='Search', font=('', 15), command=search_button)
-    cache_enter_b.grid(row=0, column=0, padx=(0, 10))
-    file_search_b.grid(row=0, column=1)
-    simple_handling(cache_enter_b, "<Return>", cache_enter)
-    simple_handling(file_search_b, "<Return>", search_button)
-    
+        cache_frame = Frame(cacheroot)
+        cache_frame.pack()
+        cache_frame.grid_rowconfigure(0, weight=1)
+        cache_frame.grid_columnconfigure(0, weight=1)
 
-    cache_entry.focus_set()
-    cacheroot.deiconify()
-    cacheroot.mainloop()
+        cache_enter_b = Button(cache_frame, text='Enter', font=('', 15), command=cache_enter)
+        file_search_b = Button(cache_frame, text='Search', font=('', 15), command=search_button)
+        cache_enter_b.grid(row=0, column=0, padx=(0, 10))
+        file_search_b.grid(row=0, column=1)
+        simple_handling(cache_enter_b, "<Return>", cache_enter)
+        simple_handling(file_search_b, "<Return>", search_button)
+        
+
+        cache_entry.focus_set()
+        cacheroot.deiconify()
+        cacheroot.mainloop()
 
 def cookie_import_window():
     global final_cookie_selection
@@ -193,10 +195,7 @@ def cookie_import_window():
 # Main tkinter instance and loose code
 
 if __name__ == "__main__":
-    
-    if not os.path.exists('cache.txt'):
-        cache_window()
-
+    cache_window()
     cookie_import_window()
 
     mainroot = tk.Tk()
