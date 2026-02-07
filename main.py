@@ -118,7 +118,7 @@ def cache_window():
     if not os.path.exists('cache.txt'):
         cacheroot = tk.Tk()
         cacheroot.bind("<Button-1>", lambda e: e.widget.focus())
-        cacheroot.withdraw()
+        cacheroot.attributes('-alpha', 0)
 
         set_window_icon(cacheroot)
         cacheroot.title('YT-DLP Path Directory Cache')
@@ -146,7 +146,7 @@ def cache_window():
         
 
         cache_entry.focus_set()
-        cacheroot.deiconify()
+        cacheroot.attributes('-alpha', 1)
         cacheroot.mainloop()
 
 def cookie_import_window():
@@ -161,7 +161,7 @@ def cookie_import_window():
 
     cookieroot = tk.Tk()
     cookieroot.bind("<Button-1>", lambda e: e.widget.focus())
-    cookieroot.withdraw()
+    cookieroot.attributes('-alpha', 0)
     set_window_icon(cookieroot)
     final_cookie_selection = tk.StringVar()
     cookieroot.title('Cookie importation')
@@ -190,7 +190,7 @@ def cookie_import_window():
     
 
     cookie_import_menu.focus_set()
-    cookieroot.deiconify()
+    cookieroot.attributes('-alpha', 1)
     cookieroot.mainloop()
 
 # Main tkinter instance and loose code
@@ -201,7 +201,7 @@ if __name__ == "__main__":
 
     mainroot = tk.Tk()
     mainroot.bind("<Button-1>", lambda e: e.widget.focus())
-    mainroot.withdraw()
+    mainroot.attributes('-alpha', 0)
 
     set_window_icon(mainroot)
     mainroot.title('Easy-DLP')
@@ -224,5 +224,5 @@ if __name__ == "__main__":
     
 
     main_entry.focus_set()
-    mainroot.deiconify()
+    mainroot.attributes('-alpha', 1)
     mainroot.mainloop()
