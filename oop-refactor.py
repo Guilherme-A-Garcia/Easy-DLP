@@ -8,6 +8,37 @@ from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedi
 def main():
     app = EasyDLPApp()
 
+def dynamic_resolution(d_root, d_width, d_height):
+    screen_height = d_root.winfo_screenheight()
+    screen_width = d_root.winfo_screenwidth()
+    x = (screen_width // 2) - (d_width // 2)
+    y = (screen_height // 2) - (d_height // 2)
+    d_root.geometry(f"{d_width}x{d_height}+{x}+{y}")
+
+def simple_handling(widget, key, event):
+    widget.bind(key, lambda e: event())    
+
+def set_window_icon(root):
+    """Runtime icon loading for Nuitka"""
+    icon = 'icon.ico'
+    try:
+        if getattr(sys, 'frozen', False):
+            icon_path = os.path.join(os.path.dirname(sys.executable), icon)
+            if not os.path.exists(icon_path):
+                icon_path = os.path.join(os.getcwd(), icon)
+        else:
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets/EasyDLP.ico')
+     
+        if os.path.exists(icon_path):
+            root.iconbitmap(icon_path)
+    except Exception as e:
+        print(f"Error, icon not available: {e}")
+
+def err_msg(text):
+    messagebox.showwarning(title='Error', message=text)
+def info_msg(text):
+    messagebox.showinfo(title='Information', message=text)
+
 class EasyDLPApp:
     def __init__(self):
         self.current_window = None
