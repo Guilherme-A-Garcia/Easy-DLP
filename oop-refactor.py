@@ -17,16 +17,21 @@ class EasyDLPApp:
         self.root.mainloop()
     
     def show_cache_window(self):
-        pass
+        self.close_current()
+        self.current_window = CacheWindow(self)
     
     def show_cookie_window(self):
-        pass
+        self.close_current()
+        self.current_window = CookieWindow(self)
     
     def show_main_window(self):
-        pass
+        self.close_current()
+        self.current_window = MainWindow(self)
 
     def close_current(self):
-        pass
+        if self.current_window is not None:
+            self.current_window.destroy()
+            self.current_window = None
     
 class CacheWindow(tk.Toplevel):
     def __init__(self, app):
