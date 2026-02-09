@@ -44,7 +44,8 @@ class EasyDLPApp:
         self.current_window = None
         self.root = tk.Tk()
         self.root.withdraw()
-        
+        # self.show_cache_window()
+
         self.root.mainloop()
     
     def show_cache_window(self):
@@ -68,7 +69,39 @@ class CacheWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
-    
+
+        if not os.path.exists('cache.txt'):
+            self.bind("<Button-1>", lambda e: e.widget.focus())
+            self.attributes('-alpha', 0)
+
+            set_window_icon(self)
+            self.title('YT-DLP Path Directory Cache')
+            dynamic_resolution(self, 500, 150)
+            self.resizable(False,False)
+
+            self.cache_main_lb = Label(self, text='Insert the path to your YT-DLP file', font=('', 20))
+            self.cache_main_lb.pack(pady=(15, 0))
+
+            self.cache_entry = Entry(self, font=('', 14), insertwidth=1)
+            self.cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
+            # simple_handling(cache_entry, "<Return>", cache_enter)
+
+            self.cache_frame = Frame(self)
+            self.cache_frame.pack()
+            self.cache_frame.grid_rowconfigure(0, weight=1)
+            self.cache_frame.grid_columnconfigure(0, weight=1)
+
+            self.cache_enter_b = Button(self.cache_frame, text='Enter', font=('', 15))  # command=cache_enter
+            self.file_search_b = Button(self.cache_frame, text='Search', font=('', 15))  # command=search_button
+            self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
+            self.file_search_b.grid(row=0, column=1)
+            # simple_handling(cache_enter_b, "<Return>", cache_enter)
+            # simple_handling(file_search_b, "<Return>", search_button)
+            
+
+            self.cache_entry.focus_set()
+            self.attributes('-alpha', 1)
+
 class CookieWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app.root)
