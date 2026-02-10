@@ -56,7 +56,7 @@ class EasyDLPApp:
         self.final_cookie_selection.set(new_val)
 
     def clear_cache(self):
-        self.result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?')
+        self.result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', parent=self.current_window)
         try:
             if self.result:
                 os.remove("cache.txt")
