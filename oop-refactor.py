@@ -163,7 +163,10 @@ class CacheWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.app.show_cookie_window()
+        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
+        if self.confirmation:
+            self.destroy()
+            self.app.root.destroy()
 
     def cache_enter(self):
         if not self.cache_entry.get():
@@ -219,7 +222,10 @@ class CookieWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
 
     def on_closing(self):
-        self.cookie_next_button()
+        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
+        if self.confirmation:
+            self.destroy()
+            self.app.root.destroy()
         
     def cookie_next_button(self):
         selected_value = self.cookie_import_menu.get()
@@ -260,8 +266,10 @@ class MainWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.destroy()
-        self.app.root.destroy()
+        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
+        if self.confirmation:
+            self.destroy()
+            self.app.root.destroy()
 
 if __name__ == "__main__":
     main()
