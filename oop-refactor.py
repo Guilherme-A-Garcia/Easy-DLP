@@ -91,16 +91,31 @@ class CacheWindow(tk.Toplevel):
             self.cache_frame.grid_rowconfigure(0, weight=1)
             self.cache_frame.grid_columnconfigure(0, weight=1)
 
-            self.cache_enter_b = Button(self.cache_frame, text='Enter', font=('', 15))  # command=cache_enter
-            self.file_search_b = Button(self.cache_frame, text='Search', font=('', 15))  # command=search_button
+            self.cache_enter_b = Button(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter)
+            self.file_search_b = Button(self.cache_frame, text='Search', font=('', 15), command=self.search_button)
             self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
             self.file_search_b.grid(row=0, column=1)
-            # simple_handling(cache_enter_b, "<Return>", cache_enter)
-            # simple_handling(file_search_b, "<Return>", search_button)
+            simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
+            simple_handling(self.file_search_b, "<Return>", self.search_button)
             
-
             self.cache_entry.focus_set()
             self.attributes('-alpha', 1)
+    
+    def cache_enter(self):
+        if not self.cache_entry.get():
+            err_msg("Please, insert a path to your YT-DLP folder.")
+        else:
+            try:
+                with open('cache.txt', 'w') as file:
+                    file.write(self.cache_entry.get())
+                self.app.show_cookie_window()
+            except Exception as e:
+                err_msg(f"Error: {e}")
+    
+    def search_button(self):
+        self.path = filedialog.askdirectory(title='Select your YT-DLP folder')
+        if self.path:
+            self.cache_entry.insert(0, self.path)
 
 class CookieWindow(tk.Toplevel):
     def __init__(self, app):
