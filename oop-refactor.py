@@ -148,12 +148,19 @@ class CookieWindow(tk.Toplevel):
         self.cookie_ntc_label = Label(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
-        self.cookie_button = Button(self, text='Save', font=('', 20))  # command=self.cookie_next_button
+        self.cookie_button = Button(self, text='Save', font=('', 20), command=self.cookie_next_button)
         self.cookie_button.pack(pady=15)
-        # simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
+        simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
         
         self.cookie_import_menu.focus_set()
         self.attributes('-alpha', 1)
+        
+    def cookie_next_button(self):
+        selected_value = self.cookie_import_menu.get()
+        if 'None' not in selected_value:
+            info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
+        self.final_cookie_selection.set(selected_value)
+        self.app.show_main_window()
     
 class MainWindow(tk.Toplevel):
     def __init__(self, app):
