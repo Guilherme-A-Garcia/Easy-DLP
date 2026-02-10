@@ -60,9 +60,9 @@ class EasyDLPApp:
         try:
             if self.result:
                 os.remove("cache.txt")
+                self.root.destroy()
         except FileNotFoundError:
             pass
-        self.root.quit()
 
     def download(self, main_entry):
         LOGTXT_CONST = "log.txt"
