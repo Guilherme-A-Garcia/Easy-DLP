@@ -7,6 +7,7 @@ from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedi
 
 def main():
     app = EasyDLPApp()
+    app.root.mainloop()
 
 def dynamic_resolution(d_root, d_width, d_height):
     screen_height = d_root.winfo_screenheight()
@@ -44,9 +45,7 @@ class EasyDLPApp:
         self.current_window = None
         self.root = tk.Tk()
         self.root.withdraw()
-        # self.show_cache_window()
-
-        self.root.mainloop()
+        self.show_cache_window()
     
     def show_cache_window(self):
         self.close_current()
