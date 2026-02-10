@@ -119,6 +119,7 @@ class CacheWindow(tk.Toplevel):
         if self.path:
             self.cache_entry.insert(0, self.path)
 
+
 class CookieWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app.root)
@@ -166,6 +167,32 @@ class MainWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
+        
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+
+        set_window_icon(self)
+        self.title('Easy-DLP')
+        dynamic_resolution(self, 500, 320)
+        self.resizable(False,False)
+
+        main_label = Label(self, text='Insert URL', font=('', 35))
+        main_label.pack(pady=(25, 0))
+
+        main_entry = Entry(self, font=('', 14), insertwidth=1)
+        main_entry.pack(pady=10, fill=X, padx=20)
+        # simple_handling(main_entry, "<Return>", download)
+
+        main_download = Button(self, text='Download', font=('', 20))  # command=download
+        main_download.pack(pady=10)
+        # simple_handling(main_download, "<Return>", download)
+
+        main_clear_dir = Button(self, text='Clear path', font=('', 13))  # command=clear_cache
+        main_clear_dir.pack(pady=0)
+        
+
+        main_entry.focus_set()
+        self.attributes('-alpha', 1)
 
 if __name__ == "__main__":
     main()
