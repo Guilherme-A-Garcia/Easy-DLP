@@ -97,15 +97,15 @@ class EasyDLPApp:
         if proc_success:
             info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".')
         else:
-            if not os.path.exists("log.txt"):
-                with open("log.txt", 'w', encoding='utf-8') as file:
+            if not os.path.exists(LOGTXT_CONST):
+                with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
                     file.write(stderr.decode('utf-8', errors='ignore'))
-                log_path = os.path.abspath("log.txt")
+                log_path = os.path.abspath(LOGTXT_CONST)
                 err_msg(f'An error occurred during the download, a log file was generated at: {log_path}')
             else:
-                with open("log.txt", 'w', encoding='utf-8') as file:
+                with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
                     file.write(stderr.decode('utf-8', errors='ignore'))
-                log_path = os.path.abspath("log.txt")
+                log_path = os.path.abspath(LOGTXT_CONST)
                 err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
         os.remove(self.download_abs_path)
 
