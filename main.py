@@ -1,10 +1,6 @@
 import os, sys, subprocess, tkinter as tk
 from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedialog, ttk
 
-# Transitional file from procedural to OOP, bound to replace main.py
-
-# Inject EasyDLPApp inside the window classes to operate it, use the old globals as class variables in op class
-
 def main():
     app = EasyDLPApp()
     app.root.mainloop()
