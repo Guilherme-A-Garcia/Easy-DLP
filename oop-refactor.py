@@ -45,12 +45,16 @@ class EasyDLPApp:
         self.current_window = None
         self.root = tk.Tk()
         self.root.withdraw()
+        self.final_cookie_selection = tk.StringVar()
 
         if os.path.exists("cache.txt"):
             self.show_cookie_window()
         else:
             self.show_cache_window()
     
+    def update_final_cookie_sel(self, new_val):
+        self.final_cookie_selection.set(new_val)
+
     def clear_cache(self):
         self.result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?')
         try:
@@ -59,6 +63,51 @@ class EasyDLPApp:
         except FileNotFoundError:
             pass
         self.root.quit()
+
+    def download(self, main_entry):
+        LOGTXT_CONST = "log.txt"
+        if not main_entry.get():
+            err_msg('Please, insert a webpage link')
+            return
+        else:
+            self.download_link = main_entry.get()
+            with open("cache.txt", 'r') as file:
+                self.path_from_cache = file.readline().strip()
+            with open('download.bat', 'w') as file:
+                file.write('@echo off\n')
+                file.write(f'cd /d {self.path_from_cache}\n')
+                self.selected_browser = self.final_cookie_selection.get()
+                if self.selected_browser == 'None':
+                    file.write(f'yt-dlp.exe --quiet --no-warnings {self.download_link}\n')
+                else:
+                    file.write(f'yt-dlp.exe --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                file.write('exit\n')
+        self.download_abs_path = os.path.abspath('download.bat')
+
+        self.startupinfo = None
+        if sys.platform.startswith("win"):
+            self.startupinfo = subprocess.STARTUPINFO()
+            self.startupinfo.wShowWindow = subprocess.SW_HIDE
+
+        self.process = subprocess.Popen([self.download_abs_path], startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0)
+        
+        _, stderr = self.process.communicate()
+        proc_success = self.process.returncode == 0
+        self.process.wait()
+        if proc_success:
+            info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".')
+        else:
+            if not os.path.exists("log.txt"):
+                with open("log.txt", 'w', encoding='utf-8') as file:
+                    file.write(stderr.decode('utf-8', errors='ignore'))
+                log_path = os.path.abspath("log.txt")
+                err_msg(f'An error occurred during the download, a log file was generated at: {log_path}')
+            else:
+                with open("log.txt", 'w', encoding='utf-8') as file:
+                    file.write(stderr.decode('utf-8', errors='ignore'))
+                log_path = os.path.abspath("log.txt")
+                err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
+        os.remove(self.download_abs_path)
 
     def show_cache_window(self):
         self.close_current()
@@ -136,7 +185,7 @@ class CookieWindow(tk.Toplevel):
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
         set_window_icon(self)
-        self.final_cookie_selection = tk.StringVar()
+        self.final_cookie_selection = self.app.final_cookie_selection
         self.title('Cookie importation')
         dynamic_resolution(self, 500, 280)
         self.resizable(False,False)
@@ -168,7 +217,7 @@ class CookieWindow(tk.Toplevel):
         selected_value = self.cookie_import_menu.get()
         if 'None' not in selected_value:
             info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
-        self.final_cookie_selection.set(selected_value)
+        self.app.update_final_cookie_sel(selected_value)
         self.app.show_main_window()
     
 class MainWindow(tk.Toplevel):
@@ -189,11 +238,11 @@ class MainWindow(tk.Toplevel):
 
         main_entry = Entry(self, font=('', 14), insertwidth=1)
         main_entry.pack(pady=10, fill=X, padx=20)
-        # simple_handling(main_entry, "<Return>", download)
+        simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
 
-        main_download = Button(self, text='Download', font=('', 20))  # command=download
+        main_download = Button(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry))
         main_download.pack(pady=10)
-        # simple_handling(main_download, "<Return>", download)
+        simple_handling(main_download, "<Return>", lambda:self.app.download(main_entry))
 
         main_clear_dir = Button(self, text='Clear path', font=('', 13), command=self.app.clear_cache)
         main_clear_dir.pack(pady=0)
