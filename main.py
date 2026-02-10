@@ -1,5 +1,5 @@
 import os, sys, subprocess, tkinter as tk
-from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedialog, ttk
+from tkinter import Label, Entry, BOTH, Button, Frame, X, messagebox, filedialog, ttk
 
 def main():
     app = EasyDLPApp()
