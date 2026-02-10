@@ -159,8 +159,12 @@ class CacheWindow(tk.Toplevel):
         simple_handling(self.file_search_b, "<Return>", self.search_button)
         
         self.cache_entry.focus_set()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
     
+    def on_closing(self):
+        self.app.show_cookie_window()
+
     def cache_enter(self):
         if not self.cache_entry.get():
             err_msg("Please, insert a path to your YT-DLP folder.")
@@ -211,7 +215,11 @@ class CookieWindow(tk.Toplevel):
         simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
         
         self.cookie_import_menu.focus_set()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
+
+    def on_closing(self):
+        self.cookie_next_button()
         
     def cookie_next_button(self):
         selected_value = self.cookie_import_menu.get()
@@ -248,7 +256,12 @@ class MainWindow(tk.Toplevel):
         main_clear_dir.pack(pady=0)
 
         main_entry.focus_set()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
+    
+    def on_closing(self):
+        self.destroy()
+        self.app.root.destroy()
 
 if __name__ == "__main__":
     main()
