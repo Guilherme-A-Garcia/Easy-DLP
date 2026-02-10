@@ -1,19 +1,19 @@
 import os, sys, subprocess, tkinter as tk
 from tkinter import Label, Entry, Tk, BOTH, Button, Frame, X, messagebox, filedialog, ttk
 
-cachetxt_const = "cache.txt"
-logtxt_const = "log.txt"
+def main():
+    app = EasyDLPApp()
+    app.root.mainloop()
 
-# Globals
-
-cache_entry = None
-cacheroot = None
-final_cookie_selection = None
-
-# Functions
+def dynamic_resolution(d_root, d_width, d_height):
+    screen_height = d_root.winfo_screenheight()
+    screen_width = d_root.winfo_screenwidth()
+    x = (screen_width // 2) - (d_width // 2)
+    y = (screen_height // 2) - (d_height // 2)
+    d_root.geometry(f"{d_width}x{d_height}+{x}+{y}")
 
 def simple_handling(widget, key, event):
-    widget.bind(key, lambda e: event())
+    widget.bind(key, lambda e: event())    
 
 def set_window_icon(root):
     """Runtime icon loading for Nuitka"""
@@ -31,198 +31,241 @@ def set_window_icon(root):
     except Exception as e:
         print(f"Error, icon not available: {e}")
 
-def dynamic_resolution(d_root, d_width, d_height):
-    screen_height = d_root.winfo_screenheight()
-    screen_width = d_root.winfo_screenwidth()
-    x = (screen_width // 2) - (d_width // 2)
-    y = (screen_height // 2) - (d_height // 2)
-    d_root.geometry(f"{d_width}x{d_height}+{x}+{y}")
-    
 def err_msg(text):
     messagebox.showwarning(title='Error', message=text)
 def info_msg(text):
     messagebox.showinfo(title='Information', message=text)
 
-def download():
-    if not main_entry.get():
-        err_msg('Please, insert a webpage link')
-        return
-    else:
-        download_link = main_entry.get()
-        with open(cachetxt_const, 'r') as file:
-            path_from_cache = file.readline().strip()
-        with open('download.bat', 'w') as file:
-            file.write('@echo off\n')
-            file.write(f'cd /d {path_from_cache}\n')
-            selected_browser = final_cookie_selection.get()
-            if selected_browser == 'None':
-                file.write(f'yt-dlp.exe --quiet --no-warnings {download_link}\n')
-            else:
-                file.write(f'yt-dlp.exe --quiet --no-warnings --cookies-from-browser {selected_browser} {download_link}\n')
-            file.write('exit\n')
-    download_abs_path = os.path.abspath('download.bat')
+class EasyDLPApp:
+    def __init__(self):
+        self.current_window = None
+        self.root = tk.Tk()
+        self.root.withdraw()
+        self.final_cookie_selection = tk.StringVar()
 
-    startupinfo = None
-    if sys.platform.startswith("win"):
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.wShowWindow = subprocess.SW_HIDE
-
-    process = subprocess.Popen([download_abs_path], startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0)
-    
-    _, stderr = process.communicate()
-    proc_success = process.returncode == 0
-    process.wait()
-    if proc_success:
-        info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".')
-    else:
-        if not os.path.exists(logtxt_const):
-            with open(logtxt_const, 'w', encoding='utf-8') as file:
-                file.write(stderr.decode('utf-8', errors='ignore'))
-            log_path = os.path.abspath(logtxt_const)
-            err_msg(f'An error occurred during the download, a log file was generated at: {log_path}')
+        if os.path.exists("cache.txt"):
+            self.show_cookie_window()
         else:
-            with open(logtxt_const, 'w', encoding='utf-8') as file:
-                file.write(stderr.decode('utf-8', errors='ignore'))
-            log_path = os.path.abspath(logtxt_const)
-            err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
-    os.remove(download_abs_path)
+            self.show_cache_window()
+    
+    def update_final_cookie_sel(self, new_val):
+        self.final_cookie_selection.set(new_val)
 
-def clear_cache():
-    result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?')
-    if result:
-        os.remove(cachetxt_const)
-        mainroot.quit()
-
-def cache_enter():
-    if not cache_entry.get():
-        err_msg("Please, insert a path to your YT-DLP folder.")
-    else:
+    def clear_cache(self):
+        self.result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', parent=self.current_window)
         try:
-            with open('cache.txt', 'w') as file:
-                file.write(cache_entry.get())
-                cacheroot.destroy()
-        except Exception as e:
-            err_msg(f"Error: {e}")
+            if self.result:
+                os.remove("cache.txt")
+                self.root.destroy()
+        except FileNotFoundError:
+            pass
 
-def search_button():
-    path = filedialog.askdirectory(title='Select your YT-DLP folder')
-    if path:
-        cache_entry.insert(0, path)
+    def download(self, main_entry):
+        LOGTXT_CONST = "log.txt"
+        if not main_entry.get():
+            err_msg('Please, insert a webpage link')
+            return
+        else:
+            self.download_link = main_entry.get()
+            with open("cache.txt", 'r') as file:
+                self.path_from_cache = file.readline().strip()
+            with open('download.bat', 'w') as file:
+                file.write('@echo off\n')
+                file.write(f'cd /d {self.path_from_cache}\n')
+                self.selected_browser = self.final_cookie_selection.get()
+                if self.selected_browser == 'None':
+                    file.write(f'yt-dlp.exe --quiet --no-warnings {self.download_link}\n')
+                else:
+                    file.write(f'yt-dlp.exe --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                file.write('exit\n')
+        self.download_abs_path = os.path.abspath('download.bat')
 
-# Tkinter instance functions
+        self.startupinfo = None
+        if sys.platform.startswith("win"):
+            self.startupinfo = subprocess.STARTUPINFO()
+            self.startupinfo.wShowWindow = subprocess.SW_HIDE
 
-def cache_window():
-    global cache_entry
-    global cacheroot
-
-    if not os.path.exists('cache.txt'):
-        cacheroot = tk.Tk()
-        cacheroot.bind("<Button-1>", lambda e: e.widget.focus())
-        cacheroot.attributes('-alpha', 0)
-
-        set_window_icon(cacheroot)
-        cacheroot.title('YT-DLP Path Directory Cache')
-        dynamic_resolution(cacheroot, 500, 150)
-        cacheroot.resizable(False,False)
-
-        cache_main_lb = Label(cacheroot, text='Insert the path to your YT-DLP file', font=('', 20))
-        cache_main_lb.pack(pady=(15, 0))
-
-        cache_entry = Entry(cacheroot, font=('', 14), insertwidth=1)
-        cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
-        simple_handling(cache_entry, "<Return>", cache_enter)
-
-        cache_frame = Frame(cacheroot)
-        cache_frame.pack()
-        cache_frame.grid_rowconfigure(0, weight=1)
-        cache_frame.grid_columnconfigure(0, weight=1)
-
-        cache_enter_b = Button(cache_frame, text='Enter', font=('', 15), command=cache_enter)
-        file_search_b = Button(cache_frame, text='Search', font=('', 15), command=search_button)
-        cache_enter_b.grid(row=0, column=0, padx=(0, 10))
-        file_search_b.grid(row=0, column=1)
-        simple_handling(cache_enter_b, "<Return>", cache_enter)
-        simple_handling(file_search_b, "<Return>", search_button)
+        self.process = subprocess.Popen([self.download_abs_path], startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0)
         
+        _, stderr = self.process.communicate()
+        proc_success = self.process.returncode == 0
+        self.process.wait()
+        if proc_success:
+            info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".')
+        else:
+            if not os.path.exists(LOGTXT_CONST):
+                with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
+                    file.write(stderr.decode('utf-8', errors='ignore'))
+                log_path = os.path.abspath(LOGTXT_CONST)
+                err_msg(f'An error occurred during the download, a log file was generated at: {log_path}')
+            else:
+                with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
+                    file.write(stderr.decode('utf-8', errors='ignore'))
+                log_path = os.path.abspath(LOGTXT_CONST)
+                err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
+        os.remove(self.download_abs_path)
 
-        cache_entry.focus_set()
-        cacheroot.attributes('-alpha', 1)
-        cacheroot.mainloop()
+    def show_cache_window(self):
+        self.close_current()
+        self.current_window = CacheWindow(self)
+    
+    def show_cookie_window(self):
+        self.close_current()
+        self.current_window = CookieWindow(self)
+    
+    def show_main_window(self):
+        self.close_current()
+        self.current_window = MainWindow(self)
 
-def cookie_import_window():
-    global final_cookie_selection
+    def close_current(self):
+        if self.current_window is not None:
+            self.current_window.destroy()
+            self.current_window = None
+    
+class CacheWindow(tk.Toplevel):
+    def __init__(self, app):
+        super().__init__(app.root)
+        self.app = app
 
-    def cookie_next_button():
-        selected_value = cookie_import_menu.get()
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+
+        set_window_icon(self)
+        self.title('YT-DLP Path Directory Cache')
+        dynamic_resolution(self, 500, 150)
+        self.resizable(False,False)
+
+        self.cache_main_lb = Label(self, text='Insert the path to your YT-DLP file', font=('', 20))
+        self.cache_main_lb.pack(pady=(15, 0))
+
+        self.cache_entry = Entry(self, font=('', 14), insertwidth=1)
+        self.cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
+        simple_handling(self.cache_entry, "<Return>", self.cache_enter)
+
+        self.cache_frame = Frame(self)
+        self.cache_frame.pack()
+        self.cache_frame.grid_rowconfigure(0, weight=1)
+        self.cache_frame.grid_columnconfigure(0, weight=1)
+
+        self.cache_enter_b = Button(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter)
+        self.file_search_b = Button(self.cache_frame, text='Search', font=('', 15), command=self.search_button)
+        self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
+        self.file_search_b.grid(row=0, column=1)
+        simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
+        simple_handling(self.file_search_b, "<Return>", self.search_button)
+        
+        self.cache_entry.focus_set()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
+    
+    def on_closing(self):
+        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
+        if self.confirmation:
+            self.destroy()
+            self.app.root.destroy()
+
+    def cache_enter(self):
+        if not self.cache_entry.get():
+            err_msg("Please, insert a path to your YT-DLP folder.")
+        else:
+            try:
+                with open('cache.txt', 'w') as file:
+                    file.write(self.cache_entry.get())
+                self.app.show_cookie_window()
+            except Exception as e:
+                err_msg(f"Error: {e}")
+    
+    def search_button(self):
+        self.path = filedialog.askdirectory(title='Select your YT-DLP folder')
+        if self.path:
+            self.cache_entry.insert(0, self.path)
+
+class CookieWindow(tk.Toplevel):
+    def __init__(self, app):
+        super().__init__(app.root)
+        self.app = app
+
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+        set_window_icon(self)
+        self.final_cookie_selection = self.app.final_cookie_selection
+        self.title('Cookie importation')
+        dynamic_resolution(self, 500, 280)
+        self.resizable(False,False)
+        
+        self.cookie_ntc2_label = Label(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
+        self.cookie_ntc2_label.pack(pady=(0, 5))
+
+        self.cookie_main_labelp1 = Label(self, text='If you wish to bypass age restriction,', font=('', 17))
+        self.cookie_main_labelp2 = Label(self, text='select your browser to import cookies from.', font=('', 17))
+        self.cookie_main_labelp1.pack(pady=(15, 0))
+        self.cookie_main_labelp2.pack(pady=(0, 15))
+
+        self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
+        self.cookie_import_menu = ttk.Combobox(self, values=self.cookie_import_options, state='readonly', font=('', 14))
+        self.cookie_import_menu.set('None')
+        self.cookie_import_menu.pack(pady=(10, 0))
+
+        self.cookie_ntc_label = Label(self, text='Select "None" to skip the cookie importation.', font=('', 10))
+        self.cookie_ntc_label.pack(pady=(0, 5))
+
+        self.cookie_button = Button(self, text='Save', font=('', 20), command=self.cookie_next_button)
+        self.cookie_button.pack(pady=15)
+        simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
+        
+        self.cookie_import_menu.focus_set()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
+
+    def on_closing(self):
+        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
+        if self.confirmation:
+            self.destroy()
+            self.app.root.destroy()
+        
+    def cookie_next_button(self):
+        selected_value = self.cookie_import_menu.get()
         if 'None' not in selected_value:
             info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
-        final_cookie_selection.set(selected_value)
-        cookieroot.destroy()
-
-    cookieroot = tk.Tk()
-    cookieroot.bind("<Button-1>", lambda e: e.widget.focus())
-    cookieroot.attributes('-alpha', 0)
-    set_window_icon(cookieroot)
-    final_cookie_selection = tk.StringVar()
-    cookieroot.title('Cookie importation')
-    dynamic_resolution(cookieroot, 500, 280)
-    cookieroot.resizable(False,False)
+        self.app.update_final_cookie_sel(selected_value)
+        self.app.show_main_window()
     
-    cookie_ntc2_label = Label(cookieroot, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
-    cookie_ntc2_label.pack(pady=(0, 5))
+class MainWindow(tk.Toplevel):
+    def __init__(self, app):
+        super().__init__(app.root)
+        self.app = app
+        
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
 
-    cookie_main_labelp1 = Label(cookieroot, text='If you wish to bypass age restriction,', font=('', 17))
-    cookie_main_labelp2 = Label(cookieroot, text='select your browser to import cookies from.', font=('', 17))
-    cookie_main_labelp1.pack(pady=(15, 0))
-    cookie_main_labelp2.pack(pady=(0, 15))
+        set_window_icon(self)
+        self.title('Easy-DLP')
+        dynamic_resolution(self, 500, 320)
+        self.resizable(False,False)
 
-    cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-    cookie_import_menu = ttk.Combobox(cookieroot, values=cookie_import_options, state='readonly', font=('', 14))
-    cookie_import_menu.set('None')
-    cookie_import_menu.pack(pady=(10, 0))
+        main_label = Label(self, text='Insert URL', font=('', 35))
+        main_label.pack(pady=(25, 0))
 
-    cookie_ntc_label = Label(cookieroot, text='Select "None" to skip the cookie importation.', font=('', 10))
-    cookie_ntc_label.pack(pady=(0, 5))
+        main_entry = Entry(self, font=('', 14), insertwidth=1)
+        main_entry.pack(pady=10, fill=X, padx=20)
+        simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
 
-    cookie_button = Button(cookieroot, text='Save', font=('', 20), command=cookie_next_button)
-    cookie_button.pack(pady=15)
-    simple_handling(cookie_button, "<Return>", cookie_next_button)
+        main_download = Button(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry))
+        main_download.pack(pady=10)
+        simple_handling(main_download, "<Return>", lambda:self.app.download(main_entry))
+
+        main_clear_dir = Button(self, text='Clear path', font=('', 13), command=self.app.clear_cache)
+        main_clear_dir.pack(pady=0)
+
+        main_entry.focus_set()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
     
-
-    cookie_import_menu.focus_set()
-    cookieroot.attributes('-alpha', 1)
-    cookieroot.mainloop()
-
-# Main tkinter instance and loose code
+    def on_closing(self):
+        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
+        if self.confirmation:
+            self.destroy()
+            self.app.root.destroy()
 
 if __name__ == "__main__":
-    cache_window()
-    cookie_import_window()
-
-    mainroot = tk.Tk()
-    mainroot.bind("<Button-1>", lambda e: e.widget.focus())
-    mainroot.attributes('-alpha', 0)
-
-    set_window_icon(mainroot)
-    mainroot.title('Easy-DLP')
-    dynamic_resolution(mainroot, 500, 320)
-    mainroot.resizable(False,False)
-
-    main_label = Label(mainroot, text='Insert URL', font=('', 35))
-    main_label.pack(pady=(25, 0))
-
-    main_entry = Entry(mainroot, font=('', 14), insertwidth=1)
-    main_entry.pack(pady=10, fill=X, padx=20)
-    simple_handling(main_entry, "<Return>", download)
-
-    main_download = Button(mainroot, text='Download', font=('', 20), command=download)
-    main_download.pack(pady=10)
-    simple_handling(main_download, "<Return>", download)
-
-    main_clear_dir = Button(mainroot, text='Clear path', font=('', 13), command=clear_cache)
-    main_clear_dir.pack(pady=0)
-    
-
-    main_entry.focus_set()
-    mainroot.attributes('-alpha', 1)
-    mainroot.mainloop()
+    main()
