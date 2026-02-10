@@ -51,6 +51,15 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
     
+    def clear_cache(self):
+        self.result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?')
+        try:
+            if self.result:
+                os.remove("cache.txt")
+        except FileNotFoundError:
+            pass
+        self.root.quit()
+
     def show_cache_window(self):
         self.close_current()
         self.current_window = CacheWindow(self)
@@ -119,7 +128,6 @@ class CacheWindow(tk.Toplevel):
         if self.path:
             self.cache_entry.insert(0, self.path)
 
-
 class CookieWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app.root)
@@ -187,9 +195,8 @@ class MainWindow(tk.Toplevel):
         main_download.pack(pady=10)
         # simple_handling(main_download, "<Return>", download)
 
-        main_clear_dir = Button(self, text='Clear path', font=('', 13))  # command=clear_cache
+        main_clear_dir = Button(self, text='Clear path', font=('', 13), command=self.app.clear_cache)
         main_clear_dir.pack(pady=0)
-        
 
         main_entry.focus_set()
         self.attributes('-alpha', 1)
