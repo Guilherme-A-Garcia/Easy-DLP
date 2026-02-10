@@ -120,6 +120,37 @@ class CookieWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
+
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+        set_window_icon(self)
+        self.final_cookie_selection = tk.StringVar()
+        self.title('Cookie importation')
+        dynamic_resolution(self, 500, 280)
+        self.resizable(False,False)
+        
+        self.cookie_ntc2_label = Label(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
+        self.cookie_ntc2_label.pack(pady=(0, 5))
+
+        self.cookie_main_labelp1 = Label(self, text='If you wish to bypass age restriction,', font=('', 17))
+        self.cookie_main_labelp2 = Label(self, text='select your browser to import cookies from.', font=('', 17))
+        self.cookie_main_labelp1.pack(pady=(15, 0))
+        self.cookie_main_labelp2.pack(pady=(0, 15))
+
+        self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
+        self.cookie_import_menu = ttk.Combobox(self, values=self.cookie_import_options, state='readonly', font=('', 14))
+        self.cookie_import_menu.set('None')
+        self.cookie_import_menu.pack(pady=(10, 0))
+
+        self.cookie_ntc_label = Label(self, text='Select "None" to skip the cookie importation.', font=('', 10))
+        self.cookie_ntc_label.pack(pady=(0, 5))
+
+        self.cookie_button = Button(self, text='Save', font=('', 20))  # command=self.cookie_next_button
+        self.cookie_button.pack(pady=15)
+        # simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
+        
+        self.cookie_import_menu.focus_set()
+        self.attributes('-alpha', 1)
     
 class MainWindow(tk.Toplevel):
     def __init__(self, app):
