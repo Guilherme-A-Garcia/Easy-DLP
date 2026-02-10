@@ -84,7 +84,7 @@ class CacheWindow(tk.Toplevel):
 
             self.cache_entry = Entry(self, font=('', 14), insertwidth=1)
             self.cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
-            # simple_handling(cache_entry, "<Return>", cache_enter)
+            simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
             self.cache_frame = Frame(self)
             self.cache_frame.pack()
