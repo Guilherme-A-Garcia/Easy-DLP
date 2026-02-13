@@ -127,7 +127,7 @@ class EasyDLPApp:
             self.current_window.destroy()
             self.current_window = None
     
-class CacheWindow(tk.Toplevel):
+class CacheWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
@@ -140,20 +140,20 @@ class CacheWindow(tk.Toplevel):
         dynamic_resolution(self, 500, 150)
         self.resizable(False,False)
 
-        self.cache_main_lb = Label(self, text='Insert the path to your YT-DLP file', font=('', 20))
+        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 20))
         self.cache_main_lb.pack(pady=(15, 0))
 
-        self.cache_entry = Entry(self, font=('', 14), insertwidth=1)
+        self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
         self.cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
         simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
-        self.cache_frame = Frame(self)
+        self.cache_frame = ctk.CTkFrame(self)
         self.cache_frame.pack()
         self.cache_frame.grid_rowconfigure(0, weight=1)
         self.cache_frame.grid_columnconfigure(0, weight=1)
 
-        self.cache_enter_b = Button(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter)
-        self.file_search_b = Button(self.cache_frame, text='Search', font=('', 15), command=self.search_button)
+        self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter)
+        self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=self.search_button)
         self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
         self.file_search_b.grid(row=0, column=1)
         simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
@@ -181,7 +181,7 @@ class CacheWindow(tk.Toplevel):
                 err_msg(f"Error: {e}")
     
     def search_button(self):
-        self.path = filedialog.askdirectory(title='Select your YT-DLP folder')
+        self.path = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
         if self.path:
             self.cache_entry.insert(0, self.path)
 
