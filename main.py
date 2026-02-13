@@ -124,7 +124,8 @@ class EasyDLPApp:
 
     def close_current(self):
         if self.current_window is not None:
-            self.current_window.destroy()
+            self.current_window.withdraw()
+            self.current_window.after(50, self.current_window.destroy)
             self.current_window = None
     
 class CacheWindow(ctk.CTkToplevel):
@@ -207,10 +208,9 @@ class CookieWindow(ctk.CTkToplevel):
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-        self.cookie_import_menu = ctk.CTkComboBox(self, values=self.cookie_import_options, state='readonly', command=self.on_select, font=('', 14))
+        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly')
         self.cookie_import_menu.set('None')
         self.cookie_import_menu.pack(pady=(10, 0))
-        self.selected_cookie_option = "None"
 
         self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
@@ -222,14 +222,11 @@ class CookieWindow(ctk.CTkToplevel):
         self.cookie_import_menu.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
-
-    def on_select(self, choice):
-        self.selected_cookie_option = choice
         
     def cookie_next_button(self):
-        selected_value = self.selected_cookie_option
+        selected_value = self.cookie_import_menu.get()
         if 'None' not in selected_value:
-            info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
+            self.msg = info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
         self.app.update_final_cookie_sel(selected_value)
         self.app.show_main_window()
 
@@ -239,7 +236,7 @@ class CookieWindow(ctk.CTkToplevel):
             self.destroy()
             self.app.root.destroy()
     
-class MainWindow(tk.Toplevel):
+class MainWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
@@ -252,18 +249,18 @@ class MainWindow(tk.Toplevel):
         dynamic_resolution(self, 500, 320)
         self.resizable(False,False)
 
-        main_label = Label(self, text='Insert URL', font=('', 35))
+        main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         main_label.pack(pady=(25, 0))
 
-        main_entry = Entry(self, font=('', 14), insertwidth=1)
+        main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
         main_entry.pack(pady=10, fill=X, padx=20)
         simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
 
-        main_download = Button(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry))
+        main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry))
         main_download.pack(pady=10)
         simple_handling(main_download, "<Return>", lambda:self.app.download(main_entry))
 
-        main_clear_dir = Button(self, text='Clear path', font=('', 13), command=self.app.clear_cache)
+        main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache)
         main_clear_dir.pack(pady=0)
 
         main_entry.focus_set()
