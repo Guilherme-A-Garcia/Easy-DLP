@@ -1,5 +1,5 @@
-# from tkinter import Label, Entry, BOTH, Button, Frame, X, messagebox, filedialog, ttk
-# import tkinter as tk
+from tkinter import Label, Entry, BOTH, Button, Frame, X, messagebox, filedialog, ttk
+import tkinter as tk
 from CTkMessagebox import CTkMessagebox
 import customtkinter as ctk
 import subprocess
@@ -37,9 +37,9 @@ def set_window_icon(root):
         print(f"Error, icon not available: {e}")
 
 def err_msg(text):
-    messagebox.showwarning(title='Error', message=text)
+    CTkMessagebox(title='Error', message=text, icon="cancel")
 def info_msg(text):
-    messagebox.showinfo(title='Information', message=text)
+    CTkMessagebox(title='Information', message=text, icon="info")
 
 class EasyDLPApp:
     def __init__(self):
@@ -57,9 +57,9 @@ class EasyDLPApp:
         self.final_cookie_selection.set(new_val)
 
     def clear_cache(self):
-        self.result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', parent=self.current_window)
+        self.result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes")
         try:
-            if self.result:
+            if self.result.get() == "Yes":
                 os.remove("cache.txt")
                 self.root.destroy()
         except FileNotFoundError:
@@ -164,8 +164,8 @@ class CacheWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
-        if self.confirmation:
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes")
+        if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
 
@@ -223,8 +223,8 @@ class CookieWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
 
     def on_closing(self):
-        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
-        if self.confirmation:
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes")
+        if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
         
@@ -267,8 +267,8 @@ class MainWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
-        if self.confirmation:
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes")
+        if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
 
