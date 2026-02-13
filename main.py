@@ -31,7 +31,12 @@ def set_window_icon(root):
             icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets/EasyDLP.ico')
      
         if os.path.exists(icon_path):
-            root.iconbitmap(icon_path)
+            def set_icon():
+                try:
+                    root.iconbitmap(icon_path)
+                except Exception as e:
+                    print(f"Delayed icon set failed: {e}")
+            root.after(190, set_icon)
     except Exception as e:
         print(f"Error, icon not available: {e}")
 
