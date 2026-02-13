@@ -33,11 +33,38 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 ## Requirements
 For now, you need Windows 8 or newer as it is the minimum requirement to run YT-DLP. For Linux users, check the [roadmap](#roadmap).<br><br>
 More importantly, you will also need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary.<br><br>
+
 If you plan on using the source code version, you must install the [latest Python version](https://www.python.org/downloads/). 🐍
+
+## Using the Source Code
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Guilherme-A-Garcia/PassGen/
+    cd PassGen
+    ```
+
+2.  **Create and activate a virtual environment** (recommended):
+
+    *   **Linux/macOS:**
+        ```bash
+        python3 -m venv venv
+        source venv/bin/activate
+        ```
+    *   **Windows:**
+        ```bash
+        python -m venv venv
+        .\venv\Scripts\activate
+        ```
+
+3.  **Install the required packages** using the `requirements.txt` file:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ## How to Use
 1. Download the latest release of this project;
-2. Execute the binary (.exe file);
+2. Execute the .exe binary (or activate your virtual environment and run `python main.py` within the project directory);
 3. Paste your YT-DLP file path in the "YT-DLP Path Directory Cache" window. For example, "C:/Users/YourName/Downloads/" if your YT-DLP binary is located in the 'Downloads' folder;
 4. If you wish to download an age-restricted video from YouTube, log into your YouTube account and select your browser in the drop-down menu, clicking save after the process. Leave the selector at "None" if you don't need cookie importation;
 5. Insert the URL of the video you're going to download and press "Download".
