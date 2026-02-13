@@ -143,7 +143,7 @@ class CacheWindow(ctk.CTkToplevel):
         self.cache_main_lb.pack(pady=(15, 0))
 
         self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        self.cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
+        self.cache_entry.pack(pady=(0, 5), fill="both", padx=20)
         simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
         self.cache_frame = ctk.CTkFrame(self)
@@ -251,7 +251,7 @@ class MainWindow(ctk.CTkToplevel):
         main_label.pack(pady=(25, 0))
 
         main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        main_entry.pack(pady=10, fill=X, padx=20)
+        main_entry.pack(pady=10, fill="x", padx=20)
         simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
 
         main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry))
