@@ -1,5 +1,8 @@
-import os, sys, subprocess, tkinter as tk
 from tkinter import Label, Entry, BOTH, Button, Frame, X, messagebox, filedialog, ttk
+import tkinter as tk
+import subprocess
+import sys
+import os
 
 def main():
     app = EasyDLPApp()
