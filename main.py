@@ -28,7 +28,7 @@ def set_window_icon(root):
             if not os.path.exists(icon_path):
                 icon_path = os.path.join(os.getcwd(), icon)
         else:
-            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets/EasyDLP.ico')
+            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), icon)
      
         if os.path.exists(icon_path):
             def set_icon():
@@ -36,7 +36,7 @@ def set_window_icon(root):
                     root.iconbitmap(icon_path)
                 except Exception as e:
                     print(f"Delayed icon set failed: {e}")
-            root.after(190, set_icon)
+            root.after(300, set_icon)
     except Exception as e:
         print(f"Error, icon not available: {e}")
 
