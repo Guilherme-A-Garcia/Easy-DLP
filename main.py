@@ -44,9 +44,9 @@ def info_msg(text):
 class EasyDLPApp:
     def __init__(self):
         self.current_window = None
-        self.root = tk.Tk()
+        self.root = ctk.CTk()
         self.root.withdraw()
-        self.final_cookie_selection = tk.StringVar()
+        self.final_cookie_selection = ctk.StringVar()
 
         if os.path.exists("cache.txt"):
             self.show_cookie_window()
