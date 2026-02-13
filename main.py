@@ -1,7 +1,11 @@
-import os, sys, subprocess, tkinter as tk
-from tkinter import Label, Entry, BOTH, Button, Frame, X, messagebox, filedialog, ttk
+from CTkMessagebox import CTkMessagebox
+import customtkinter as ctk
+import subprocess
+import sys
+import os
 
 def main():
+    ctk.set_appearance_mode("System")
     app = EasyDLPApp()
     app.root.mainloop()
 
@@ -27,21 +31,26 @@ def set_window_icon(root):
             icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets/EasyDLP.ico')
      
         if os.path.exists(icon_path):
-            root.iconbitmap(icon_path)
+            def set_icon():
+                try:
+                    root.iconbitmap(icon_path)
+                except Exception as e:
+                    print(f"Delayed icon set failed: {e}")
+            root.after(190, set_icon)
     except Exception as e:
         print(f"Error, icon not available: {e}")
 
 def err_msg(text):
-    messagebox.showwarning(title='Error', message=text)
+    CTkMessagebox(title='Error', message=text, icon="cancel", option_focus=1, button_color="#950808", button_hover_color="#630202")
 def info_msg(text):
-    messagebox.showinfo(title='Information', message=text)
+    CTkMessagebox(title='Information', message=text, icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
 
 class EasyDLPApp:
     def __init__(self):
         self.current_window = None
-        self.root = tk.Tk()
+        self.root = ctk.CTk()
         self.root.withdraw()
-        self.final_cookie_selection = tk.StringVar()
+        self.final_cookie_selection = ctk.StringVar()
 
         if os.path.exists("cache.txt"):
             self.show_cookie_window()
@@ -52,9 +61,9 @@ class EasyDLPApp:
         self.final_cookie_selection.set(new_val)
 
     def clear_cache(self):
-        self.result = messagebox.askokcancel(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', parent=self.current_window)
+        self.result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes", button_color="#950808", button_hover_color="#630202", border_width=1)
         try:
-            if self.result:
+            if self.result.get() == "Yes":
                 os.remove("cache.txt")
                 self.root.destroy()
         except FileNotFoundError:
@@ -119,10 +128,11 @@ class EasyDLPApp:
 
     def close_current(self):
         if self.current_window is not None:
-            self.current_window.destroy()
+            self.current_window.withdraw()
+            self.current_window.after(50, self.current_window.destroy)
             self.current_window = None
     
-class CacheWindow(tk.Toplevel):
+class CacheWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
@@ -135,20 +145,20 @@ class CacheWindow(tk.Toplevel):
         dynamic_resolution(self, 500, 150)
         self.resizable(False,False)
 
-        self.cache_main_lb = Label(self, text='Insert the path to your YT-DLP file', font=('', 20))
+        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 20))
         self.cache_main_lb.pack(pady=(15, 0))
 
-        self.cache_entry = Entry(self, font=('', 14), insertwidth=1)
-        self.cache_entry.pack(pady=(0, 5), fill=BOTH, padx=20)
+        self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
+        self.cache_entry.pack(pady=15, fill="both", padx=20)
         simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
-        self.cache_frame = Frame(self)
+        self.cache_frame = ctk.CTkFrame(self, bg_color="transparent", fg_color="transparent")
         self.cache_frame.pack()
         self.cache_frame.grid_rowconfigure(0, weight=1)
         self.cache_frame.grid_columnconfigure(0, weight=1)
 
-        self.cache_enter_b = Button(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter)
-        self.file_search_b = Button(self.cache_frame, text='Search', font=('', 15), command=self.search_button)
+        self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=self.search_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
         self.file_search_b.grid(row=0, column=1)
         simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
@@ -159,8 +169,8 @@ class CacheWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
-        if self.confirmation:
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
+        if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
 
@@ -176,11 +186,11 @@ class CacheWindow(tk.Toplevel):
                 err_msg(f"Error: {e}")
     
     def search_button(self):
-        self.path = filedialog.askdirectory(title='Select your YT-DLP folder')
+        self.path = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
         if self.path:
             self.cache_entry.insert(0, self.path)
 
-class CookieWindow(tk.Toplevel):
+class CookieWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
@@ -193,44 +203,44 @@ class CookieWindow(tk.Toplevel):
         dynamic_resolution(self, 500, 280)
         self.resizable(False,False)
         
-        self.cookie_ntc2_label = Label(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
+        self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
         self.cookie_ntc2_label.pack(pady=(0, 5))
 
-        self.cookie_main_labelp1 = Label(self, text='If you wish to bypass age restriction,', font=('', 17))
-        self.cookie_main_labelp2 = Label(self, text='select your browser to import cookies from.', font=('', 17))
+        self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 17))
+        self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 17))
         self.cookie_main_labelp1.pack(pady=(15, 0))
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-        self.cookie_import_menu = ttk.Combobox(self, values=self.cookie_import_options, state='readonly', font=('', 14))
+        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909")
         self.cookie_import_menu.set('None')
-        self.cookie_import_menu.pack(pady=(10, 0))
+        self.cookie_import_menu.pack(pady=(20, 0))
 
-        self.cookie_ntc_label = Label(self, text='Select "None" to skip the cookie importation.', font=('', 10))
+        self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
-        self.cookie_button = Button(self, text='Save', font=('', 20), command=self.cookie_next_button)
+        self.cookie_button = ctk.CTkButton(self, text='Save', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cookie_button.pack(pady=15)
         simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
         
         self.cookie_import_menu.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
-
-    def on_closing(self):
-        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
-        if self.confirmation:
-            self.destroy()
-            self.app.root.destroy()
         
     def cookie_next_button(self):
         selected_value = self.cookie_import_menu.get()
         if 'None' not in selected_value:
-            info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
+            self.msg = info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
         self.app.update_final_cookie_sel(selected_value)
         self.app.show_main_window()
+
+    def on_closing(self):
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
+        if self.confirmation.get() == "Yes":
+            self.destroy()
+            self.app.root.destroy()
     
-class MainWindow(tk.Toplevel):
+class MainWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
@@ -240,21 +250,21 @@ class MainWindow(tk.Toplevel):
 
         set_window_icon(self)
         self.title('Easy-DLP')
-        dynamic_resolution(self, 500, 320)
+        dynamic_resolution(self, 500, 220)
         self.resizable(False,False)
 
-        main_label = Label(self, text='Insert URL', font=('', 35))
+        main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         main_label.pack(pady=(25, 0))
 
-        main_entry = Entry(self, font=('', 14), insertwidth=1)
-        main_entry.pack(pady=10, fill=X, padx=20)
+        main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
+        main_entry.pack(pady=10, fill="x", padx=20)
         simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
 
-        main_download = Button(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry))
+        main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         main_download.pack(pady=10)
         simple_handling(main_download, "<Return>", lambda:self.app.download(main_entry))
 
-        main_clear_dir = Button(self, text='Clear path', font=('', 13), command=self.app.clear_cache)
+        main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         main_clear_dir.pack(pady=0)
 
         main_entry.focus_set()
@@ -262,8 +272,8 @@ class MainWindow(tk.Toplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.confirmation = messagebox.askyesno(title="Exit confirmation", message="Exit application?", icon='warning', parent=self)
-        if self.confirmation:
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
+        if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
 
