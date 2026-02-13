@@ -41,9 +41,9 @@ def set_window_icon(root):
         print(f"Error, icon not available: {e}")
 
 def err_msg(text):
-    CTkMessagebox(title='Error', message=text, icon="cancel")
+    CTkMessagebox(title='Error', message=text, icon="cancel", option_focus=1, button_color="#950808", button_hover_color="#630202")
 def info_msg(text):
-    CTkMessagebox(title='Information', message=text, icon="info")
+    CTkMessagebox(title='Information', message=text, icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
 
 class EasyDLPApp:
     def __init__(self):
@@ -61,7 +61,7 @@ class EasyDLPApp:
         self.final_cookie_selection.set(new_val)
 
     def clear_cache(self):
-        self.result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes")
+        self.result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes", button_color="#950808", button_hover_color="#630202", border_width=1)
         try:
             if self.result.get() == "Yes":
                 os.remove("cache.txt")
@@ -157,8 +157,8 @@ class CacheWindow(ctk.CTkToplevel):
         self.cache_frame.grid_rowconfigure(0, weight=1)
         self.cache_frame.grid_columnconfigure(0, weight=1)
 
-        self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter)
-        self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=self.search_button)
+        self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=self.search_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
         self.file_search_b.grid(row=0, column=1)
         simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
@@ -169,7 +169,7 @@ class CacheWindow(ctk.CTkToplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes")
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
         if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
@@ -212,14 +212,14 @@ class CookieWindow(ctk.CTkToplevel):
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly')
+        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909")
         self.cookie_import_menu.set('None')
         self.cookie_import_menu.pack(pady=(10, 0))
 
         self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
-        self.cookie_button = ctk.CTkButton(self, text='Save', font=('', 20), command=self.cookie_next_button)
+        self.cookie_button = ctk.CTkButton(self, text='Save', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cookie_button.pack(pady=15)
         simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
         
@@ -235,7 +235,7 @@ class CookieWindow(ctk.CTkToplevel):
         self.app.show_main_window()
 
     def on_closing(self):
-        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes")
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
         if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
@@ -260,11 +260,11 @@ class MainWindow(ctk.CTkToplevel):
         main_entry.pack(pady=10, fill="x", padx=20)
         simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
 
-        main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry))
+        main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         main_download.pack(pady=10)
         simple_handling(main_download, "<Return>", lambda:self.app.download(main_entry))
 
-        main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache)
+        main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         main_clear_dir.pack(pady=0)
 
         main_entry.focus_set()
@@ -272,7 +272,7 @@ class MainWindow(ctk.CTkToplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes")
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
         if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
