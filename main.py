@@ -1,5 +1,3 @@
-from tkinter import Label, Entry, BOTH, Button, Frame, X, messagebox, filedialog, ttk
-import tkinter as tk
 from CTkMessagebox import CTkMessagebox
 import customtkinter as ctk
 import subprocess
