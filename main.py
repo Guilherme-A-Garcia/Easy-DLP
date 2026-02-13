@@ -185,7 +185,7 @@ class CacheWindow(ctk.CTkToplevel):
         if self.path:
             self.cache_entry.insert(0, self.path)
 
-class CookieWindow(tk.Toplevel):
+class CookieWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
@@ -198,23 +198,24 @@ class CookieWindow(tk.Toplevel):
         dynamic_resolution(self, 500, 280)
         self.resizable(False,False)
         
-        self.cookie_ntc2_label = Label(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
+        self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
         self.cookie_ntc2_label.pack(pady=(0, 5))
 
-        self.cookie_main_labelp1 = Label(self, text='If you wish to bypass age restriction,', font=('', 17))
-        self.cookie_main_labelp2 = Label(self, text='select your browser to import cookies from.', font=('', 17))
+        self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 17))
+        self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 17))
         self.cookie_main_labelp1.pack(pady=(15, 0))
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-        self.cookie_import_menu = ttk.Combobox(self, values=self.cookie_import_options, state='readonly', font=('', 14))
+        self.cookie_import_menu = ctk.CTkComboBox(self, values=self.cookie_import_options, state='readonly', command=self.on_select, font=('', 14))
         self.cookie_import_menu.set('None')
         self.cookie_import_menu.pack(pady=(10, 0))
+        self.selected_cookie_option = "None"
 
-        self.cookie_ntc_label = Label(self, text='Select "None" to skip the cookie importation.', font=('', 10))
+        self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
-        self.cookie_button = Button(self, text='Save', font=('', 20), command=self.cookie_next_button)
+        self.cookie_button = ctk.CTkButton(self, text='Save', font=('', 20), command=self.cookie_next_button)
         self.cookie_button.pack(pady=15)
         simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
         
@@ -222,18 +223,21 @@ class CookieWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
 
+    def on_select(self, choice):
+        self.selected_cookie_option = choice
+        
+    def cookie_next_button(self):
+        selected_value = self.selected_cookie_option
+        if 'None' not in selected_value:
+            info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
+        self.app.update_final_cookie_sel(selected_value)
+        self.app.show_main_window()
+
     def on_closing(self):
         self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes")
         if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
-        
-    def cookie_next_button(self):
-        selected_value = self.cookie_import_menu.get()
-        if 'None' not in selected_value:
-            info_msg('Tip: You might want to keep your browser of choice closed while downloading.')
-        self.app.update_final_cookie_sel(selected_value)
-        self.app.show_main_window()
     
 class MainWindow(tk.Toplevel):
     def __init__(self, app):
