@@ -5,6 +5,7 @@ import sys
 import os
 
 def main():
+    ctk.set_appearance_mode("System")
     app = EasyDLPApp()
     app.root.mainloop()
 
