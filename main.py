@@ -149,10 +149,10 @@ class CacheWindow(ctk.CTkToplevel):
         self.cache_main_lb.pack(pady=(15, 0))
 
         self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        self.cache_entry.pack(pady=(0, 5), fill="both", padx=20)
+        self.cache_entry.pack(pady=15, fill="both", padx=20)
         simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
-        self.cache_frame = ctk.CTkFrame(self)
+        self.cache_frame = ctk.CTkFrame(self, bg_color="transparent", fg_color="transparent")
         self.cache_frame.pack()
         self.cache_frame.grid_rowconfigure(0, weight=1)
         self.cache_frame.grid_columnconfigure(0, weight=1)
@@ -214,7 +214,7 @@ class CookieWindow(ctk.CTkToplevel):
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
         self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909")
         self.cookie_import_menu.set('None')
-        self.cookie_import_menu.pack(pady=(10, 0))
+        self.cookie_import_menu.pack(pady=(20, 0))
 
         self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
@@ -250,7 +250,7 @@ class MainWindow(ctk.CTkToplevel):
 
         set_window_icon(self)
         self.title('Easy-DLP')
-        dynamic_resolution(self, 500, 320)
+        dynamic_resolution(self, 500, 220)
         self.resizable(False,False)
 
         main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
