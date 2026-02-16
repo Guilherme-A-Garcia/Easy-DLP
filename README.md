@@ -77,7 +77,6 @@ If you plan on using the source code version, you must install the [latest Pytho
 ## Roadmap
 - ✅ Refactor to use classes instead of functions;
 - ✅ Migrate to CustomTkinter;
-- ❌ Step up the game to PySide6;
 - ❌ Themes;
 - ❌ Additional path verification for better integrity;
 - ❌ Add threading and a progress bar;
@@ -85,6 +84,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 - ❌ Playlist support;
 - ❌ Add a settings tab;
 - ❌ Add an auto-update system.
+- ❌ Step up the game to PySide6;
 
 ## Contributing
 ✨ Contributions are always welcome! ✨<br><br>
