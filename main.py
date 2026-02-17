@@ -57,6 +57,11 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
     
+    def set_theme(self, location):
+        self.location = location
+        theme = self.location.themes.theme_variable.get()
+        ctk.set_appearance_mode(theme)
+
     def update_final_cookie_sel(self, new_val):
         self.final_cookie_selection.set(new_val)
 
@@ -145,11 +150,14 @@ class CacheWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 150)
         self.resizable(False,False)
 
-        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 20))
-        self.cache_main_lb.pack(pady=(15, 0))
+        self.themes = ThemeFrame(self, app)
+        self.themes.pack(anchor="w", padx=10)
+
+        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
+        self.cache_main_lb.pack(pady=(5))
 
         self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        self.cache_entry.pack(pady=15, fill="both", padx=20)
+        self.cache_entry.pack(pady=10, fill="both", padx=20)
         simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
         self.cache_frame = ctk.CTkFrame(self, bg_color="transparent", fg_color="transparent")
@@ -200,28 +208,31 @@ class CookieWindow(ctk.CTkToplevel):
         set_window_icon(self)
         self.final_cookie_selection = self.app.final_cookie_selection
         self.title('Cookie importation')
-        dynamic_resolution(self, 500, 280)
+        dynamic_resolution(self, 500, 250)
         self.resizable(False,False)
-        
-        self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
-        self.cookie_ntc2_label.pack(pady=(0, 5))
 
-        self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 17))
-        self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 17))
+        self.themes = ThemeFrame(self, app)
+        self.themes.pack(anchor="w", padx=10)
+
+        self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 22))
+        self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 22))
         self.cookie_main_labelp1.pack(pady=(15, 0))
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909")
+        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909", font=('', 18))
         self.cookie_import_menu.set('None')
-        self.cookie_import_menu.pack(pady=(20, 0))
+        self.cookie_import_menu.pack(pady=(5, 0))
 
         self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
         self.cookie_button = ctk.CTkButton(self, text='Save', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.cookie_button.pack(pady=15)
+        self.cookie_button.pack(pady=10)
         simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
+
+        self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
+        self.cookie_ntc2_label.pack(pady=(0, 5))
         
         self.cookie_import_menu.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -253,8 +264,11 @@ class MainWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 220)
         self.resizable(False,False)
 
+        self.themes = ThemeFrame(self, app)
+        self.themes.pack(anchor="w", padx=10)
+
         main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
-        main_label.pack(pady=(25, 0))
+        main_label.pack(pady=(12, 0))
 
         main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
         main_entry.pack(pady=10, fill="x", padx=20)
@@ -276,6 +290,19 @@ class MainWindow(ctk.CTkToplevel):
         if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
+
+class ThemeFrame(ctk.CTkFrame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, fg_color="transparent")
+        self.controller = controller
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.initial_theme = ctk.get_appearance_mode()
+        self.theme_variable = ctk.StringVar(value=self.initial_theme)
+        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 12), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.controller.set_theme(parent), offvalue="Dark", onvalue="Light")
+        self.theme_switch.grid(row=0, column=0, padx=0)
 
 if __name__ == "__main__":
     main()
