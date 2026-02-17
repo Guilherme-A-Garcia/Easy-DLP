@@ -151,13 +151,13 @@ class CacheWindow(ctk.CTkToplevel):
         self.resizable(False,False)
 
         self.themes = ThemeFrame(self, app)
-        self.themes.pack()
+        self.themes.pack(anchor="w", padx=10)
 
-        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 20))
-        self.cache_main_lb.pack(pady=(15, 0))
+        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
+        self.cache_main_lb.pack(pady=(5))
 
         self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        self.cache_entry.pack(pady=15, fill="both", padx=20)
+        self.cache_entry.pack(pady=10, fill="both", padx=20)
         simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
         self.cache_frame = ctk.CTkFrame(self, bg_color="transparent", fg_color="transparent")
@@ -208,31 +208,31 @@ class CookieWindow(ctk.CTkToplevel):
         set_window_icon(self)
         self.final_cookie_selection = self.app.final_cookie_selection
         self.title('Cookie importation')
-        dynamic_resolution(self, 500, 280)
+        dynamic_resolution(self, 500, 250)
         self.resizable(False,False)
 
         self.themes = ThemeFrame(self, app)
-        self.themes.pack()
-        
-        self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
-        self.cookie_ntc2_label.pack(pady=(0, 5))
+        self.themes.pack(anchor="w", padx=10)
 
-        self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 17))
-        self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 17))
+        self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 22))
+        self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 22))
         self.cookie_main_labelp1.pack(pady=(15, 0))
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909")
+        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909", font=('', 18))
         self.cookie_import_menu.set('None')
-        self.cookie_import_menu.pack(pady=(20, 0))
+        self.cookie_import_menu.pack(pady=(5, 0))
 
         self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
         self.cookie_button = ctk.CTkButton(self, text='Save', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.cookie_button.pack(pady=15)
+        self.cookie_button.pack(pady=10)
         simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
+
+        self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
+        self.cookie_ntc2_label.pack(pady=(0, 5))
         
         self.cookie_import_menu.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -265,10 +265,10 @@ class MainWindow(ctk.CTkToplevel):
         self.resizable(False,False)
 
         self.themes = ThemeFrame(self, app)
-        self.themes.pack()
+        self.themes.pack(anchor="w", padx=10)
 
         main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
-        main_label.pack(pady=(25, 0))
+        main_label.pack(pady=(12, 0))
 
         main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
         main_entry.pack(pady=10, fill="x", padx=20)
