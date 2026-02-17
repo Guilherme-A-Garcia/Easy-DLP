@@ -281,8 +281,17 @@ class MainWindow(ctk.CTkToplevel):
             self.app.root.destroy()
 
     class ThemeFrame(ctk.CTkFrame):
-        def __init__(self):
-            pass
+        def __init__(self, parent, controller):
+            super().__init__(parent, fg_color="transparent")
+            self.controller = controller
+
+            self.columnconfigure(0, weight=1)
+            self.rowconfigure(0, weight=1)
+
+            self.initial_theme = ctk.get_appearance_mode()
+            self.theme_variable = ctk.StringVar(value=self.initial_theme)
+            self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 12), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.controller.set_theme(parent), offvalue="Dark", onvalue="Light")
+            self.theme_switch.grid(row=0, column=0, padx=0)
 
 if __name__ == "__main__":
     main()
