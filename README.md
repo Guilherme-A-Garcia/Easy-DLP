@@ -41,7 +41,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/Guilherme-A-Garcia/Easy-DLP.git
-    cd PassGen
+    cd Easy-DLP
     ```
 
 2.  **Create and activate a virtual environment** (recommended):
