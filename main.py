@@ -41,9 +41,11 @@ def set_window_icon(root):
         print(f"Error, icon not available: {e}")
 
 def err_msg(text):
-    CTkMessagebox(title='Error', message=text, icon="cancel", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    error = CTkMessagebox(title='Error', message=text, icon="cancel", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    error.get()
 def info_msg(text):
-    CTkMessagebox(title='Information', message=text, icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    info = CTkMessagebox(title='Information', message=text, icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    info.get()
 
 class EasyDLPApp:
     def __init__(self):
