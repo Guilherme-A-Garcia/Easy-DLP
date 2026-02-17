@@ -78,7 +78,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 - ✅ Refactor to use classes instead of functions;
 - ✅ Migrate to CustomTkinter;
 - ✅ Themes;
-- ❌ Additional path verification for better integrity;
+- ✅ Additional path verification for better integrity;
 - ❌ Add threading and a progress bar;
 - ❌ Linux support;
 - ❌ Playlist support;
