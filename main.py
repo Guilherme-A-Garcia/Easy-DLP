@@ -150,6 +150,9 @@ class CacheWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 150)
         self.resizable(False,False)
 
+        self.themes = ThemeFrame(self, app)
+        self.themes.pack()
+
         self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 20))
         self.cache_main_lb.pack(pady=(15, 0))
 
@@ -207,6 +210,9 @@ class CookieWindow(ctk.CTkToplevel):
         self.title('Cookie importation')
         dynamic_resolution(self, 500, 280)
         self.resizable(False,False)
+
+        self.themes = ThemeFrame(self, app)
+        self.themes.pack()
         
         self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
         self.cookie_ntc2_label.pack(pady=(0, 5))
@@ -257,6 +263,9 @@ class MainWindow(ctk.CTkToplevel):
         self.title('Easy-DLP')
         dynamic_resolution(self, 500, 220)
         self.resizable(False,False)
+
+        self.themes = ThemeFrame(self, app)
+        self.themes.pack()
 
         main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         main_label.pack(pady=(25, 0))
