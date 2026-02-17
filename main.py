@@ -81,6 +81,11 @@ class EasyDLPApp:
         if not main_entry.get():
             err_msg('Please, insert a webpage link')
             return
+        
+        if not os.path.exists("cache.txt"):
+            err_msg('Cache file missing, closing application...\nPlease, re-open the application and follow the necessary procedures.')
+            return self.root.destroy()
+        
         else:
             self.download_link = main_entry.get()
             with open("cache.txt", 'r') as file:
