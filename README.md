@@ -77,7 +77,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 ## Roadmap
 - ✅ Refactor to use classes instead of functions;
 - ✅ Migrate to CustomTkinter;
-- ❌ Themes;
+- ✅ Themes;
 - ❌ Additional path verification for better integrity;
 - ❌ Add threading and a progress bar;
 - ❌ Linux support;
