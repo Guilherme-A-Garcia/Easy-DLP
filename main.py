@@ -57,8 +57,10 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
     
-    def set_theme(self):
-        pass
+    def set_theme(self, location):
+        self.location = location
+        theme = self.location.themes.theme_variable.get()
+        ctk.set_appearance_mode(theme)
 
     def update_final_cookie_sel(self, new_val):
         self.final_cookie_selection.set(new_val)
