@@ -57,6 +57,9 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
     
+    def set_theme(self):
+        pass
+
     def update_final_cookie_sel(self, new_val):
         self.final_cookie_selection.set(new_val)
 
