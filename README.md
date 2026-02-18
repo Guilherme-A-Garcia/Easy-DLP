@@ -16,6 +16,7 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 - [Current Features](#current-features)
 - [Requirements](#requirements)
 - [How to Use](#how-to-use)
+- [Using the Source Code](#using-the-source-code)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 
@@ -35,6 +36,13 @@ For now, you need Windows 8 or newer as it is the minimum requirement to run YT-
 More importantly, you will also need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary.<br><br>
 
 If you plan on using the source code version, you must install the [latest Python version](https://www.python.org/downloads/). 🐍
+
+## How to Use
+1. Download the latest release of this project;
+2. Execute the .exe binary (or activate your virtual environment and run `python main.py` within the project directory);
+3. Paste your YT-DLP file path in the "YT-DLP Path Directory Cache" window. For example, "C:/Users/YourName/Downloads/" if your YT-DLP binary is located in the 'Downloads' folder;
+4. If you wish to download an age-restricted video from YouTube, log into your YouTube account and select your browser in the drop-down menu, clicking save after the process. Leave the selector at "None" if you don't need cookie importation;
+5. Insert the URL of the video you're going to download and press "Download".
 
 ## Using the Source Code
 
@@ -62,13 +70,6 @@ If you plan on using the source code version, you must install the [latest Pytho
     pip install -r requirements.txt
     ```
 
-## How to Use
-1. Download the latest release of this project;
-2. Execute the .exe binary (or activate your virtual environment and run `python main.py` within the project directory);
-3. Paste your YT-DLP file path in the "YT-DLP Path Directory Cache" window. For example, "C:/Users/YourName/Downloads/" if your YT-DLP binary is located in the 'Downloads' folder;
-4. If you wish to download an age-restricted video from YouTube, log into your YouTube account and select your browser in the drop-down menu, clicking save after the process. Leave the selector at "None" if you don't need cookie importation;
-5. Insert the URL of the video you're going to download and press "Download".
-
 >[!TIP]
 > You are able to clear the YT-DLP file path you provided by clicking "Clear path", doing this will close the application,<br>
   and will generate a new cache file once you open it up again.<br>
@@ -79,8 +80,8 @@ If you plan on using the source code version, you must install the [latest Pytho
 - ✅ Migrate to CustomTkinter;
 - ✅ Themes;
 - ✅ Additional path verification for better integrity;
-- ❌ Add threading and a progress bar;
 - ❌ Linux support;
+- ❌ Add threading and a progress bar;
 - ❌ Playlist support;
 - ❌ Add a settings tab;
 - ❌ Add an auto-update system.
