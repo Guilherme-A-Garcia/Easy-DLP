@@ -86,7 +86,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 - ✅ Migrate to CustomTkinter;
 - ✅ Themes;
 - ✅ Additional path verification for better integrity;
-- ❌ Linux support;
+- ✅ Linux support;
 - ❌ Add threading and a progress bar;
 - ❌ Playlist support;
 - ❌ Add a settings tab;
