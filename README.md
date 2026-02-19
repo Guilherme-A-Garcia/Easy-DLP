@@ -29,7 +29,7 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 - Browser cookie import (for age-restricted content)
 - Remembers the last YT-DLP binary location (simple .txt soft-cache system)
 - Error handling with user-friendly message boxes
-- No external libraries required
+- Dark/Light theme switch
 
 ## Requirements
 For now, you need Windows 8 or newer as it is the minimum requirement to run YT-DLP. For Linux users, check the [roadmap](#roadmap).<br><br>
