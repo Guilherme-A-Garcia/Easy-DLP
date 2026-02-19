@@ -99,6 +99,7 @@ class EasyDLPApp:
 
     def download(self, main_entry):
         LOGTXT_CONST = "log.txt"
+        self.selected_browser = self.final_cookie_selection.get()
         if not main_entry.get():
             err_msg('Please, insert a webpage link')
             return
@@ -107,27 +108,43 @@ class EasyDLPApp:
             err_msg('Cache file missing, closing application...\nPlease, re-open the application and follow the necessary procedures.')
             return self.root.destroy()
         
+        self.download_link = main_entry.get()
+        
+        with open("cache.txt", 'r') as file:
+            self.path_from_cache = file.readline().strip()
+            
+        if is_linux():
+            with open('download.sh', 'w') as file:
+                file.write('#!/bin/bash\n')
+                file.write('set -x\n')
+                file.write(f'cd {self.path_from_cache}\n')
+                if self.selected_browser == 'None':
+                    file.write(f'./yt-dlp -S ext:mp4 --recode mp4 --quiet --no-warnings {self.download_link}\n')
+                else:
+                    file.write(f'./yt-dlp -S ext:mp4 --recode mp4 --quiet --no-warning --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                file.write('\n')
+            self.download_abs_path = os.path.abspath('download.sh')
+            
         else:
-            self.download_link = main_entry.get()
-            with open("cache.txt", 'r') as file:
-                self.path_from_cache = file.readline().strip()
             with open('download.bat', 'w') as file:
                 file.write('@echo off\n')
                 file.write(f'cd /d {self.path_from_cache}\n')
-                self.selected_browser = self.final_cookie_selection.get()
                 if self.selected_browser == 'None':
-                    file.write(f'yt-dlp.exe --quiet --no-warnings {self.download_link}\n')
+                    file.write(f'yt-dlp.exe -S ext:mp4 --recode mp4 --quiet --no-warnings {self.download_link}\n')
                 else:
-                    file.write(f'yt-dlp.exe --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                    file.write(f'yt-dlp.exe -S ext:mp4 --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 file.write('exit\n')
-        self.download_abs_path = os.path.abspath('download.bat')
+            self.download_abs_path = os.path.abspath('download.bat')
 
-        self.startupinfo = None
-        if sys.platform.startswith("win"):
+        if sys.platform.startswith('win'):
             self.startupinfo = subprocess.STARTUPINFO()
             self.startupinfo.wShowWindow = subprocess.SW_HIDE
+            self.creationflags=subprocess.CREATE_NO_WINDOW
+        else:
+            self.startupinfo = None
+            self.creationflags = 0
 
-        self.process = subprocess.Popen([self.download_abs_path], startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith("win") else 0)
+        self.process = subprocess.Popen([self.download_abs_path], startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=self.creationflags)
         
         _, stderr = self.process.communicate()
         proc_success = self.process.returncode == 0
