@@ -1,4 +1,5 @@
 from CTkMessagebox import CTkMessagebox
+from PIL import Image, ImageTk
 import customtkinter as ctk
 import subprocess
 import sys
@@ -21,22 +22,36 @@ def simple_handling(widget, key, event):
 
 def set_window_icon(root):
     """Runtime icon loading for Nuitka"""
-    icon = 'icon.ico'
+    def win_set_icon():
+        try:
+            root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Failed setting delayed icon: {e}")
+    
     try:
-        if getattr(sys, 'frozen', False):
-            icon_path = os.path.join(os.path.dirname(sys.executable), icon)
-            if not os.path.exists(icon_path):
-                icon_path = os.path.join(os.getcwd(), icon)
+        if is_linux():
+            if getattr(sys, 'frozen', False):
+                icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.png')
+                if not os.path.exists(icon_path):
+                    icon_path = os.path.join(os.getcwd(), 'icon.png')
+            else:
+                icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
+            
+            if os.path.exists(icon_path):
+                pil_img = Image.open(icon_path).convert("RGBA")
+                imagetk = ImageTk.PhotoImage(pil_img)
+                root.after(300, root.iconphoto(False, imagetk))
+
         else:
-            icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), icon)
-     
-        if os.path.exists(icon_path):
-            def set_icon():
-                try:
-                    root.iconbitmap(icon_path)
-                except Exception as e:
-                    print(f"Delayed icon set failed: {e}")
-            root.after(300, set_icon)
+            if getattr(sys, 'frozen', False):
+                icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.ico')
+                if not os.path.exists(icon_path):
+                    icon_path = os.path.join(os.getcwd(), 'icon.ico')
+            else:
+                icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.ico')
+        
+            if os.path.exists(icon_path):
+                root.after(300, win_set_icon)
     except Exception as e:
         print(f"Error, icon not available: {e}")
 
