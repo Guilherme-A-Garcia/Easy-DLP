@@ -90,8 +90,8 @@ If you plan on using the source code version, you must install the [latest Pytho
 - ❌ Add threading and a progress bar;
 - ❌ Playlist support;
 - ❌ Add a settings tab;
-- ❌ Add an auto-update system.
-- ❌ Step up the game to PySide6;
+- ❌ Add an auto-update system;
+- ❌ Step up the game to PySide6.
 
 ## Contributing
 ✨ Contributions are always welcome! ✨<br><br>
