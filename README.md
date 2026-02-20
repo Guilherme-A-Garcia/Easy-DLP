@@ -18,7 +18,7 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 - [How to Use](#how-to-use)
 - [Using the Source Code](#using-the-source-code)
 - [Roadmap](#roadmap)
-- [Contributing](#contributing)
+- [How to Contribute](#how-to-contribute)
 
 ## Preview
 ![Main interface](assets/previews/Main.png)<br>
@@ -83,24 +83,23 @@ If you plan on using the source code version, you must install the [latest Pytho
    ```
 
 ## Roadmap
-- ✅ Refactor to use classes instead of functions;
-- ✅ Migrate to CustomTkinter;
-- ✅ Themes;
-- ✅ Additional path verification for better integrity;
-- ✅ Linux support;
-- ❌ Add threading and a progress bar;
-- ❌ Playlist support;
-- ❌ Add a settings tab;
-- ❌ Add an auto-update system;
-- ❌ Step up the game to PySide6.
+- - [x] Refactor to use classes instead of functions;
+- - [x] Migrate to CustomTkinter;
+- - [x] Themes;
+- - [x] Additional path verification for better integrity;
+- - [x] Linux support;
+- - [ ] Add threading and a progress bar;
+- - [ ] Playlist support;
+- - [ ] Add a settings tab;
+- - [ ] Add an auto-update system;
+- - [ ] Step up the game to PySide6.
 
-## Contributing
+## How to Contribute
 ✨ Contributions are always welcome! ✨<br><br>
 
-### How to Contribute:
-*   **Report Bugs**: Open an issue with detailed steps to reproduce.
-*   **Suggest Features**: Open an issue to discuss your idea.
-*   **Contribute Directly to the Code**:<br>
+-   **Report Bugs**: Open an issue with detailed steps to reproduce.
+-   **Suggest Features**: Open an issue to discuss your idea.
+-   **Contribute Directly to the Code**:<br>
     I. Fork the repository;<br>
     II. Create a new branch;<br>
     III. Make your changes and commit;<br>
