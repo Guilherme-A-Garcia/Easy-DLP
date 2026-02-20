@@ -30,6 +30,7 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 - Remembers the last YT-DLP binary location (simple .txt soft-cache system)
 - Error handling with user-friendly message boxes
 - Dark/Light theme switch
+- Binaries for both Windows and Linux
 
 ## Requirements
 First and foremost, you will need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary and [FFMPEG](https://www.ffmpeg.org/download.html).<br><br>
