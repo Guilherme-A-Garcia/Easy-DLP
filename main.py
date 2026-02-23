@@ -174,6 +174,12 @@ class EasyDLPApp:
     def download_thread(self, download_abs_path, path_from_cache):
         self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache))
         self.thread.start()
+        
+    def disable_widgets(self):
+        pass
+        
+    def enable_widgets(self):
+        pass
 
     def show_cache_window(self):
         self.close_current()
