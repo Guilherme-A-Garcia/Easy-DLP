@@ -7,7 +7,6 @@ import sys
 import os
 
 # add progress bar ;)
-# turn the subprocess into a method, make a thread with the method as the target
 # make a method to disable/enable widgets while thread is running
 
 def main():
@@ -128,7 +127,7 @@ class EasyDLPApp:
                     file.write(f'./yt-dlp -S ext:mp4 --recode mp4 --quiet --no-warning --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 file.write('\n')
             self.download_abs_path = os.path.abspath('download.sh')
-            self.download_subprocess(self.download_abs_path, self.path_from_cache)
+            self.download_thread(self.download_abs_path, self.path_from_cache)
             
         else:
             with open('download.bat', 'w') as file:
@@ -140,7 +139,7 @@ class EasyDLPApp:
                     file.write(f'yt-dlp.exe -S ext:mp4 --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 file.write('exit\n')
             self.download_abs_path = os.path.abspath('download.bat')
-            self.download_subprocess(self.download_abs_path, self.path_from_cache)
+            self.download_thread(self.download_abs_path, self.path_from_cache)
   
     def download_subprocess(self, download_abs_path, path_from_cache):
         LOGTXT_CONST = "log.txt"
@@ -171,6 +170,10 @@ class EasyDLPApp:
                 log_path = os.path.abspath(LOGTXT_CONST)
                 err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
         os.remove(download_abs_path)
+
+    def download_thread(self, download_abs_path, path_from_cache):
+        self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache))
+        self.thread.start()
 
     def show_cache_window(self):
         self.close_current()
