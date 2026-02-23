@@ -322,12 +322,17 @@ class MainWindow(ctk.CTkToplevel):
         self.main_entry.pack(pady=10, fill="x", padx=20)
         simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
-        self.main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.main_download.pack(pady=10)
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame.columnconfigure((0,1), weight=1)
+        self.button_frame.rowconfigure(0, weight=1)
+        self.button_frame.pack()
+        
+        self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_download.grid(row=0, column=0, padx=5)
         simple_handling(self.main_download, "<Return>", lambda:self.app.download(self.main_entry))
 
-        self.main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.main_clear_dir.pack(pady=0)
+        self.main_clear_dir = ctk.CTkButton(self.button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_clear_dir.grid(row=0, column=1, padx=5)
 
         self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
