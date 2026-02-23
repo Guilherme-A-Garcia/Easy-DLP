@@ -2,8 +2,11 @@ from CTkMessagebox import CTkMessagebox
 from PIL import Image, ImageTk
 import customtkinter as ctk
 import subprocess
+import threading
 import sys
 import os
+
+# add progress bar ;)
 
 def main():
     ctk.set_appearance_mode("System")
@@ -312,21 +315,21 @@ class MainWindow(ctk.CTkToplevel):
         self.themes = ThemeFrame(self, app)
         self.themes.pack(anchor="w", padx=10)
 
-        main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
-        main_label.pack(pady=(12, 0))
+        self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
+        self.main_label.pack(pady=(12, 0))
 
-        main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        main_entry.pack(pady=10, fill="x", padx=20)
-        simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
+        self.main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
+        self.main_entry.pack(pady=10, fill="x", padx=20)
+        simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
-        main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        main_download.pack(pady=10)
-        simple_handling(main_download, "<Return>", lambda:self.app.download(main_entry))
+        self.main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_download.pack(pady=10)
+        simple_handling(self.main_download, "<Return>", lambda:self.app.download(self.main_entry))
 
-        main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        main_clear_dir.pack(pady=0)
+        self.main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_clear_dir.pack(pady=0)
 
-        main_entry.focus_set()
+        self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
     
