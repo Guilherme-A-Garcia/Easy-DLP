@@ -156,7 +156,7 @@ class EasyDLPApp:
         proc_success = self.process.returncode == 0
         self.process.wait()
         if proc_success:
-            self.root.after(500, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".'))
+            self.root.after(100, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".'))
             self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
             self.root.after(0, self.current_window.progress_bar.set(0))
             self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
