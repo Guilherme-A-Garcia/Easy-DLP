@@ -6,9 +6,6 @@ import threading
 import sys
 import os
 
-# add progress bar ;)
-# make a method to disable/enable widgets while thread is running
-
 def main():
     ctk.set_appearance_mode("System")
     app = EasyDLPApp()
