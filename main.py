@@ -176,10 +176,20 @@ class EasyDLPApp:
         self.thread.start()
         
     def disable_widgets(self):
-        pass
+        try:
+            widgets = (self.current_window.main_entry, self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            for widget in widgets:
+                widget.configure(state="disabled")
+        except AttributeError:
+            pass
         
     def enable_widgets(self):
-        pass
+        try:
+            widgets = (self.current_window.main_entry, self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            for widget in widgets:
+                widget.configure(state="enabled")
+        except AttributeError:
+            pass
 
     def show_cache_window(self):
         self.close_current()
