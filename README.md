@@ -88,7 +88,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 - - [x] Themes;
 - - [x] Additional path verification for better integrity;
 - - [x] Linux support;
-- - [ ] Add threading and a progress bar;
+- - [x] Add threading and a progress bar;
 - - [ ] Playlist support;
 - - [ ] Add a settings tab;
 - - [ ] Add an auto-update system;
