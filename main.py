@@ -2,8 +2,12 @@ from CTkMessagebox import CTkMessagebox
 from PIL import Image, ImageTk
 import customtkinter as ctk
 import subprocess
+import threading
 import sys
 import os
+
+# add progress bar ;)
+# make a method to disable/enable widgets while thread is running
 
 def main():
     ctk.set_appearance_mode("System")
@@ -98,7 +102,6 @@ class EasyDLPApp:
             self.root.destroy()
 
     def download(self, main_entry):
-        LOGTXT_CONST = "log.txt"
         self.selected_browser = self.final_cookie_selection.get()
         if not main_entry.get():
             err_msg('Please, insert a webpage link')
@@ -124,6 +127,7 @@ class EasyDLPApp:
                     file.write(f'./yt-dlp -S ext:mp4 --recode mp4 --quiet --no-warning --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 file.write('\n')
             self.download_abs_path = os.path.abspath('download.sh')
+            self.download_thread(self.download_abs_path, self.path_from_cache)
             
         else:
             with open('download.bat', 'w') as file:
@@ -135,7 +139,10 @@ class EasyDLPApp:
                     file.write(f'yt-dlp.exe -S ext:mp4 --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 file.write('exit\n')
             self.download_abs_path = os.path.abspath('download.bat')
-
+            self.download_thread(self.download_abs_path, self.path_from_cache)
+  
+    def download_subprocess(self, download_abs_path, path_from_cache):
+        LOGTXT_CONST = "log.txt"
         if sys.platform.startswith('win'):
             self.startupinfo = subprocess.STARTUPINFO()
             self.startupinfo.wShowWindow = subprocess.SW_HIDE
@@ -144,25 +151,68 @@ class EasyDLPApp:
             self.startupinfo = None
             self.creationflags = 0
 
-        self.process = subprocess.Popen([self.download_abs_path], startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=self.creationflags)
-        
+        self.process = subprocess.Popen([download_abs_path], startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=self.creationflags)
         _, stderr = self.process.communicate()
         proc_success = self.process.returncode == 0
         self.process.wait()
         if proc_success:
-            info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".')
+            self.root.after(100, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".'))
+            self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
+            self.root.after(0, self.current_window.progress_bar.set(0))
+            self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
         else:
             if not os.path.exists(LOGTXT_CONST):
                 with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
                     file.write(stderr.decode('utf-8', errors='ignore'))
                 log_path = os.path.abspath(LOGTXT_CONST)
+                self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
+                self.root.after(0, self.current_window.progress_bar.set(0))
+                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
                 err_msg(f'An error occurred during the download, a log file was generated at: {log_path}')
+                
             else:
                 with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
                     file.write(stderr.decode('utf-8', errors='ignore'))
                 log_path = os.path.abspath(LOGTXT_CONST)
+                self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
+                self.root.after(0, self.current_window.progress_bar.set(0))
+                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
                 err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
-        os.remove(self.download_abs_path)
+        os.remove(download_abs_path)
+
+    def download_thread(self, download_abs_path, path_from_cache):
+        
+        def check_thread():
+            if self.thread.is_alive():
+                self.root.after(200, check_thread)
+            else:
+                self.enable_widgets()
+                self.current_window.progress_bar['value'] = 0
+                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        
+        self.disable_widgets()
+        self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
+        self.current_window.progress_bar.start()
+                
+        self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache), daemon=True)
+        self.thread.start()
+        check_thread()
+        
+    def disable_widgets(self):
+        try:
+            widgets = (self.current_window.main_entry, self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            for widget in widgets:
+                widget.configure(state="disabled")
+        except AttributeError:
+            pass
+        
+    def enable_widgets(self):
+        try:
+            widgets = (self.current_window.main_entry, self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            for widget in widgets:
+                widget.configure(state="normal")
+        except AttributeError:
+            pass
 
     def show_cache_window(self):
         self.close_current()
@@ -312,21 +362,30 @@ class MainWindow(ctk.CTkToplevel):
         self.themes = ThemeFrame(self, app)
         self.themes.pack(anchor="w", padx=10)
 
-        main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
-        main_label.pack(pady=(12, 0))
+        self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
+        self.main_label.pack(pady=(12, 0))
 
-        main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        main_entry.pack(pady=10, fill="x", padx=20)
-        simple_handling(main_entry, "<Return>", lambda:self.app.download(main_entry))
+        self.main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
+        self.main_entry.pack(pady=10, fill="x", padx=20)
+        simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
-        main_download = ctk.CTkButton(self, text='Download', font=('', 20), command=lambda:self.app.download(main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        main_download.pack(pady=10)
-        simple_handling(main_download, "<Return>", lambda:self.app.download(main_entry))
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame.columnconfigure((0,1), weight=1)
+        self.button_frame.rowconfigure(0, weight=1)
+        self.button_frame.pack()
+        
+        self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_download.grid(row=0, column=0, padx=5)
+        simple_handling(self.main_download, "<Return>", lambda:self.app.download(self.main_entry))
 
-        main_clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 13), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        main_clear_dir.pack(pady=0)
+        self.main_clear_dir = ctk.CTkButton(self.button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_clear_dir.grid(row=0, column=1, padx=5)
+        
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=20, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=1)
+        self.progress_bar['value'] = 0
+        self.progress_bar.pack(pady=15)
 
-        main_entry.focus_set()
+        self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
     
