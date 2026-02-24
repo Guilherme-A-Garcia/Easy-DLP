@@ -159,7 +159,7 @@ class EasyDLPApp:
             self.root.after(500, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".'))
             self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
             self.root.after(0, self.current_window.progress_bar.set(0))
-            self.current_window.progress_bar.configure(progress_color="#2a2b2d", fg_color="#2a2b2d")
+            self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
         else:
             if not os.path.exists(LOGTXT_CONST):
                 with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
@@ -167,7 +167,7 @@ class EasyDLPApp:
                 log_path = os.path.abspath(LOGTXT_CONST)
                 self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
                 self.root.after(0, self.current_window.progress_bar.set(0))
-                self.current_window.progress_bar.configure(progress_color="#2a2b2d", fg_color="#2a2b2d")
+                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
                 err_msg(f'An error occurred during the download, a log file was generated at: {log_path}')
                 
             else:
@@ -176,7 +176,7 @@ class EasyDLPApp:
                 log_path = os.path.abspath(LOGTXT_CONST)
                 self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
                 self.root.after(0, self.current_window.progress_bar.set(0))
-                self.current_window.progress_bar.configure(progress_color="#2a2b2d", fg_color="#2a2b2d")
+                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
                 err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
         os.remove(download_abs_path)
 
@@ -188,10 +188,10 @@ class EasyDLPApp:
             else:
                 self.enable_widgets()
                 self.current_window.progress_bar['value'] = 0
-                self.current_window.progress_bar.configure(progress_color="#2a2b2d", fg_color="#2a2b2d")
+                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
         
         self.disable_widgets()
-        self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#4a4d50", mode="indeterminate")
+        self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
         self.current_window.progress_bar.start()
                 
         self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache), daemon=True)
@@ -381,7 +381,7 @@ class MainWindow(ctk.CTkToplevel):
         self.main_clear_dir = ctk.CTkButton(self.button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_clear_dir.grid(row=0, column=1, padx=5)
         
-        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=20, corner_radius=10, progress_color="#2a2b2d", fg_color="#2a2b2d", mode="determinate")
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=20, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=1)
         self.progress_bar['value'] = 0
         self.progress_bar.pack(pady=15)
 
