@@ -148,11 +148,11 @@ class EasyDLPApp:
                 if self.selected_browser == 'None' and not self.is_playlist():
                     file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 {self.download_link}\n')
                 elif self.selected_browser == 'None' and self.is_playlist():
-                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings -o "{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s" {self.download_link}\n')
+                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings -o "{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s" {self.download_link}\n')
                 elif self.selected_browser != 'None' and not self.is_playlist():
-                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --js-runtime node --no-playlist --playlist-end 1 --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 elif self.selected_browser != 'None' and self.is_playlist():
-                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --js-runtime node --cookies-from-browser {self.selected_browser} -o "{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s" {self.download_link}\n')
+                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} -o "{self.playlist_folder}\\%%(playlist)s\\\%%(title)s.%%(ext)s" {self.download_link}\n')
                 file.write('exit\n')
             self.download_abs_path = os.path.abspath('download.bat')
             self.download_thread(self.download_abs_path, self.path_from_cache, self.playlist_folder)
