@@ -394,14 +394,17 @@ class MainWindow(ctk.CTkToplevel):
     
     def playlist_handler(self, event):
         if self.pl_checkbox_state.get() == 'on':
-            self.playlist_directory = ctk.filedialog.askdirectory(title="Choose the download location for the playlist")
-            if self.playlist_directory:
-                self.playlist_directory = self.playlist_directory
-            else:
-                self.pl_checkbox_state.set('off')
+            self.playlist_directory = str(ctk.filedialog.askdirectory(title="Choose the download location for the playlist")).strip('()')
         else:
             self.playlist_directory = ''
-        print(self.playlist_directory)
+
+        if self.playlist_directory != '':
+            if not os.path.exists(self.playlist_directory):
+                err_msg("This directory does not exist.")
+                self.playlist_directory = ''
+                self.pl_checkbox_state.set('off')
+        else:
+            self.pl_checkbox_state.set('off')
     
     def on_closing(self):
         self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
