@@ -398,17 +398,20 @@ class MainWindow(ctk.CTkToplevel):
         self.main_entry.pack(pady=8, fill="x", padx=20)
         simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
-        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_frame.columnconfigure((0,1), weight=1)
+        sself.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame.columnconfigure((0,1,2), weight=1)
         self.button_frame.rowconfigure(0, weight=1)
         self.button_frame.pack()
         
+        self.main_settings = ctk.CTkButton(self.button_frame, text="Settings", font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_settings.grid(row=0, column=0)
+        
         self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.main_download.grid(row=0, column=0, padx=5)
+        self.main_download.grid(row=0, column=1, padx=10)
         simple_handling(self.main_download, "<Return>", lambda:self.app.download(self.main_entry))
 
         self.main_clear_dir = ctk.CTkButton(self.button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.main_clear_dir.grid(row=0, column=1, padx=5)
+        self.main_clear_dir.grid(row=0, column=2,)
         
         self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=15, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=2)
         self.progress_bar['value'] = 0
