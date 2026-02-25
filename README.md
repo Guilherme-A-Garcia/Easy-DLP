@@ -31,11 +31,15 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 - Error handling with user-friendly message boxes
 - Dark/Light theme switch
 - Binaries for both Windows and Linux
+- Support for downloading playlists
 
 ## Requirements
-First and foremost, you will need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary and [FFMPEG](https://www.ffmpeg.org/download.html).<br><br>
+First and foremost, you will need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary and [FFMPEG](https://www.ffmpeg.org/download.html).<br>
+
 If you use Windows, Windows 8 (or newer) is needed, as it is the minimum requirement to run YT-DLP.<br>
-As for Linux users, don't forget to give execution permissions to the YT-DLP binary with `sudo chmod a+rx`!<br>
+
+As for Linux users, you will need to install [Node](https://nodejs.org/en). <br>
+Don't forget to give execution permissions to the YT-DLP binary with `sudo chmod a+rx`!<br>
 
 If you plan on using the source code version, you must install the [latest Python version](https://www.python.org/downloads/). 🐍
 
@@ -89,7 +93,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 - - [x] Additional path verification for better integrity;
 - - [x] Linux support;
 - - [x] Add threading and a progress bar;
-- - [ ] Playlist support;
+- - [x] Playlist support;
 - - [ ] Add a settings tab;
 - - [ ] Add an auto-update system;
 - - [ ] Step up the game to PySide6.
