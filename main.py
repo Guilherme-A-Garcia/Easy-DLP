@@ -347,6 +347,7 @@ class MainWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
+        self.playlist_directory = ''
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
@@ -362,6 +363,7 @@ class MainWindow(ctk.CTkToplevel):
         self.pl_checkbox_state = ctk.StringVar(value='off')
         self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
         self.playlist_checkbox.pack(anchor='w', padx=10)
+        self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         self.main_label.pack()
@@ -389,6 +391,17 @@ class MainWindow(ctk.CTkToplevel):
         self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
+    
+    def playlist_handler(self, event):
+        if self.pl_checkbox_state.get() == 'on':
+            self.playlist_directory = ctk.filedialog.askdirectory(title="Choose the download location for the playlist")
+            if self.playlist_directory:
+                self.playlist_directory = self.playlist_directory
+            else:
+                self.pl_checkbox_state.set('off')
+        else:
+            self.playlist_directory = ''
+        print(self.playlist_directory)
     
     def on_closing(self):
         self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
