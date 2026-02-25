@@ -397,12 +397,12 @@ class MainWindow(ctk.CTkToplevel):
         self.main_entry.pack(pady=8, fill="x", padx=20)
         simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
-        sself.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.columnconfigure((0,1,2), weight=1)
         self.button_frame.rowconfigure(0, weight=1)
         self.button_frame.pack()
         
-        self.main_settings = ctk.CTkButton(self.button_frame, text="Settings", font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_settings = ctk.CTkButton(self.button_frame, text="Settings", font=('', 18), command=self.show_settings, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_settings.grid(row=0, column=0)
         
         self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
@@ -419,7 +419,11 @@ class MainWindow(ctk.CTkToplevel):
         self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
-    
+            
+    def show_settings(self):
+        self.withdraw()
+        self.current_window = SettingsWindow(self, self.app)
+        
     def playlist_handler(self, event):
         if self.pl_checkbox_state.get() == 'on':
             self.playlist_directory = str(ctk.filedialog.askdirectory(title="Choose the download location for the playlist")).strip('()')
