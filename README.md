@@ -45,7 +45,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 
 ## How to Use
 1. Download the latest release of this project;<br>
-2. Execute the .exe binary (or the .AppImage);<br>
+2. Execute the .exe binary (or the .AppImage if you are using Linux);<br>
 3. Paste your YT-DLP file path in the "YT-DLP Path Directory Cache" window. For example, "C:/Users/YourName/Downloads/" if your YT-DLP binary is located in the 'Downloads' folder;<br>
 4. If you wish to download an age-restricted video from YouTube, log into your YouTube account and select your browser in the drop-down menu, clicking save after the process. Leave the selector at "None" if you don't need cookie importation;<br>
 5. Insert the URL of the video you're going to download and press "Download".<br>
