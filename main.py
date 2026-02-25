@@ -98,8 +98,19 @@ class EasyDLPApp:
             err_msg("The cache file was either moved or deleted, closing application.\nPlease, re-open and follow the procedures.")
             self.root.destroy()
 
+    def is_playlist(self):
+        if hasattr(self.current_window, 'playlist_checkbox'):
+            if self.current_window.pl_checkbox_state.get() == 'on':
+                return True
+            else:
+                return False
+
     def download(self, main_entry):
         self.selected_browser = self.final_cookie_selection.get()
+        
+        if self.is_playlist:
+            self.playlist_folder = self.current_window.playlist_directory
+
         if not main_entry.get():
             err_msg('Please, insert a webpage link')
             return
@@ -124,7 +135,7 @@ class EasyDLPApp:
                     file.write(f'./yt-dlp -S ext:mp4 --recode mp4 --quiet --no-warning --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 file.write('\n')
             self.download_abs_path = os.path.abspath('download.sh')
-            self.download_thread(self.download_abs_path, self.path_from_cache)
+            self.download_thread(self.download_abs_path, self.path_from_cache, self.playlist_folder)
             
         else:
             with open('download.bat', 'w') as file:
@@ -136,10 +147,14 @@ class EasyDLPApp:
                     file.write(f'yt-dlp.exe -S ext:mp4 --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
                 file.write('exit\n')
             self.download_abs_path = os.path.abspath('download.bat')
-            self.download_thread(self.download_abs_path, self.path_from_cache)
+            self.download_thread(self.download_abs_path, self.path_from_cache, self.playlist_folder)
   
-    def download_subprocess(self, download_abs_path, path_from_cache):
+    def download_subprocess(self, download_abs_path, path_from_cache, playlist_folder):
         LOGTXT_CONST = "log.txt"
+        
+        if self.is_playlist:
+            self.download_location = playlist_folder
+        
         if sys.platform.startswith('win'):
             self.startupinfo = subprocess.STARTUPINFO()
             self.startupinfo.wShowWindow = subprocess.SW_HIDE
@@ -153,7 +168,10 @@ class EasyDLPApp:
         proc_success = self.process.returncode == 0
         self.process.wait()
         if proc_success:
-            self.root.after(100, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".'))
+            if self.is_playlist():
+                self.root.after(100, info_msg(f'Playlist successfully downloaded. Check the output location: "{self.download_location}".'))
+            else:
+                self.root.after(100, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".'))
             self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
             self.root.after(0, self.current_window.progress_bar.set(0))
             self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
@@ -177,7 +195,7 @@ class EasyDLPApp:
                 err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
         os.remove(download_abs_path)
 
-    def download_thread(self, download_abs_path, path_from_cache):
+    def download_thread(self, download_abs_path, path_from_cache, playlist_folder):
         
         def check_thread():
             if self.thread.is_alive():
@@ -191,7 +209,7 @@ class EasyDLPApp:
         self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
         self.current_window.progress_bar.start()
                 
-        self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache), daemon=True)
+        self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache, playlist_folder), daemon=True)
         self.thread.start()
         check_thread()
         
@@ -397,7 +415,7 @@ class MainWindow(ctk.CTkToplevel):
             self.playlist_directory = str(ctk.filedialog.askdirectory(title="Choose the download location for the playlist")).strip('()')
         else:
             self.playlist_directory = ''
-
+            
         if self.playlist_directory != '':
             if not os.path.exists(self.playlist_directory):
                 err_msg("This directory does not exist.")
