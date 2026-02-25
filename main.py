@@ -98,8 +98,19 @@ class EasyDLPApp:
             err_msg("The cache file was either moved or deleted, closing application.\nPlease, re-open and follow the procedures.")
             self.root.destroy()
 
+    def is_playlist(self):
+        if hasattr(self.current_window, 'playlist_checkbox'):
+            if self.current_window.pl_checkbox_state.get() == 'on':
+                return True
+            else:
+                return False
+
     def download(self, main_entry):
         self.selected_browser = self.final_cookie_selection.get()
+        
+        if self.is_playlist:
+            self.playlist_folder = self.current_window.playlist_directory
+
         if not main_entry.get():
             err_msg('Please, insert a webpage link')
             return
@@ -118,28 +129,40 @@ class EasyDLPApp:
                 file.write('#!/bin/bash\n')
                 file.write('set -x\n')
                 file.write(f'cd {self.path_from_cache}\n')
-                if self.selected_browser == 'None':
-                    file.write(f'./yt-dlp -S ext:mp4 --recode mp4 --quiet --no-warnings {self.download_link}\n')
-                else:
-                    file.write(f'./yt-dlp -S ext:mp4 --recode mp4 --quiet --no-warning --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                if self.selected_browser == 'None' and not self.is_playlist():
+                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 {self.download_link}\n')
+                elif self.selected_browser == 'None' and self.is_playlist():
+                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings -o "{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s" {self.download_link}\n')
+                elif self.selected_browser != 'None' and not self.is_playlist():
+                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --js-runtime node --no-playlist --playlist-end 1 --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                elif self.selected_browser != 'None' and self.is_playlist():
+                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --js-runtime node --cookies-from-browser {self.selected_browser} -o "{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s" {self.download_link}\n')
                 file.write('\n')
             self.download_abs_path = os.path.abspath('download.sh')
-            self.download_thread(self.download_abs_path, self.path_from_cache)
+            self.download_thread(self.download_abs_path, self.path_from_cache, self.playlist_folder)
             
         else:
             with open('download.bat', 'w') as file:
                 file.write('@echo off\n')
                 file.write(f'cd /d {self.path_from_cache}\n')
-                if self.selected_browser == 'None':
-                    file.write(f'yt-dlp.exe -S ext:mp4 --recode mp4 --quiet --no-warnings {self.download_link}\n')
-                else:
-                    file.write(f'yt-dlp.exe -S ext:mp4 --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                if self.selected_browser == 'None' and not self.is_playlist():
+                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 {self.download_link}\n')
+                elif self.selected_browser == 'None' and self.is_playlist():
+                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings -o "{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s" {self.download_link}\n')
+                elif self.selected_browser != 'None' and not self.is_playlist():
+                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 --cookies-from-browser {self.selected_browser} {self.download_link}\n')
+                elif self.selected_browser != 'None' and self.is_playlist():
+                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} -o "{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s" {self.download_link}\n')
                 file.write('exit\n')
             self.download_abs_path = os.path.abspath('download.bat')
-            self.download_thread(self.download_abs_path, self.path_from_cache)
+            self.download_thread(self.download_abs_path, self.path_from_cache, self.playlist_folder)
   
-    def download_subprocess(self, download_abs_path, path_from_cache):
+    def download_subprocess(self, download_abs_path, path_from_cache, playlist_folder):
         LOGTXT_CONST = "log.txt"
+        
+        if self.is_playlist:
+            self.download_location = playlist_folder
+        
         if sys.platform.startswith('win'):
             self.startupinfo = subprocess.STARTUPINFO()
             self.startupinfo.wShowWindow = subprocess.SW_HIDE
@@ -153,7 +176,10 @@ class EasyDLPApp:
         proc_success = self.process.returncode == 0
         self.process.wait()
         if proc_success:
-            self.root.after(100, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{path_from_cache}".'))
+            if self.is_playlist():
+                self.root.after(100, info_msg(f'Playlist successfully downloaded. Check the output location: "{self.download_location}".'))
+            else:
+                self.root.after(100, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".'))
             self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
             self.root.after(0, self.current_window.progress_bar.set(0))
             self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
@@ -177,7 +203,7 @@ class EasyDLPApp:
                 err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
         os.remove(download_abs_path)
 
-    def download_thread(self, download_abs_path, path_from_cache):
+    def download_thread(self, download_abs_path, path_from_cache, playlist_folder):
         
         def check_thread():
             if self.thread.is_alive():
@@ -191,7 +217,7 @@ class EasyDLPApp:
         self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
         self.current_window.progress_bar.start()
                 
-        self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache), daemon=True)
+        self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache, playlist_folder), daemon=True)
         self.thread.start()
         check_thread()
         
@@ -347,6 +373,7 @@ class MainWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
+        self.playlist_directory = ''
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
@@ -358,12 +385,17 @@ class MainWindow(ctk.CTkToplevel):
 
         self.themes = ThemeFrame(self, app)
         self.themes.pack(anchor="w", padx=10)
+        
+        self.pl_checkbox_state = ctk.StringVar(value='off')
+        self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
+        self.playlist_checkbox.pack(anchor='w', padx=10)
+        self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
-        self.main_label.pack(pady=(12, 0))
+        self.main_label.pack()
 
         self.main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        self.main_entry.pack(pady=10, fill="x", padx=20)
+        self.main_entry.pack(pady=8, fill="x", padx=20)
         simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -378,13 +410,27 @@ class MainWindow(ctk.CTkToplevel):
         self.main_clear_dir = ctk.CTkButton(self.button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_clear_dir.grid(row=0, column=1, padx=5)
         
-        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=20, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=1)
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=15, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=2)
         self.progress_bar['value'] = 0
-        self.progress_bar.pack(pady=15)
+        self.progress_bar.pack(pady=15, fill='both', padx=50)
 
         self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
+    
+    def playlist_handler(self, event):
+        if self.pl_checkbox_state.get() == 'on':
+            self.playlist_directory = str(ctk.filedialog.askdirectory(title="Choose the download location for the playlist")).strip('()')
+        else:
+            self.playlist_directory = ''
+            
+        if self.playlist_directory != '':
+            if not os.path.exists(self.playlist_directory):
+                err_msg("This directory does not exist.")
+                self.playlist_directory = ''
+                self.pl_checkbox_state.set('off')
+        else:
+            self.pl_checkbox_state.set('off')
     
     def on_closing(self):
         self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
@@ -402,7 +448,7 @@ class ThemeFrame(ctk.CTkFrame):
 
         self.initial_theme = ctk.get_appearance_mode()
         self.theme_variable = ctk.StringVar(value=self.initial_theme)
-        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 12), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.controller.set_theme(parent), offvalue="Dark", onvalue="Light")
+        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.controller.set_theme(parent), offvalue="Dark", onvalue="Light")
         self.theme_switch.grid(row=0, column=0, padx=0)
 
 if __name__ == "__main__":
