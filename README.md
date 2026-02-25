@@ -5,7 +5,7 @@
 
 # Easy-DLP
 Easy-DLP is a clean and simple GUI wrapper for **YT-DLP**. Download videos easily with browser cookie support.<br>
-This application is but a humble wrapper coded in Python, using the following libraries: CustomTkinter, CTkMessagebox, subprocess, os and sys.<br>
+This application is but a humble Python wrapper, using the following libraries: CustomTkinter, CTkMessagebox, PIL, subprocess, threading, os and sys.<br>
 The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are currently compiled with [Nuitka](https://nuitka.net/).
 
 >[!CAUTION]
@@ -44,16 +44,17 @@ Don't forget to give execution permissions to the YT-DLP binary with `sudo chmod
 If you plan on using the source code version, you must install the [latest Python version](https://www.python.org/downloads/). 🐍
 
 ## How to Use
-1. Download the latest release of this project;<br><br>
-2. Execute the .exe binary (or the .AppImage);<br><br>
-3. Paste your YT-DLP file path in the "YT-DLP Path Directory Cache" window. For example, "C:/Users/YourName/Downloads/" if your YT-DLP binary is located in the 'Downloads' folder;<br><br>
-4. If you wish to download an age-restricted video from YouTube, log into your YouTube account and select your browser in the drop-down menu, clicking save after the process. Leave the selector at "None" if you don't need cookie importation;<br><br>
-5. Insert the URL of the video you're going to download and press "Download".<br><br>
+1. Download the latest release of this project;<br>
+2. Execute the .exe binary (or the .AppImage);<br>
+3. Paste your YT-DLP file path in the "YT-DLP Path Directory Cache" window. For example, "C:/Users/YourName/Downloads/" if your YT-DLP binary is located in the 'Downloads' folder;<br>
+4. If you wish to download an age-restricted video from YouTube, log into your YouTube account and select your browser in the drop-down menu, clicking save after the process. Leave the selector at "None" if you don't need cookie importation;<br>
+5. Insert the URL of the video you're going to download and press "Download".<br>
 
 >[!TIP]
 > You are able to clear the YT-DLP file path you provided by clicking "Clear path", doing this will close the application,<br>
   and will generate a new cache file once you open it up again.<br>
 > If you are importing cookies, it MIGHT be preferable to close your browser before downloading any video.
+> And if you're downloading a playlist, simply click the 'Playlist mode' check-box in the top right corner, select the directory and insert the playlist link.
 
 ## Using the Source Code
 
