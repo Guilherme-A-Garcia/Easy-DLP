@@ -57,8 +57,7 @@ def set_window_icon(root):
         print(f"Error, icon not available: {e}")
 
 def is_linux():
-    if sys.platform.startswith('linux'):
-        return True
+    return sys.platform.startswith('linux')
 
 def err_msg(text):
     error = CTkMessagebox(title='Error', message=text, icon="cancel", option_focus=1, button_color="#950808", button_hover_color="#630202")
