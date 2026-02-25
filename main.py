@@ -372,6 +372,7 @@ class MainWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
+        self.settings_open = False
         self.playlist_directory = ''
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
@@ -422,6 +423,7 @@ class MainWindow(ctk.CTkToplevel):
             
     def show_settings(self):
         self.withdraw()
+        self.settings_open = True
         self.current_window = SettingsWindow(self, self.app)
         
     def playlist_handler(self, event):
@@ -449,6 +451,33 @@ class SettingsWindow(ctk.CTkToplevel):
         super().__init__(parent)
         self.parent = parent
         self.app = app
+        
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+
+        set_window_icon(self)
+        self.title('Settings')
+        dynamic_resolution(self, 500, 230)
+        self.resizable(False,False)
+
+        self.themes = ThemeFrame(self, app)
+        self.themes.pack(anchor="w", padx=10)
+
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
+    
+    def on_closing(self):
+        self.save = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
+        if self.save.get() == "Yes":
+            self.app.current_window = self.parent
+            self.destroy()
+            self.parent.deiconify()
+        elif self.save.get() == "No":
+            self.app.current_window = self.parent
+            self.destroy()
+            self.parent.deiconify()
+        else:
+            return
 
 class ThemeFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
