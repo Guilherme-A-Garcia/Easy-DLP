@@ -360,7 +360,7 @@ class MainWindow(ctk.CTkToplevel):
         self.themes.pack(anchor="w", padx=10)
         
         self.pl_checkbox_state = ctk.StringVar(value='off')
-        self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202")
+        self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
         self.playlist_checkbox.pack(anchor='w', padx=10)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
