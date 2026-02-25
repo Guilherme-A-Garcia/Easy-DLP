@@ -437,6 +437,12 @@ class MainWindow(ctk.CTkToplevel):
         if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
+            
+class SettingsWindow(ctk.CTkToplevel):
+    def __init__(self, parent, app):
+        super().__init__(parent)
+        self.parent = parent
+        self.app = app
 
 class ThemeFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
