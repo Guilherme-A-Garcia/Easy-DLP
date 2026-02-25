@@ -358,12 +358,16 @@ class MainWindow(ctk.CTkToplevel):
 
         self.themes = ThemeFrame(self, app)
         self.themes.pack(anchor="w", padx=10)
+        
+        self.pl_checkbox_state = ctk.StringVar(value='off')
+        self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202")
+        self.playlist_checkbox.pack(anchor='w', padx=10)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
-        self.main_label.pack(pady=(12, 0))
+        self.main_label.pack()
 
         self.main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
-        self.main_entry.pack(pady=10, fill="x", padx=20)
+        self.main_entry.pack(pady=8, fill="x", padx=20)
         simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -378,9 +382,9 @@ class MainWindow(ctk.CTkToplevel):
         self.main_clear_dir = ctk.CTkButton(self.button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_clear_dir.grid(row=0, column=1, padx=5)
         
-        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=20, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=1)
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=15, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=2)
         self.progress_bar['value'] = 0
-        self.progress_bar.pack(pady=15)
+        self.progress_bar.pack(pady=15, fill='both', padx=50)
 
         self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -402,7 +406,7 @@ class ThemeFrame(ctk.CTkFrame):
 
         self.initial_theme = ctk.get_appearance_mode()
         self.theme_variable = ctk.StringVar(value=self.initial_theme)
-        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 12), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.controller.set_theme(parent), offvalue="Dark", onvalue="Light")
+        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.controller.set_theme(parent), offvalue="Dark", onvalue="Light")
         self.theme_switch.grid(row=0, column=0, padx=0)
 
 if __name__ == "__main__":
