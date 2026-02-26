@@ -6,7 +6,6 @@ import threading
 import sys
 import os
 
-# before anything, fix the damn fragile batch generating logic in EasyDLPApp.download() 
 # make a ctk.CTkFrame class to fit the settings, then instead of having the themes loose, have it in the settings window
 # add checkbox to force mp4
 # add checkbox to download audio only (grays out all other options besides playlist mode)
@@ -130,43 +129,32 @@ class EasyDLPApp:
         with open("cache.txt", 'r') as file:
             self.path_from_cache = file.readline().strip()
             
-        if is_linux():
-            with open('download.sh', 'w') as file:
-                file.write('#!/bin/bash\n')
-                file.write('set -x\n')
-                file.write(f'cd {self.path_from_cache}\n')
-                if self.selected_browser == 'None' and not self.is_playlist():
-                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 {self.download_link}\n')
-                elif self.selected_browser == 'None' and self.is_playlist():
-                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings -o "{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s" {self.download_link}\n')
-                elif self.selected_browser != 'None' and not self.is_playlist():
-                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --js-runtime node --no-playlist --playlist-end 1 --cookies-from-browser {self.selected_browser} {self.download_link}\n')
-                elif self.selected_browser != 'None' and self.is_playlist():
-                    file.write(f'./yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --js-runtime node --cookies-from-browser {self.selected_browser} -o "{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s" {self.download_link}\n')
-                file.write('\n')
-            self.download_abs_path = os.path.abspath('download.sh')
-            self.download_thread(self.download_abs_path, self.path_from_cache, self.playlist_folder)
+        self.cmd_parts = ['yt-dlp', '-S', 'res,ext:mp4:m4a', '--recode', 'mp4', '--quiet', '--no-warnings']
+        if is_linux:
+            self.cmd_parts[0] = './yt-dlp'
             
+        if self.selected_browser != 'None':
+            if is_linux():
+                self.cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', self.selected_browser]
+            else:
+                self.cmd_parts += ['--cookies-from-browser', self.selected_browser]
+
+        if not self.is_playlist():
+            self.cmd_parts += ['--no-playlist', '--playlist-end', '1']
         else:
-            with open('download.bat', 'w') as file:
-                file.write('@echo off\n')
-                file.write(f'cd /d {self.path_from_cache}\n')
-                if self.selected_browser == 'None' and not self.is_playlist():
-                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 {self.download_link}\n')
-                elif self.selected_browser == 'None' and self.is_playlist():
-                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings -o "{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s" {self.download_link}\n')
-                elif self.selected_browser != 'None' and not self.is_playlist():
-                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --no-playlist --playlist-end 1 --cookies-from-browser {self.selected_browser} {self.download_link}\n')
-                elif self.selected_browser != 'None' and self.is_playlist():
-                    file.write(f'yt-dlp -S res,ext:mp4:m4a --recode mp4 --quiet --no-warnings --cookies-from-browser {self.selected_browser} -o "{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s" {self.download_link}\n')
-                file.write('exit\n')
-            self.download_abs_path = os.path.abspath('download.bat')
-            self.download_thread(self.download_abs_path, self.path_from_cache, self.playlist_folder)
+            if is_linux:
+                self.cmd_parts += ['-o', f"{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s"]
+            else:
+                self.cmd_parts += ['-o', f"{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s"]
+        
+        self.cmd_parts.append(self.download_link)
+        
+        self.download_thread(self.cmd_parts, self.path_from_cache, self.playlist_folder)
   
-    def download_subprocess(self, download_abs_path, path_from_cache, playlist_folder):
+    def download_subprocess(self, cmd_parts, path_from_cache, playlist_folder):
         LOGTXT_CONST = "log.txt"
         
-        if self.is_playlist:
+        if self.is_playlist():
             self.download_location = playlist_folder
         
         if sys.platform.startswith('win'):
@@ -177,7 +165,7 @@ class EasyDLPApp:
             self.startupinfo = None
             self.creationflags = 0
 
-        self.process = subprocess.Popen([download_abs_path], startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=self.creationflags)
+        self.process = subprocess.Popen(cmd_parts, startupinfo=self.startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=self.creationflags, cwd=path_from_cache)
         _, stderr = self.process.communicate()
         proc_success = self.process.returncode == 0
         self.process.wait()
@@ -207,9 +195,8 @@ class EasyDLPApp:
                 self.root.after(0, self.current_window.progress_bar.set(0))
                 self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
                 err_msg(f'An error occurred during the download, a preexisting log file was updated at: {log_path}')
-        os.remove(download_abs_path)
 
-    def download_thread(self, download_abs_path, path_from_cache, playlist_folder):
+    def download_thread(self, cmd_parts, path_from_cache, playlist_folder):
         
         def check_thread():
             if self.thread.is_alive():
@@ -223,7 +210,7 @@ class EasyDLPApp:
         self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
         self.current_window.progress_bar.start()
                 
-        self.thread = threading.Thread(target=self.download_subprocess, args=(download_abs_path, path_from_cache, playlist_folder), daemon=True)
+        self.thread = threading.Thread(target=self.download_subprocess, args=(cmd_parts, path_from_cache, playlist_folder), daemon=True)
         self.thread.start()
         check_thread()
         
