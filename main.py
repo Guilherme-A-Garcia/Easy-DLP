@@ -6,12 +6,12 @@ import threading
 import sys
 import os
 
-# make a class to fit the settings, then instead of having the themes loose, have it in the settings window
+# before anything, fix the damn fragile batch generating logic in EasyDLPApp.download() 
+# make a ctk.CTkFrame class to fit the settings, then instead of having the themes loose, have it in the settings window
 # add checkbox to force mp4
 # add checkbox to download audio only (grays out all other options besides playlist mode)
 # add button to rewrite cache
 # add button to save settings
-# MAKE A GOOD DESIGN FOR ONCE
 
 def main():
     ctk.set_appearance_mode("System")
