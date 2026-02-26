@@ -6,7 +6,12 @@ import threading
 import sys
 import os
 
-# repurpose the themes class to fit the settings too, then instead of having the themes loose, have it in the settings window
+# make a class to fit the settings, then instead of having the themes loose, have it in the settings window
+# add checkbox to force mp4
+# add checkbox to download audio only (grays out all other options besides playlist mode)
+# add button to rewrite cache
+# add button to save settings
+# MAKE A GOOD DESIGN FOR ONCE
 
 def main():
     ctk.set_appearance_mode("System")
@@ -432,7 +437,6 @@ class SettingsWindow(ctk.CTkToplevel):
         super().__init__(parent)
         self.parent = parent
         self.app = app
-        # self.playlist_directory = ''
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
