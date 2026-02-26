@@ -6,6 +6,8 @@ import threading
 import sys
 import os
 
+# repurpose the themes class to fit the settings too, then instead of having the themes loose, have it in the settings window
+
 def main():
     ctk.set_appearance_mode("System")
     app = EasyDLPApp()
@@ -70,6 +72,7 @@ def info_msg(text):
 class EasyDLPApp:
     def __init__(self):
         self.current_window = None
+        self.playlist_directory = ''
         self.root = ctk.CTk()
         self.root.withdraw()
         self.final_cookie_selection = ctk.StringVar()
@@ -108,7 +111,7 @@ class EasyDLPApp:
         self.selected_browser = self.final_cookie_selection.get()
         
         if self.is_playlist:
-            self.playlist_folder = self.current_window.playlist_directory
+            self.playlist_folder = self.playlist_directory
 
         if not main_entry.get():
             err_msg('Please, insert a webpage link')
@@ -325,7 +328,7 @@ class CookieWindow(ctk.CTkToplevel):
         set_window_icon(self)
         self.final_cookie_selection = self.app.final_cookie_selection
         self.title('Cookie importation')
-        dynamic_resolution(self, 500, 250)
+        dynamic_resolution(self, 500, 258)
         self.resizable(False,False)
 
         self.themes = ThemeFrame(self, app)
@@ -344,7 +347,7 @@ class CookieWindow(ctk.CTkToplevel):
         self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
-        self.cookie_button = ctk.CTkButton(self, text='Save', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.cookie_button = ctk.CTkButton(self, text='Next', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cookie_button.pack(pady=10)
         simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
 
@@ -373,7 +376,6 @@ class MainWindow(ctk.CTkToplevel):
         super().__init__(app.root)
         self.app = app
         self.settings_open = False
-        self.playlist_directory = ''
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
@@ -385,11 +387,6 @@ class MainWindow(ctk.CTkToplevel):
 
         self.themes = ThemeFrame(self, app)
         self.themes.pack(anchor="w", padx=10)
-        
-        self.pl_checkbox_state = ctk.StringVar(value='off')
-        self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
-        self.playlist_checkbox.pack(anchor='w', padx=10)
-        self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         self.main_label.pack()
@@ -399,19 +396,17 @@ class MainWindow(ctk.CTkToplevel):
         simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_frame.columnconfigure((0,1,2), weight=1)
+        self.button_frame.columnconfigure((0,1), weight=1)
         self.button_frame.rowconfigure(0, weight=1)
         self.button_frame.pack()
         
         self.main_settings = ctk.CTkButton(self.button_frame, text="Settings", font=('', 18), command=self.show_settings, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_settings.grid(row=0, column=0)
+        simple_handling(self.main_settings, "<Return>", self.show_settings)
         
         self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_download.grid(row=0, column=1, padx=10)
         simple_handling(self.main_download, "<Return>", lambda:self.app.download(self.main_entry))
-
-        self.main_clear_dir = ctk.CTkButton(self.button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.main_clear_dir.grid(row=0, column=2,)
         
         self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=15, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=2)
         self.progress_bar['value'] = 0
@@ -425,20 +420,8 @@ class MainWindow(ctk.CTkToplevel):
         self.withdraw()
         self.settings_open = True
         self.current_window = SettingsWindow(self, self.app)
-        
-    def playlist_handler(self, event):
-        if self.pl_checkbox_state.get() == 'on':
-            self.playlist_directory = str(ctk.filedialog.askdirectory(title="Choose the download location for the playlist")).strip('()')
-        else:
-            self.playlist_directory = ''
-            
-        if self.playlist_directory != '':
-            if not os.path.exists(self.playlist_directory):
-                err_msg("This directory does not exist.")
-                self.playlist_directory = ''
-                self.pl_checkbox_state.set('off')
-        else:
-            self.pl_checkbox_state.set('off')
+        if self.app.playlist_directory != '':
+            self.current_window.pl_checkbox_state.set('on')
     
     def on_closing(self):
         self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
@@ -451,17 +434,27 @@ class SettingsWindow(ctk.CTkToplevel):
         super().__init__(parent)
         self.parent = parent
         self.app = app
+        # self.playlist_directory = ''
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
 
         set_window_icon(self)
         self.title('Settings')
-        dynamic_resolution(self, 500, 230)
+        dynamic_resolution(self, 500, 330)
         self.resizable(False,False)
 
         self.themes = ThemeFrame(self, app)
         self.themes.pack(anchor="w", padx=10)
+        
+        self.pl_checkbox_state = ctk.StringVar()
+        self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
+        self.playlist_checkbox.pack(anchor='w', padx=10)
+        self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
+        
+        self.clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.clear_dir.pack()
+        simple_handling(self.clear_dir, "<Return>", self.app.clear_cache)
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
@@ -473,11 +466,26 @@ class SettingsWindow(ctk.CTkToplevel):
             self.destroy()
             self.parent.deiconify()
         elif self.save.get() == "No":
+            self.app.playlist_directory = ''
             self.app.current_window = self.parent
             self.destroy()
             self.parent.deiconify()
         else:
             return
+    
+    def playlist_handler(self, event):
+        if self.pl_checkbox_state.get() == 'on':
+            self.app.playlist_directory = str(ctk.filedialog.askdirectory(title="Choose the download location for the playlist")).strip('()')
+        else:
+            self.app.playlist_directory = ''
+            
+        if self.app.playlist_directory != '':
+            if not os.path.exists(self.app.playlist_directory):
+                err_msg("This directory does not exist.")
+                self.app.playlist_directory = ''
+                self.pl_checkbox_state.set('off')
+        else:
+            self.pl_checkbox_state.set('off')
 
 class ThemeFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
