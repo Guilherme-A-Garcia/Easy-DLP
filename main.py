@@ -101,11 +101,10 @@ class EasyDLPApp:
             self.root.destroy()
 
     def is_playlist(self):
-        if hasattr(self.current_window, 'playlist_checkbox'):
-            if self.current_window.pl_checkbox_state.get() == 'on':
-                return True
-            else:
-                return False
+        if self.playlist_directory != '':
+            return True
+        else:
+            return False
 
     def download(self, main_entry):
         self.selected_browser = self.final_cookie_selection.get()
@@ -375,7 +374,6 @@ class MainWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
-        self.settings_open = False
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
