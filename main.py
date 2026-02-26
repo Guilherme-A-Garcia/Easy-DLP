@@ -261,8 +261,8 @@ class CacheWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 150)
         self.resizable(False,False)
 
-        self.themes = ThemeFrame(self, app)
-        self.themes.pack(anchor="w", padx=10)
+        # self.themes = ThemeFrame(self, app)
+        # self.themes.pack(anchor="w", padx=10)
 
         self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
         self.cache_main_lb.pack(pady=(5))
@@ -322,8 +322,8 @@ class CookieWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 258)
         self.resizable(False,False)
 
-        self.themes = ThemeFrame(self, app)
-        self.themes.pack(anchor="w", padx=10)
+        # self.themes = ThemeFrame(self, app)
+        # self.themes.pack(anchor="w", padx=10)
 
         self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 22))
         self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 22))
@@ -375,8 +375,8 @@ class MainWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 220)
         self.resizable(False,False)
 
-        self.themes = ThemeFrame(self, app)
-        self.themes.pack(anchor="w", padx=10)
+        # self.themes = ThemeFrame(self, app)
+        # self.themes.pack(anchor="w", padx=10)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         self.main_label.pack()
@@ -477,16 +477,16 @@ class SettingsWindow(ctk.CTkToplevel):
             self.pl_checkbox_state.set('off')
 
 class ThemeFrame(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, app):
         super().__init__(parent, fg_color="transparent")
-        self.controller = controller
+        self.app = app
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
         self.initial_theme = ctk.get_appearance_mode()
         self.theme_variable = ctk.StringVar(value=self.initial_theme)
-        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.controller.set_theme(parent), offvalue="Dark", onvalue="Light")
+        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.app.set_theme(parent), offvalue="Dark", onvalue="Light")
         self.theme_switch.grid(row=0, column=0, padx=0)
 
 if __name__ == "__main__":
