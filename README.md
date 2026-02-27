@@ -40,8 +40,8 @@ First and foremost, you will need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) b
 
 If you use Windows, Windows 8 (or newer) is needed, as it is the minimum requirement to run YT-DLP.<br>
 
-As for Linux users, you will need to install [Node](https://nodejs.org/en). <br>
-Don't forget to give execution permissions to the YT-DLP binary with `sudo chmod a+rx`!<br>
+For Linux users, you will need to install [Node](https://nodejs.org/en) to use cookie importation, as sometimes<br> it's very tricky to fetch cookies due to rigid browser security.<br>
+Don't forget to grant execution permissions to the YT-DLP binary with `sudo chmod a+rx`!<br>
 
 If you plan on using the source code version, you must install the [latest Python version](https://www.python.org/downloads/). 🐍
 
