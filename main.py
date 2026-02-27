@@ -101,7 +101,7 @@ class EasyDLPApp:
                 self.root.destroy()
         except FileNotFoundError:
             err_msg("The cache file was either moved or deleted, closing application.\nPlease, re-open and follow the procedures.")
-            self.root.destroy()
+            self.write_cache(rewrite=True)
 
     def is_playlist(self):
         if self.playlist_directory != '':
@@ -132,8 +132,8 @@ class EasyDLPApp:
             return
         
         if not os.path.exists("cache.txt"):
-            err_msg('Cache file missing, closing application...\nPlease, re-open the application and follow the necessary procedures.')
-            return self.root.destroy()
+            err_msg('Cache file missing!\nPlease, enter your YT-DLP directory and try again.')
+            self.write_cache(rewrite=True)
         
         self.download_link = main_entry.get()
         
