@@ -594,7 +594,11 @@ class SettingsFrame(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.parent = parent
         self.app = app
-        self.menu_image = ctk.CTkImage(Image.open("menu.png"), size=(25, 25))
+        
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(current_dir, "menu.png")
+        
+        self.menu_image = ctk.CTkImage(Image.open(image_path), size=(25, 25))
         
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
