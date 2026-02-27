@@ -22,7 +22,7 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 
 ## Preview
 ![Main interface](assets/previews/Main.png)<br>
-![Importing cookies interface](assets/previews/Cookie.png)
+![Importing cookies interface](assets/previews/Cookie.png)<br>
 ![Settings interface](assets/previews/Settings.png)
 
 ## Current Features
