@@ -491,7 +491,7 @@ class SettingsWindow(ctk.CTkToplevel):
         
         self.pl_checkbox_state = ctk.StringVar()
         self.playlist_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
-        self.playlist_checkbox.grid(sticky="w", column=0, row=0, padx=10, pady=(10,0))
+        self.playlist_checkbox.grid(sticky="w", column=0, row=0, padx=10)
         self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
         
         self.mp4_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp4_value)
@@ -594,7 +594,7 @@ class SettingsFrame(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.parent = parent
         self.app = app
-        self.menu_image = ctk.CTkImage(Image.open("assets/menu.png"), size=(25, 25))
+        self.menu_image = ctk.CTkImage(Image.open("menu.png"), size=(25, 25))
         
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)

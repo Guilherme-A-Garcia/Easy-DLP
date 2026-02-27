@@ -39,7 +39,7 @@ binaries/
 *.dist/
 *.build/
 *.onefile-build/
-icon.*
+# icon.*
 *.exe
 
 # Installer logs
@@ -222,3 +222,4 @@ __marimo__/
 # Misc.
 cache.txt
 temp.txt
+Easy-DLP*
