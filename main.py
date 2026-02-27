@@ -6,8 +6,6 @@ import threading
 import sys
 import os
 
-# make a ctk.CTkFrame class to fit the settings, then instead of having the themes loose, have it in the settings window
-# add checkbox to force mp4
 # add checkbox to download audio only (grays out all other options besides playlist mode)
 # add button to rewrite cache
 # add button to save settings
@@ -79,6 +77,7 @@ class EasyDLPApp:
         self.playlist_directory = ''
         self.root = ctk.CTk()
         self.root.withdraw()
+        self.mp4_checkbox_state = ctk.StringVar(value='off')
         self.final_cookie_selection = ctk.StringVar()
 
         if os.path.exists("cache.txt"):
@@ -109,8 +108,15 @@ class EasyDLPApp:
             return True
         else:
             return False
+        
+    def is_mp4_conversion(self):
+        if self.mp4_checkbox_state.get() == 'on':
+            return True
+        else:
+            return False
 
     def download(self, main_entry):
+        print(self.mp4_checkbox_state.get())
         self.selected_browser = self.final_cookie_selection.get()
         
         if self.is_playlist:
@@ -129,7 +135,11 @@ class EasyDLPApp:
         with open("cache.txt", 'r') as file:
             self.path_from_cache = file.readline().strip()
             
-        self.cmd_parts = ['yt-dlp', '-S', 'res,ext:mp4:m4a', '--recode', 'mp4', '--quiet', '--no-warnings']
+        self.cmd_parts = ['yt-dlp', '--quiet', '--no-warnings']
+        
+        if self.is_mp4_conversion:
+            self.cmd_parts += ['-S', '+vcodec:h264', '--audio-format', 'aac', '--merge-output-format', 'mp4']
+        
         if is_linux:
             self.cmd_parts[0] = './yt-dlp'
             
@@ -216,7 +226,7 @@ class EasyDLPApp:
         
     def disable_widgets(self):
         try:
-            widgets = (self.current_window.main_entry, self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            widgets = (self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
             for widget in widgets:
                 widget.configure(state="disabled")
         except AttributeError:
@@ -224,7 +234,7 @@ class EasyDLPApp:
         
     def enable_widgets(self):
         try:
-            widgets = (self.current_window.main_entry, self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            widgets = (self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
             for widget in widgets:
                 widget.configure(state="normal")
         except AttributeError:
@@ -440,6 +450,10 @@ class SettingsWindow(ctk.CTkToplevel):
         self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
         self.playlist_checkbox.pack(anchor='w', padx=10)
         self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
+        
+        self.mp4_checkbox = ctk.CTkCheckBox(self, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.app.mp4_checkbox_state)
+        self.mp4_checkbox.pack(anchor='w', padx=10)
+        # self.mp4_checkbox.bind('<Button-1>', self.mp4_conversion_handler)
         
         self.clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.clear_dir.pack()
