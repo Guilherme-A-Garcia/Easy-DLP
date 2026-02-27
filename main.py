@@ -239,7 +239,7 @@ class EasyDLPApp:
             self.path = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
             
             if not self.path or not os.path.exists(self.path):
-                self.error = CTkMessagebox(icon='cancel', title="Error", message="Please, insert a valid path to proceed.", option_1="Cancel", option_2="Retry", option_focus=1)
+                self.error = CTkMessagebox(icon='cancel', title="Error", message="Please, insert a valid path to proceed.", option_1="Cancel", option_2="Retry", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
                 if self.error.get() == "Retry":
                     return self.write_cache(rewrite=True)
                 else:
@@ -453,7 +453,7 @@ class MainWindow(ctk.CTkToplevel):
         self.attributes('-alpha', 1)
     
     def on_closing(self):
-        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
         if self.confirmation.get() == "Yes":
             self.destroy()
             self.app.root.destroy()
@@ -509,18 +509,36 @@ class SettingsWindow(ctk.CTkToplevel):
         self.right_button_frame.columnconfigure(0, weight=1)
         self.right_button_frame.grid(sticky="nsew", row=2, column=1)
         
-        self.clear_dir = ctk.CTkButton(self.right_button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.clear_dir = ctk.CTkButton(self.right_button_frame, text='Clear path', font=('', 18), width=50, command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.clear_dir.grid(row=0)
         simple_handling(self.clear_dir, "<Return>", self.app.clear_cache)
-        self.rewrite = ctk.CTkButton(self.right_button_frame, text='Rewrite path', font=('', 18), command=lambda:self.app.write_cache(rewrite=True), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.rewrite = ctk.CTkButton(self.right_button_frame, text='Rewrite path', font=('', 18), width=50, command=lambda:self.app.write_cache(rewrite=True), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.rewrite.grid(row=1)
         if hasattr(self.parent, 'cache_main_lb'):
             self.clear_dir.configure(state="disabled")
             self.rewrite.configure(state="disabled")
+            
+        self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), command=self.save_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.save_button.grid(sticky="ew", row=3, column=0, padx=(70,30))
+        
+        self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.save_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.discard_button.grid(sticky="ew", row=3, column=1, padx=(30,70))
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
-                    
+
+    def save_changes(self):
+        self.app.mp4_checkbox_state.set(self.current_mp4_value.get())
+        self.app.mp3_checkbox_state.set(self.current_mp3_value.get())
+        self.app.current_window = self.parent
+        self.destroy()
+        self.parent.deiconify()
+    
+    def discard_changes(self):
+        self.app.playlist_directory = ''
+        self.app.current_window = self.parent
+        self.destroy()
+        self.parent.deiconify()
     
     def mp3_disable_checkboxes(self):
         try:
@@ -548,18 +566,11 @@ class SettingsWindow(ctk.CTkToplevel):
             self.mp3_enable_checkboxes()
         
     def on_closing(self):
-        self.save = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
+        self.save = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
         if self.save.get() == "Yes":
-            self.app.mp4_checkbox_state.set(self.current_mp4_value.get())
-            self.app.mp3_checkbox_state.set(self.current_mp3_value.get())
-            self.app.current_window = self.parent
-            self.destroy()
-            self.parent.deiconify()
+            self.save_changes()
         elif self.save.get() == "No":
-            self.app.playlist_directory = ''
-            self.app.current_window = self.parent
-            self.destroy()
-            self.parent.deiconify()
+            self.discard_changes()
         else:
             return
         
