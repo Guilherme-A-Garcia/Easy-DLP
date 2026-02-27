@@ -230,6 +230,13 @@ class EasyDLPApp:
         except AttributeError:
             pass
 
+    def show_settings(self):
+        self.previous_window = self.current_window
+        self.previous_window.withdraw()
+        self.current_window = SettingsWindow(self.previous_window, self)
+        if self.playlist_directory != '':
+            self.current_window.pl_checkbox_state.set('on')
+
     def show_cache_window(self):
         self.close_current()
         self.current_window = CacheWindow(self)
@@ -258,11 +265,11 @@ class CacheWindow(ctk.CTkToplevel):
 
         set_window_icon(self)
         self.title('YT-DLP Path Directory Cache')
-        dynamic_resolution(self, 500, 150)
+        dynamic_resolution(self, 500, 160)
         self.resizable(False,False)
 
-        # self.themes = ThemeFrame(self, app)
-        # self.themes.pack(anchor="w", padx=10)
+        self.settings_frame = SettingsFrame(self, self.app)
+        self.settings_frame.pack(anchor="w", padx=3)
 
         self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
         self.cache_main_lb.pack(pady=(5))
@@ -322,12 +329,12 @@ class CookieWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 258)
         self.resizable(False,False)
 
-        # self.themes = ThemeFrame(self, app)
-        # self.themes.pack(anchor="w", padx=10)
+        self.settings_frame = SettingsFrame(self, self.app)
+        self.settings_frame.pack(anchor="w", padx=3)
 
         self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 22))
         self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 22))
-        self.cookie_main_labelp1.pack(pady=(15, 0))
+        self.cookie_main_labelp1.pack()
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
@@ -375,8 +382,8 @@ class MainWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 220)
         self.resizable(False,False)
 
-        # self.themes = ThemeFrame(self, app)
-        # self.themes.pack(anchor="w", padx=10)
+        self.settings_frame = SettingsFrame(self, self.app)
+        self.settings_frame.pack(anchor="w", padx=3)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         self.main_label.pack()
@@ -390,9 +397,9 @@ class MainWindow(ctk.CTkToplevel):
         self.button_frame.rowconfigure(0, weight=1)
         self.button_frame.pack()
         
-        self.main_settings = ctk.CTkButton(self.button_frame, text="Settings", font=('', 18), command=self.show_settings, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_settings = ctk.CTkButton(self.button_frame, text="Settings", font=('', 18), command=self.app.show_settings, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_settings.grid(row=0, column=0)
-        simple_handling(self.main_settings, "<Return>", self.show_settings)
+        simple_handling(self.main_settings, "<Return>", self.app.show_settings)
         
         self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.main_download.grid(row=0, column=1, padx=10)
@@ -405,13 +412,6 @@ class MainWindow(ctk.CTkToplevel):
         self.main_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
-            
-    def show_settings(self):
-        self.withdraw()
-        self.settings_open = True
-        self.current_window = SettingsWindow(self, self.app)
-        if self.app.playlist_directory != '':
-            self.current_window.pl_checkbox_state.set('on')
     
     def on_closing(self):
         self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
@@ -476,9 +476,23 @@ class SettingsWindow(ctk.CTkToplevel):
         else:
             self.pl_checkbox_state.set('off')
 
+class SettingsFrame(ctk.CTkFrame):
+    def __init__(self, parent, app):
+        super().__init__(parent, fg_color="transparent")
+        self.parent = parent
+        self.app = app
+        self.menu_image = ctk.CTkImage(Image.open("assets/menu.png"), size=(25, 25))
+        
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+                
+        self.menu = ctk.CTkButton(self, image=self.menu_image, fg_color="transparent", bg_color="transparent", hover=False, text="", command=self.app.show_settings, width=0)
+        self.menu.grid(row=0, column=0, padx=0)
+
 class ThemeFrame(ctk.CTkFrame):
     def __init__(self, parent, app):
         super().__init__(parent, fg_color="transparent")
+        self.parent = parent
         self.app = app
 
         self.columnconfigure(0, weight=1)
