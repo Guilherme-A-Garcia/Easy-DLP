@@ -6,8 +6,6 @@ import threading
 import sys
 import os
 
-# add button to save settings
-
 def main():
     ctk.set_appearance_mode("System")
     app = EasyDLPApp()
