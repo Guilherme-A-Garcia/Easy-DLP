@@ -6,7 +6,6 @@ import threading
 import sys
 import os
 
-# add checkbox to download audio only (grays out all other options besides playlist mode)
 # add button to rewrite cache
 # add button to save settings
 
@@ -78,6 +77,7 @@ class EasyDLPApp:
         self.root = ctk.CTk()
         self.root.withdraw()
         self.mp4_checkbox_state = ctk.StringVar(value='off')
+        self.mp3_checkbox_state = ctk.StringVar(value='off')
         self.final_cookie_selection = ctk.StringVar()
 
         if os.path.exists("cache.txt"):
@@ -114,9 +114,14 @@ class EasyDLPApp:
             return True
         else:
             return False
+    
+    def is_mp3(self):
+        if self.mp3_checkbox_state.get() == 'on':
+            return True
+        else:
+            return False
 
     def download(self, main_entry):
-        print(self.mp4_checkbox_state.get())
         self.selected_browser = self.final_cookie_selection.get()
         
         if self.is_playlist:
@@ -137,11 +142,14 @@ class EasyDLPApp:
             
         self.cmd_parts = ['yt-dlp', '--quiet', '--no-warnings']
         
-        if self.is_mp4_conversion:
-            self.cmd_parts += ['-S', '+vcodec:h264', '--audio-format', 'aac', '--merge-output-format', 'mp4']
-        
-        if is_linux:
+        if is_linux():
             self.cmd_parts[0] = './yt-dlp'
+
+        if self.is_mp3():
+            self.cmd_parts += ['--extract-audio', '--audio-format', 'mp3']
+        
+        if self.is_mp4_conversion():
+            self.cmd_parts += ['-S', '+vcodec:h264', '--audio-format', 'aac', '--merge-output-format', 'mp4']
             
         if self.selected_browser != 'None':
             if is_linux():
@@ -226,7 +234,7 @@ class EasyDLPApp:
         
     def disable_widgets(self):
         try:
-            widgets = (self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            widgets = (self.current_window.main_entry, self.current_window.settings_frame.menu, self.current_window.main_download)
             for widget in widgets:
                 widget.configure(state="disabled")
         except AttributeError:
@@ -403,16 +411,12 @@ class MainWindow(ctk.CTkToplevel):
         simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
 
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_frame.columnconfigure((0,1), weight=1)
+        self.button_frame.columnconfigure(0, weight=1)
         self.button_frame.rowconfigure(0, weight=1)
         self.button_frame.pack()
         
-        self.main_settings = ctk.CTkButton(self.button_frame, text="Settings", font=('', 18), command=self.app.show_settings, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.main_settings.grid(row=0, column=0)
-        simple_handling(self.main_settings, "<Return>", self.app.show_settings)
-        
         self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.main_download.grid(row=0, column=1, padx=10)
+        self.main_download.grid(row=0, column=0, padx=10)
         simple_handling(self.main_download, "<Return>", lambda:self.app.download(self.main_entry))
         
         self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=15, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=2)
@@ -434,6 +438,8 @@ class SettingsWindow(ctk.CTkToplevel):
         super().__init__(parent)
         self.parent = parent
         self.app = app
+        self.current_mp4_value = ctk.StringVar(value=self.app.mp4_checkbox_state.get())
+        self.current_mp3_value = ctk.StringVar(value=self.app.mp3_checkbox_state.get())
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
@@ -448,12 +454,16 @@ class SettingsWindow(ctk.CTkToplevel):
         
         self.pl_checkbox_state = ctk.StringVar()
         self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
-        self.playlist_checkbox.pack(anchor='w', padx=10)
+        self.playlist_checkbox.pack(anchor='w', padx=10, pady=(10,0))
         self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
         
-        self.mp4_checkbox = ctk.CTkCheckBox(self, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.app.mp4_checkbox_state)
-        self.mp4_checkbox.pack(anchor='w', padx=10)
-        # self.mp4_checkbox.bind('<Button-1>', self.mp4_conversion_handler)
+        self.mp4_checkbox = ctk.CTkCheckBox(self, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp4_value)
+        self.mp4_checkbox.pack(anchor='w', padx=10, pady=10)
+        
+        self.mp3_checkbox = ctk.CTkCheckBox(self, text="Audio only (MP3)", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp3_value)
+        self.mp3_checkbox.pack(anchor='w', padx=10)
+        self.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
+        self.verify_mp3_checkbox()
         
         self.clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.clear_dir.pack()
@@ -462,9 +472,36 @@ class SettingsWindow(ctk.CTkToplevel):
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
     
+    def mp3_disable_checkboxes(self):
+        try:
+            # checkboxes = [(self.current_window.mp4_checkbox, self.mp4_checkbox_state), 
+            #               (self.current_window.placeholder, self.placeholder_variable)]
+            # for checkbox, variable in checkboxes:
+            self.current_mp4_value.set(value='off')
+            self.mp4_checkbox.configure(state="disabled")
+        except AttributeError:
+            pass
+
+    def mp3_enable_checkboxes(self):
+        try:
+            # checkboxes = [(self.current_window.mp4_checkbox, self.mp4_checkbox_state), 
+            #               (self.current_window.placeholder, self.placeholder_variable)]
+            # for checkbox, variable in checkboxes:
+            self.mp4_checkbox.configure(state="normal")
+        except AttributeError:
+            pass
+    
+    def verify_mp3_checkbox(self):
+        if self.current_mp3_value.get() == 'on':
+            self.mp3_disable_checkboxes()
+        else:
+            self.mp3_enable_checkboxes()
+        
     def on_closing(self):
         self.save = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202")
         if self.save.get() == "Yes":
+            self.app.mp4_checkbox_state.set(self.current_mp4_value.get())
+            self.app.mp3_checkbox_state.set(self.current_mp3_value.get())
             self.app.current_window = self.parent
             self.destroy()
             self.parent.deiconify()
@@ -475,6 +512,9 @@ class SettingsWindow(ctk.CTkToplevel):
             self.parent.deiconify()
         else:
             return
+        
+    def mp3_handler(self, event):
+        self.verify_mp3_checkbox()
     
     def playlist_handler(self, event):
         if self.pl_checkbox_state.get() == 'on':
