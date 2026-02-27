@@ -134,6 +134,7 @@ class EasyDLPApp:
         if not os.path.exists("cache.txt"):
             err_msg('Cache file missing!\nPlease, enter your YT-DLP directory and try again.')
             self.write_cache(rewrite=True)
+            return
         
         self.download_link = main_entry.get()
         
@@ -237,12 +238,9 @@ class EasyDLPApp:
             self.path = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
             
             if not self.path or not os.path.exists(self.path):
-                self.error = CTkMessagebox(icon='cancel', title="Error", message="Please, insert a valid path to proceed.", option_1="Cancel", option_2="Retry", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
-                if self.error.get() == "Retry":
-                    return self.write_cache(rewrite=True)
-                else:
-                    return
-
+                err_msg("Please, insert a valid path to proceed.")
+                return
+                
             if rewrite:
                 if os.path.exists('cache.txt'):
                     with open('cache.txt', 'w') as file:
@@ -270,7 +268,7 @@ class EasyDLPApp:
         
     def enable_widgets(self):
         try:
-            widgets = (self.current_window.main_entry, self.current_window.main_clear_dir, self.current_window.main_download)
+            widgets = (self.current_window.main_entry, self.current_window.settings_frame.menu, self.current_window.main_download)
             for widget in widgets:
                 widget.configure(state="normal")
         except AttributeError:
