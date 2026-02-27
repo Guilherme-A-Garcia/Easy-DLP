@@ -6,7 +6,6 @@ import threading
 import sys
 import os
 
-# add button to rewrite cache
 # add button to save settings
 
 def main():
@@ -69,6 +68,9 @@ def err_msg(text):
 def info_msg(text):
     info = CTkMessagebox(title='Information', message=text, icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
     info.get()
+    
+def success_msg(text):
+    success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
 
 class EasyDLPApp:
     def __init__(self):
@@ -189,9 +191,9 @@ class EasyDLPApp:
         self.process.wait()
         if proc_success:
             if self.is_playlist():
-                self.root.after(100, info_msg(f'Playlist successfully downloaded. Check the output location: "{self.download_location}".'))
+                self.root.after(100, success_msg(f'Playlist successfully downloaded. Check the output location: "{self.download_location}".'))
             else:
-                self.root.after(100, info_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".'))
+                self.root.after(100, success_msg(f'File successfully downloaded. Check your YT-DLP folder: "{self.path_from_cache}".'))
             self.root.after(0, self.current_window.progress_bar.configure(mode="determinate"))
             self.root.after(0, self.current_window.progress_bar.set(0))
             self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
@@ -231,6 +233,34 @@ class EasyDLPApp:
         self.thread = threading.Thread(target=self.download_subprocess, args=(cmd_parts, path_from_cache, playlist_folder), daemon=True)
         self.thread.start()
         check_thread()
+        
+    def write_cache(self, rewrite:bool):
+        try:
+            self.path = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
+            
+            if not self.path or not os.path.exists(self.path):
+                self.error = CTkMessagebox(icon='cancel', title="Error", message="Please, insert a valid path to proceed.", option_1="Cancel", option_2="Retry", option_focus=1)
+                if self.error.get() == "Retry":
+                    return self.write_cache(rewrite=True)
+                else:
+                    return
+
+            if rewrite:
+                if os.path.exists('cache.txt'):
+                    with open('cache.txt', 'w') as file:
+                        file.write(self.path)
+                        file.close()
+                    success_msg("The YT-DLP path has been successfully rewritten!")
+                else:
+                    with open('cache.txt', 'w') as file:
+                        file.write(self.path)
+                        file.close()
+                    success_msg("The YT-DLP path has been successfully written!")
+            else:
+                self.current_window.cache_entry.insert(0, self.path)
+        
+        except Exception as e:
+            print(f"An error has occurred: {e}")
         
     def disable_widgets(self):
         try:
@@ -302,11 +332,11 @@ class CacheWindow(ctk.CTkToplevel):
         self.cache_frame.grid_columnconfigure(0, weight=1)
 
         self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=self.search_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=lambda:self.app.write_cache(rewrite=False), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
         self.file_search_b.grid(row=0, column=1)
         simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
-        simple_handling(self.file_search_b, "<Return>", self.search_button)
+        simple_handling(self.file_search_b, "<Return>", lambda:self.app.write_cache(rewrite=False))
         
         self.cache_entry.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -319,8 +349,8 @@ class CacheWindow(ctk.CTkToplevel):
             self.app.root.destroy()
 
     def cache_enter(self):
-        if not self.cache_entry.get():
-            err_msg("Please, insert a path to your YT-DLP folder.")
+        if not self.cache_entry.get() or not os.path.exists(self.cache_entry.get()):
+            err_msg("Please, insert a valid path to your YT-DLP folder.")
         else:
             try:
                 with open('cache.txt', 'w') as file:
@@ -328,11 +358,6 @@ class CacheWindow(ctk.CTkToplevel):
                 self.app.show_cookie_window()
             except Exception as e:
                 err_msg(f"Error: {e}")
-    
-    def search_button(self):
-        self.path = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
-        if self.path:
-            self.cache_entry.insert(0, self.path)
 
 class CookieWindow(ctk.CTkToplevel):
     def __init__(self, app):
@@ -487,9 +512,15 @@ class SettingsWindow(ctk.CTkToplevel):
         self.clear_dir = ctk.CTkButton(self.right_button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.clear_dir.grid(row=0)
         simple_handling(self.clear_dir, "<Return>", self.app.clear_cache)
+        self.rewrite = ctk.CTkButton(self.right_button_frame, text='Rewrite path', font=('', 18), command=lambda:self.app.write_cache(rewrite=True), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.rewrite.grid(row=1)
+        if hasattr(self.parent, 'cache_main_lb'):
+            self.clear_dir.configure(state="disabled")
+            self.rewrite.configure(state="disabled")
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
+                    
     
     def mp3_disable_checkboxes(self):
         try:
