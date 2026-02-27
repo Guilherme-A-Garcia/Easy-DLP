@@ -438,6 +438,12 @@ class SettingsWindow(ctk.CTkToplevel):
         super().__init__(parent)
         self.parent = parent
         self.app = app
+        self.rowconfigure(0, weight=0)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=2)
+        self.rowconfigure(3, weight=1)
+        self.columnconfigure((0,1), weight=1)
+        
         self.current_mp4_value = ctk.StringVar(value=self.app.mp4_checkbox_state.get())
         self.current_mp3_value = ctk.StringVar(value=self.app.mp3_checkbox_state.get())
         
@@ -449,24 +455,37 @@ class SettingsWindow(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 330)
         self.resizable(False,False)
 
-        self.themes = ThemeFrame(self, app)
-        self.themes.pack(anchor="w", padx=10)
+        self.themes = ThemeFrame(self, self.app)
+        self.themes.grid(row=0, column=0, padx=5, sticky="nw")
+        
+        self.settings_label = ctk.CTkLabel(self, text="Settings", font=('', 35))
+        self.settings_label.grid(sticky="nsew", row=1, columnspan=2)
+        
+        self.checkbox_frame = ctk.CTkFrame(self)
+        self.checkbox_frame.rowconfigure((0,1,2), weight=1)
+        self.checkbox_frame.columnconfigure(0, weight=1)
+        self.checkbox_frame.grid(sticky="nsew", row=2, column=0)
         
         self.pl_checkbox_state = ctk.StringVar()
-        self.playlist_checkbox = ctk.CTkCheckBox(self, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
-        self.playlist_checkbox.pack(anchor='w', padx=10, pady=(10,0))
+        self.playlist_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
+        self.playlist_checkbox.grid(sticky="w", column=0, row=0, padx=10, pady=(10,0))
         self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
         
-        self.mp4_checkbox = ctk.CTkCheckBox(self, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp4_value)
-        self.mp4_checkbox.pack(anchor='w', padx=10, pady=10)
+        self.mp4_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp4_value)
+        self.mp4_checkbox.grid(sticky="w", column=0, row=1, padx=10, pady=10)
         
-        self.mp3_checkbox = ctk.CTkCheckBox(self, text="Audio only (MP3)", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp3_value)
-        self.mp3_checkbox.pack(anchor='w', padx=10)
+        self.mp3_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Audio only (MP3)", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp3_value)
+        self.mp3_checkbox.grid(sticky="w", column=0, row=2, padx=10)
         self.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
         self.verify_mp3_checkbox()
         
-        self.clear_dir = ctk.CTkButton(self, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.clear_dir.pack()
+        self.right_button_frame = ctk.CTkFrame(self)
+        self.right_button_frame.rowconfigure((0,1,2), weight=1)
+        self.right_button_frame.columnconfigure(0, weight=1)
+        self.right_button_frame.grid(sticky="nsew", row=2, column=1)
+        
+        self.clear_dir = ctk.CTkButton(self.right_button_frame, text='Clear path', font=('', 18), command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.clear_dir.grid(row=0)
         simple_handling(self.clear_dir, "<Return>", self.app.clear_cache)
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
