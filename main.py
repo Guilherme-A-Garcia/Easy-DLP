@@ -85,6 +85,9 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
     
+    def auto_update(self):
+        pass
+    
     def set_theme(self, location):
         self.location = location
         theme = self.location.themes.theme_variable.get()
