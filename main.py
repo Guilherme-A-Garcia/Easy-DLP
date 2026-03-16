@@ -1,6 +1,8 @@
 from CTkMessagebox import CTkMessagebox
 from PIL import Image, ImageTk
 import customtkinter as ctk
+import requests
+from bs4 import BeautifulSoup
 import subprocess
 import threading
 import sys
@@ -71,7 +73,9 @@ def success_msg(text):
     success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
 
 class EasyDLPApp:
+    CURRENT_VERSION = "v3.0.0"
     def __init__(self):
+        self.auto_update()
         self.current_window = None
         self.playlist_directory = ''
         self.root = ctk.CTk()
@@ -84,9 +88,21 @@ class EasyDLPApp:
             self.show_cookie_window()
         else:
             self.show_cache_window()
+            
     
-    def auto_update(self):
-        pass
+    def auto_update(self):  # compare fetched version to current version. if different, replace binaries using subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", f"git+https://github.com/Guilherme-A-Garcia/Easy-DLP.git"]) and restart
+        try:
+            req_url = "https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest"
+            req_response = requests.get(req_url)
+            soup = BeautifulSoup(req_response.text, 'html.parser')
+            git_version = soup.find('span', class_='css-truncate-target').text.strip()
+            print(git_version)
+            
+            if git_version != EasyDLPApp.CURRENT_VERSION:
+                pass
+                
+        except Exception as e:
+            print(e)
     
     def set_theme(self, location):
         self.location = location
