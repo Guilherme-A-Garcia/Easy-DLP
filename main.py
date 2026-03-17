@@ -72,6 +72,7 @@ def info_msg(text):
     
 def success_msg(text):
     success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    success.get()
 
 class EasyDLPApp:
     CURRENT_VERSION = "v3.0.0"
@@ -537,7 +538,7 @@ class SettingsWindow(ctk.CTkToplevel):
         self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), command=self.save_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.save_button.grid(sticky="ew", row=3, column=0, padx=(70,30))
         
-        self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.save_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.discard_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.discard_button.grid(sticky="ew", row=3, column=1, padx=(30,70))
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
