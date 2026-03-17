@@ -75,7 +75,7 @@ def success_msg(text):
     success.get()
 
 class EasyDLPApp:
-    CURRENT_VERSION = "v3.0.0"
+    CURRENT_VERSION = "v3.1.0"
     def __init__(self):
         self.auto_update()
         self.current_window = None
