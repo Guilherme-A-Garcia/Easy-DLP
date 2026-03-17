@@ -91,9 +91,9 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
             
-        self.auto_update()
+        self.auto_version_fetch()
     
-    def auto_update(self):  # compare fetched version to current version. if different, replace binaries using subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", f"git+https://github.com/Guilherme-A-Garcia/Easy-DLP.git"]) and restart
+    def auto_version_fetch(self):
         try:
             req_url = "https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest"
             req_response = requests.get(req_url)
