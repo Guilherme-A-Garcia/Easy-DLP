@@ -624,6 +624,11 @@ class SettingsWindow(ctk.CTkToplevel):
         else:
             self.pl_checkbox_state.set('off')
 
+class UpdatingWindow(ctk.CTkToplevel):
+    def __init__(self, app):
+        super().__init__(app.root)
+        self.app = app
+
 class SettingsFrame(ctk.CTkFrame):
     def __init__(self, parent, app):
         super().__init__(parent, fg_color="transparent")
