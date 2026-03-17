@@ -77,7 +77,7 @@ def success_msg(text):
 class EasyDLPApp:
     CURRENT_VERSION = "v3.1.0"
     def __init__(self):
-        self.auto_update()
+        self.different_version = False
         self.current_window = None
         self.playlist_directory = ''
         self.root = ctk.CTk()
@@ -91,6 +91,7 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
             
+        self.auto_update()
     
     def auto_update(self):  # compare fetched version to current version. if different, replace binaries using subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", f"git+https://github.com/Guilherme-A-Garcia/Easy-DLP.git"]) and restart
         try:
@@ -98,11 +99,11 @@ class EasyDLPApp:
             req_response = requests.get(req_url)
             soup = BeautifulSoup(req_response.text, 'html.parser')
             git_version = soup.find('span', class_='css-truncate-target').text.strip()
-            print(git_version)
+            print(f'Version located in the latest GitHub Release: {git_version}')
             
             if git_version != EasyDLPApp.CURRENT_VERSION:
-                pass
-                
+                self.different_version = True
+        
         except Exception as e:
             print(e)
     
