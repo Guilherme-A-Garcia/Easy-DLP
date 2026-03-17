@@ -379,6 +379,9 @@ class EasyDLPApp:
             self.current_window.after(50, self.current_window.destroy)
             self.current_window = None
     
+    def close_and_rename(self):
+        pass
+    
 class CacheWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
