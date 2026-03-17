@@ -329,7 +329,7 @@ class EasyDLPApp:
     def show_main_window(self):
         self.close_current()
         self.current_window = MainWindow(self)
-
+        
     def close_current(self):
         if self.current_window is not None:
             self.current_window.withdraw()
@@ -628,6 +628,23 @@ class UpdatingWindow(ctk.CTkToplevel):
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
+        
+        set_window_icon(self)
+        dynamic_resolution(self, 450, 100)
+        self.resizable(False, False)
+        self.title('Updating...')
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+        self.progress_label1 = ctk.CTkLabel(self, text="Update in progress.", font=("", 20))
+        self.progress_label1.pack()
+        
+        self.progress_label2 = ctk.CTkLabel(self, text="Please, don't close this window while the application is being updated.", font=("", 12))
+        self.progress_label2.pack()
+        
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=10, width=400, corner_radius=10, progress_color="#770505", fg_color="#808080", mode="indeterminate", border_color="#1d0000", border_width=1)
+        self.progress_bar.pack(pady=10)
+        self.progress_bar.start()
 
 class SettingsFrame(ctk.CTkFrame):
     def __init__(self, parent, app):
