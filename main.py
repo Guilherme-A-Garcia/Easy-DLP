@@ -132,7 +132,29 @@ class EasyDLPApp:
                     return
                 
     def update_app(self):
-        pass
+        url = ''
+        self.file_path = ''
+        cwd = self.get_app_directory()
+
+        print("Resolved update directory:", cwd)
+        
+        if os.path.exists(cwd):
+            if is_linux():
+                url = 'https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest/download/Easy-DLP-x86_64.AppImage'
+                self.file_path = os.path.join(cwd, 'Easy-DLP-x86_64-NEW.AppImage')
+            else:
+                url = 'https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest/download/Easy-DLP.exe'
+                self.file_path = os.path.join(cwd, 'Easy-DLP-NEW.exe')
+
+            print("Downloading to:", self.file_path)
+            
+            try:
+                urllib.request.urlretrieve(url, self.file_path)
+            except Exception as e:
+                err_msg(f"An error occurred while downloading the update, the application will close: {e}")
+                self.root.destroy()
+            success_msg('Update finished successfully. Closing application...')
+            self.close_and_rename()
     
     def get_app_directory(self):
         if getattr(sys, 'frozen', False):
