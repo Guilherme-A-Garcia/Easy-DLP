@@ -118,9 +118,18 @@ class EasyDLPApp:
             
         self.thread1 = threading.Thread(target=self.auto_version_fetch)
         self.thread1.start()
+        update_thread(self.thread1)
         
         def check_update():
-            pass
+            if self.different_version:
+                msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
+                if msg.get() == "Yes":
+                    self.show_updating_window()
+                    self.thread2 = threading.Thread(target=self.update_app)
+                    self.thread2.start()
+                    update_thread(self.thread2)
+                else:
+                    return
     
     def set_theme(self, location):
         self.location = location
