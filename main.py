@@ -91,7 +91,7 @@ class EasyDLPApp:
         else:
             self.show_cache_window()
             
-        self.auto_version_fetch()
+        self.auto_update_thread()
     
     def auto_version_fetch(self):
         try:
@@ -106,6 +106,13 @@ class EasyDLPApp:
         
         except Exception as e:
             print(e)
+            
+    def auto_update_thread(self):
+        def update_thread():
+            pass
+        
+        def check_update():
+            pass
     
     def set_theme(self, location):
         self.location = location
