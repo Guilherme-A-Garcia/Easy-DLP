@@ -130,6 +130,9 @@ class EasyDLPApp:
                     update_thread(self.thread2)
                 else:
                     return
+                
+    def update_app(self):
+        pass
     
     def set_theme(self, location):
         self.location = location
