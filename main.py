@@ -330,6 +330,10 @@ class EasyDLPApp:
         self.close_current()
         self.current_window = MainWindow(self)
         
+    def show_updating_window(self):
+        self.close_current()
+        self.current_window = UpdatingWindow(self)
+
     def close_current(self):
         if self.current_window is not None:
             self.current_window.withdraw()
