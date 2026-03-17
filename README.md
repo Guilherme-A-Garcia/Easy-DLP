@@ -5,7 +5,7 @@
 
 # Easy-DLP
 Easy-DLP is a clean and simple GUI wrapper for **YT-DLP**. Download videos easily with browser cookie support.<br>
-This application is but a humble Python wrapper, using the following libraries: CustomTkinter, CTkMessagebox, PIL, subprocess, threading, os and sys.<br>
+This application is but a humble Python wrapper, using the following libraries: CustomTkinter, CTkMessagebox, PIL, urllib, subprocess, requests, threading, os and sys.<br>
 The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are currently compiled with [Nuitka](https://nuitka.net/).
 
 >[!CAUTION]
@@ -34,6 +34,7 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 - Binaries for both Windows and Linux
 - Support for downloading playlists
 - Settings centralized in a window
+- Automatic binary updates
 
 ## Requirements
 First and foremost, you will need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary and [FFMPEG](https://www.ffmpeg.org/download.html).<br>
@@ -98,7 +99,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 - - [x] Add threading and a progress bar;
 - - [x] Playlist support;
 - - [x] Add a settings tab;
-- - [ ] Add an auto-update system;
+- - [x] Add an auto-update system;
 - - [ ] Step up the game to PySide6.
 
 ## How to Contribute
