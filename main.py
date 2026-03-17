@@ -134,6 +134,9 @@ class EasyDLPApp:
     def update_app(self):
         pass
     
+    def get_app_directory(self):
+        pass
+    
     def set_theme(self, location):
         self.location = location
         theme = self.location.themes.theme_variable.get()
