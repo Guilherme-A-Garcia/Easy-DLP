@@ -1,8 +1,11 @@
 from CTkMessagebox import CTkMessagebox
 from PIL import Image, ImageTk
+from bs4 import BeautifulSoup
 import customtkinter as ctk
+import urllib.request
 import subprocess
 import threading
+import requests
 import sys
 import os
 
@@ -69,9 +72,12 @@ def info_msg(text):
     
 def success_msg(text):
     success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    success.get()
 
 class EasyDLPApp:
+    CURRENT_VERSION = "v3.1.0"
     def __init__(self):
+        self.different_version = False
         self.current_window = None
         self.playlist_directory = ''
         self.root = ctk.CTk()
@@ -84,6 +90,98 @@ class EasyDLPApp:
             self.show_cookie_window()
         else:
             self.show_cache_window()
+            
+        self.auto_update_thread()
+    
+    def auto_version_fetch(self):
+        try:
+            req_url = "https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest"
+            req_response = requests.get(req_url)
+            soup = BeautifulSoup(req_response.text, 'html.parser')
+            git_version = soup.find('span', class_='css-truncate-target').text.strip()
+            print(f'Version located in the latest GitHub Release: {git_version}')
+            
+            if git_version != EasyDLPApp.CURRENT_VERSION:
+                self.different_version = True
+        
+        except Exception as e:
+            print(e)
+            
+    def auto_update_thread(self):
+        def update_thread(inputted_thread):
+            if inputted_thread.is_alive():
+                self.root.after(10, lambda: update_thread(inputted_thread))
+            else:
+                print(f"Thread {inputted_thread} ended successfully!")
+                if inputted_thread == self.thread1:
+                    check_update()
+            
+        self.thread1 = threading.Thread(target=self.auto_version_fetch)
+        self.thread1.start()
+        update_thread(self.thread1)
+        
+        def check_update():
+            if self.different_version:
+                msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
+                if msg.get() == "Yes":
+                    self.show_updating_window()
+                    self.thread2 = threading.Thread(target=self.update_app)
+                    self.thread2.start()
+                    update_thread(self.thread2)
+                else:
+                    return
+                
+    def update_app(self):
+        url = ''
+        self.file_path = ''
+        cwd = self.get_app_directory()
+
+        print("Resolved update directory:", cwd)
+        
+        if os.path.exists(cwd):
+            if is_linux():
+                url = 'https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest/download/Easy-DLP-x86_64.AppImage'
+                self.file_path = os.path.join(cwd, 'Easy-DLP-x86_64-NEW.AppImage')
+            else:
+                url = 'https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest/download/Easy-DLP.exe'
+                self.file_path = os.path.join(cwd, 'Easy-DLP-NEW.exe')
+
+            print("Downloading to:", self.file_path)
+            
+            try:
+                urllib.request.urlretrieve(url, self.file_path)
+            except Exception as e:
+                err_msg(f"An error occurred while downloading the update, the application will close: {e}")
+                self.root.destroy()
+            success_msg('Update finished successfully. Closing application...')
+            self.close_and_rename()
+    
+    def get_app_directory(self):
+        if getattr(sys, 'frozen', False):
+            try:
+                path = os.path.abspath(sys.argv[0])
+                dir_path = os.path.dirname(path)
+                if os.path.exists(dir_path):
+                    return dir_path
+            except Exception:
+                pass
+            
+            try:
+                cwd = os.getcwd()
+                if os.path.exists(cwd):
+                    return cwd
+            except Exception:
+                pass
+            
+            try:
+                temp_dir = os.path.dirname(sys.executable)
+                parent = os.path.abspath(os.path.join(temp_dir, '..'))
+                if os.path.exists(parent):
+                    return parent
+            except Exception:
+                pass
+        
+        return os.getcwd()
     
     def set_theme(self, location):
         self.location = location
@@ -124,7 +222,7 @@ class EasyDLPApp:
     def download(self, main_entry):
         self.selected_browser = self.final_cookie_selection.get()
         
-        if self.is_playlist:
+        if self.is_playlist():
             self.playlist_folder = self.playlist_directory
 
         if not main_entry.get():
@@ -161,7 +259,7 @@ class EasyDLPApp:
         if not self.is_playlist():
             self.cmd_parts += ['--no-playlist', '--playlist-end', '1']
         else:
-            if is_linux:
+            if is_linux():
                 self.cmd_parts += ['-o', f"{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s"]
             else:
                 self.cmd_parts += ['-o', f"{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s"]
@@ -293,11 +391,43 @@ class EasyDLPApp:
         self.close_current()
         self.current_window = MainWindow(self)
 
+    def show_updating_window(self):
+        self.close_current()
+        self.current_window = UpdatingWindow(self)
+
     def close_current(self):
         if self.current_window is not None:
             self.current_window.withdraw()
             self.current_window.after(50, self.current_window.destroy)
             self.current_window = None
+    
+    def close_and_rename(self):
+        
+        if is_linux():
+            new_file = 'Easy-DLP-x86_64-NEW.AppImage'
+            file_name = 'Easy-DLP-x86_64.AppImage'
+
+            cmd = ['sh', '-c', f'(sleep 1; mv "{new_file}" "{file_name}"; chmod +x "{file_name}"; exec "{os.path.abspath(file_name)}") >/dev/null 2>&1']
+            
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, close_fds=True)
+            os._exit(0)
+        else:
+            cwd = self.get_app_directory()
+            
+            new_file = 'Easy-DLP-NEW.exe'
+            file_name = 'Easy-DLP.exe'
+            
+            new_file_abs = os.path.join(cwd, new_file)
+            file_name_abs = os.path.join(cwd, file_name)
+            
+            os.system(f'start /b cmd /c "timeout /nobreak > nul 2 & move /y "{new_file_abs}" "{file_name_abs}" >nul 2>&1 &"')
+            os._exit(0)
+            os.system('exit')
+        
+        if self.current_window is not None:
+            self.current_window.destroy()
+        self.root.destroy()
+        sys.exit()
     
 class CacheWindow(ctk.CTkToplevel):
     def __init__(self, app):
@@ -517,7 +647,7 @@ class SettingsWindow(ctk.CTkToplevel):
         self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), command=self.save_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.save_button.grid(sticky="ew", row=3, column=0, padx=(70,30))
         
-        self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.save_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.discard_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.discard_button.grid(sticky="ew", row=3, column=1, padx=(30,70))
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -587,6 +717,32 @@ class SettingsWindow(ctk.CTkToplevel):
         else:
             self.pl_checkbox_state.set('off')
 
+class UpdatingWindow(ctk.CTkToplevel):
+    def __init__(self, app):
+        super().__init__(app.root)
+        self.app = app
+        
+        set_window_icon(self)
+        dynamic_resolution(self, 450, 100)
+        self.resizable(False, False)
+        self.title('Updating...')
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+        self.progress_label1 = ctk.CTkLabel(self, text="Update in progress.", font=("", 20))
+        self.progress_label1.pack()
+        
+        self.progress_label2 = ctk.CTkLabel(self, text="Please, don't close this window while the application is being updated.", font=("", 12))
+        self.progress_label2.pack()
+        
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=10, width=400, corner_radius=10, progress_color="#770505", fg_color="#808080", mode="indeterminate", border_color="#1d0000", border_width=1)
+        self.progress_bar.pack(pady=10)
+        self.progress_bar.start()
+        
+    def on_closing(self):
+        self.destroy()
+        self.app.root.destroy()
+        
 class SettingsFrame(ctk.CTkFrame):
     def __init__(self, parent, app):
         super().__init__(parent, fg_color="transparent")
