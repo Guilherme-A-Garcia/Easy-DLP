@@ -108,8 +108,16 @@ class EasyDLPApp:
             print(e)
             
     def auto_update_thread(self):
-        def update_thread():
-            pass
+        def update_thread(inputted_thread):
+            if inputted_thread.is_alive():
+                self.root.after(10, lambda: update_thread(inputted_thread))
+            else:
+                print(f"Thread {inputted_thread} ended successfully!")
+                if inputted_thread == self.thread1:
+                    check_update()
+            
+        self.thread1 = threading.Thread(target=self.auto_version_fetch)
+        self.thread1.start()
         
         def check_update():
             pass
