@@ -222,7 +222,7 @@ class EasyDLPApp:
     def download(self, main_entry):
         self.selected_browser = self.final_cookie_selection.get()
         
-        if self.is_playlist:
+        if self.is_playlist():
             self.playlist_folder = self.playlist_directory
 
         if not main_entry.get():
@@ -259,7 +259,7 @@ class EasyDLPApp:
         if not self.is_playlist():
             self.cmd_parts += ['--no-playlist', '--playlist-end', '1']
         else:
-            if is_linux:
+            if is_linux():
                 self.cmd_parts += ['-o', f"{self.playlist_folder}/%(playlist)s/%(title)s.%(ext)s"]
             else:
                 self.cmd_parts += ['-o', f"{self.playlist_folder}\\%%(playlist)s\\%%(title)s.%%(ext)s"]
@@ -390,7 +390,7 @@ class EasyDLPApp:
     def show_main_window(self):
         self.close_current()
         self.current_window = MainWindow(self)
-        
+
     def show_updating_window(self):
         self.close_current()
         self.current_window = UpdatingWindow(self)
@@ -402,6 +402,7 @@ class EasyDLPApp:
             self.current_window = None
     
     def close_and_rename(self):
+        
         if is_linux():
             new_file = 'Easy-DLP-x86_64-NEW.AppImage'
             file_name = 'Easy-DLP-x86_64.AppImage'
@@ -737,7 +738,11 @@ class UpdatingWindow(ctk.CTkToplevel):
         self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=10, width=400, corner_radius=10, progress_color="#770505", fg_color="#808080", mode="indeterminate", border_color="#1d0000", border_width=1)
         self.progress_bar.pack(pady=10)
         self.progress_bar.start()
-
+        
+    def on_closing(self):
+        self.destroy()
+        self.app.root.destroy()
+        
 class SettingsFrame(ctk.CTkFrame):
     def __init__(self, parent, app):
         super().__init__(parent, fg_color="transparent")
