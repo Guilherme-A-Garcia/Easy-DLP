@@ -380,7 +380,31 @@ class EasyDLPApp:
             self.current_window = None
     
     def close_and_rename(self):
-        pass
+        if is_linux():
+            new_file = 'Easy-DLP-x86_64-NEW.AppImage'
+            file_name = 'Easy-DLP-x86_64.AppImage'
+
+            cmd = ['sh', '-c', f'(sleep 1; mv "{new_file}" "{file_name}"; chmod +x "{file_name}"; exec "{os.path.abspath(file_name)}") >/dev/null 2>&1']
+            
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, close_fds=True)
+            os._exit(0)
+        else:
+            cwd = self.get_app_directory()
+            
+            new_file = 'Easy-DLP-NEW.exe'
+            file_name = 'Easy-DLP.exe'
+            
+            new_file_abs = os.path.join(cwd, new_file)
+            file_name_abs = os.path.join(cwd, file_name)
+            
+            os.system(f'start /b cmd /c "timeout /nobreak > nul 2 & move /y "{new_file_abs}" "{file_name_abs}" >nul 2>&1 &"')
+            os._exit(0)
+            os.system('exit')
+        
+        if self.current_window is not None:
+            self.current_window.destroy()
+        self.root.destroy()
+        sys.exit()
     
 class CacheWindow(ctk.CTkToplevel):
     def __init__(self, app):
