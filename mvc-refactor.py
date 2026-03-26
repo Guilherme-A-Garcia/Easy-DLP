@@ -70,9 +70,40 @@ def success_msg(text):
     success.get()
 
 class Controller:
+    CURRENT_VERSION = "v4.0.0"
     def __init__(self):
+        self.different_version = False
+        self.current_window = None
         self.root = ctk.CTk()
         self.root.withdraw()
+
+        if os.path.exists("cache.txt"):
+            self.show_cookie_window()
+        else:
+            self.show_cache_window()
+    
+    def show_settings(self):
+        self.previous_window = self.current_window
+        self.previous_window.withdraw()
+        self.current_window = SettingsView(self.previous_window)
+    
+    def show_cache_window(self):
+        self.close_current()
+        self.current_window = CacheView(self)
+    
+    def show_cookie_window(self):
+        self.close_current()
+        self.current_window = CookieView(self)
+    
+    def show_main_window(self):
+        self.close_current()
+        self.current_window = MainView(self)
+    
+    def close_current(self):
+        if self.current_window is not None:
+            self.current_window.withdraw()
+            self.current_window.after(50, self.current_window.destroy)
+            self.current_window = None
     
 class CacheView(ctk.CTkToplevel):
     def __init__(self, controller):
