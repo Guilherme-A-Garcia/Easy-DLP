@@ -198,6 +198,42 @@ class MainView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
         self.controller = controller
+        
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+
+        set_window_icon(self)
+        self.title('Easy-DLP')
+        dynamic_resolution(self, 500, 220)
+        self.resizable(False,False)
+
+        # self.settings_frame = SettingsFrame(self, self.app)
+        # self.settings_frame.pack(anchor="w", padx=3)
+
+        self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
+        self.main_label.pack()
+
+        self.main_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
+        self.main_entry.pack(pady=8, fill="x", padx=20)
+        # simple_handling(self.main_entry, "<Return>", lambda:self.app.download(self.main_entry))
+
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.rowconfigure(0, weight=1)
+        self.button_frame.pack()
+        
+        # self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), command=lambda:self.app.download(self.main_entry), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_download = ctk.CTkButton(self.button_frame, text='Download', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.main_download.grid(row=0, column=0, padx=10)
+        # simple_handling(self.main_download, "<Return>", lambda:self.app.download(self.main_entry))
+        
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=15, corner_radius=10, progress_color="#808080", fg_color="#808080", mode="determinate", border_color="#1d0000", border_width=2)
+        self.progress_bar['value'] = 0
+        self.progress_bar.pack(pady=15, fill='both', padx=50)
+
+        self.main_entry.focus_set()
+        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
 
 class SettingsView(ctk.CTkToplevel):
     def __init__(self, controller):
