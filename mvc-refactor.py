@@ -114,6 +114,43 @@ class CacheView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
         self.controller = controller
+        
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+
+        set_window_icon(self)
+        self.title('YT-DLP Path Directory Cache')
+        dynamic_resolution(self, 500, 160)
+        self.resizable(False,False)
+
+        # self.settings_frame = SettingsFrame(self, self.controller)
+        # self.settings_frame.pack(anchor="w", padx=3)
+
+        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
+        self.cache_main_lb.pack(pady=(5))
+
+        self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
+        self.cache_entry.pack(pady=10, fill="both", padx=20)
+        # simple_handling(self.cache_entry, "<Return>", self.cache_enter)
+
+        self.cache_frame = ctk.CTkFrame(self, bg_color="transparent", fg_color="transparent")
+        self.cache_frame.pack()
+        self.cache_frame.grid_rowconfigure(0, weight=1)
+        self.cache_frame.grid_columnconfigure(0, weight=1)
+
+        # self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        # self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=lambda:self.app.write_cache(rewrite=False), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+
+        self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
+        self.file_search_b.grid(row=0, column=1)
+        # simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
+        # simple_handling(self.file_search_b, "<Return>", lambda:self.app.write_cache(rewrite=False))
+        
+        self.cache_entry.focus_set()
+        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
 
 class CookieView(ctk.CTkToplevel):
     def __init__(self, controller):
