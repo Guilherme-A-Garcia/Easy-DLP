@@ -9,4 +9,62 @@ import requests
 import sys
 import os
 
+def dynamic_resolution(d_root, d_width, d_height):
+    screen_height = d_root.winfo_screenheight()
+    screen_width = d_root.winfo_screenwidth()
+    x = (screen_width // 2) - (d_width // 2)
+    y = (screen_height // 2) - (d_height // 2)
+    d_root.geometry(f"{d_width}x{d_height}+{x}+{y}")
 
+def simple_handling(widget, key, event):
+    widget.bind(key, lambda e: event())    
+
+def set_window_icon(root):
+    """Runtime icon loading for Nuitka"""
+    def win_set_icon():
+        try:
+            root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Failed setting delayed icon: {e}")
+    
+    try:
+        if is_linux():
+            if getattr(sys, 'frozen', False):
+                icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.png')
+                if not os.path.exists(icon_path):
+                    icon_path = os.path.join(os.getcwd(), 'icon.png')
+            else:
+                icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
+            
+            if os.path.exists(icon_path):
+                pil_img = Image.open(icon_path).convert("RGBA")
+                imagetk = ImageTk.PhotoImage(pil_img)
+                root.after(300, root.iconphoto(False, imagetk))
+
+        else:
+            if getattr(sys, 'frozen', False):
+                icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.ico')
+                if not os.path.exists(icon_path):
+                    icon_path = os.path.join(os.getcwd(), 'icon.ico')
+            else:
+                icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.ico')
+        
+            if os.path.exists(icon_path):
+                root.after(300, win_set_icon)
+    except Exception as e:
+        print(f"Error, icon not available: {e}")
+
+def is_linux():
+    return sys.platform.startswith('linux')
+
+def err_msg(text):
+    error = CTkMessagebox(title='Error', message=text, icon="cancel", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    error.get()
+
+def info_msg(text):
+    info = CTkMessagebox(title='Information', message=text, icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    info.get()
+    
+def success_msg(text):
+    success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
+    success.get()
