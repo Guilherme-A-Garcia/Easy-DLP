@@ -68,3 +68,64 @@ def info_msg(text):
 def success_msg(text):
     success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
     success.get()
+
+class Controller:
+    def __init__(self):
+        self.root = ctk.CTk()
+        self.root.withdraw()
+    
+class CacheView(ctk.CTkToplevel):
+    def __init__(self, controller):
+        super().__init__(controller.root)
+        self.controller = controller
+
+class CookieView(ctk.CTkToplevel):
+    def __init__(self, controller):
+        super().__init__(controller.root)
+        self.controller = controller
+        
+class MainView(ctk.CTkToplevel):
+    def __init__(self, controller):
+        super().__init__(controller.root)
+        self.controller = controller
+
+class SettingsView(ctk.CTkToplevel):
+    def __init__(self, controller):
+        super().__init__(controller.root)
+        self.controller = controller
+        
+class UpdatingView(ctk.CTkToplevel):
+    def __init__(self, controller):
+        super().__init__(controller.root)
+        self.controller = controller
+        
+class SettingsButtonFrame(ctk.CTkFrame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, controller.root)
+        self.controller = controller
+
+class ThemeButtonFrame(ctk.CTkFrame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, controller.root)
+        self.controller = controller
+        
+class CacheModel:
+    def __init__(self):
+        pass
+
+class CookieModel:
+    def __init__(self):
+        pass
+
+class MainModel:
+    def __init__(self):
+        pass
+
+class SettingsModel:
+    def __init__(self):
+        pass
+
+class UpdatingModel:
+    def __init__(self):
+        pass
+
