@@ -9,6 +9,11 @@ import requests
 import sys
 import os
 
+def main():
+    ctk.set_appearance_mode("System")
+    app = Controller()
+    app.root.mainloop()
+
 def dynamic_resolution(d_root, d_width, d_height):
     screen_height = d_root.winfo_screenheight()
     screen_width = d_root.winfo_screenwidth()
@@ -160,3 +165,6 @@ class UpdatingModel:
     def __init__(self):
         pass
 
+
+if __name__ == "__main__":
+    main()
