@@ -156,6 +156,43 @@ class CookieView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
         self.controller = controller
+
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+        
+        # self.final_cookie_selection = self.controller.final_cookie_selection
+        set_window_icon(self)
+        self.title('Cookie importation')
+        dynamic_resolution(self, 500, 258)
+        self.resizable(False,False)
+
+        # self.settings_frame = SettingsFrame(self, self.app)
+        # self.settings_frame.pack(anchor="w", padx=3)
+
+        self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 22))
+        self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 22))
+        self.cookie_main_labelp1.pack()
+        self.cookie_main_labelp2.pack(pady=(0, 15))
+
+        self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
+        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909", font=('', 18))
+        self.cookie_import_menu.set('None')
+        self.cookie_import_menu.pack(pady=(5, 0))
+
+        self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
+        self.cookie_ntc_label.pack(pady=(0, 5))
+
+        # self.cookie_button = ctk.CTkButton(self, text='Next', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.cookie_button = ctk.CTkButton(self, text='Next', font=('', 20), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.cookie_button.pack(pady=10)
+        # simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
+
+        self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
+        self.cookie_ntc2_label.pack(pady=(0, 5))
+        
+        self.cookie_import_menu.focus_set()
+        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
         
 class MainView(ctk.CTkToplevel):
     def __init__(self, controller):
