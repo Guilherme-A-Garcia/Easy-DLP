@@ -316,6 +316,27 @@ class UpdatingView(ctk.CTkToplevel):
         super().__init__(controller.root)
         self.controller = controller
         
+        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.attributes('-alpha', 0)
+        
+        set_window_icon(self)
+        dynamic_resolution(self, 450, 100)
+        self.resizable(False, False)
+        self.title('Updating...')
+        
+        self.progress_label1 = ctk.CTkLabel(self, text="Update in progress.", font=("", 20))
+        self.progress_label1.pack()
+        
+        self.progress_label2 = ctk.CTkLabel(self, text="Please, don't close this window while the application is being updated.", font=("", 12))
+        self.progress_label2.pack()
+        
+        self.progress_bar = ctk.CTkProgressBar(self, orientation="horizontal", height=10, width=400, corner_radius=10, progress_color="#770505", fg_color="#808080", mode="indeterminate", border_color="#1d0000", border_width=1)
+        self.progress_bar.pack(pady=10)
+        self.progress_bar.start()
+        
+        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.attributes('-alpha', 1)
+        
 class SettingsButtonFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent, controller.root)
