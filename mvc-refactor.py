@@ -87,23 +87,44 @@ class Controller:
         else:
             self.show_cache_window()
     
+    def show_cache_window(self):
+        self.close_current()
+        self.current_window = CacheView(self)
+        self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='cookie'))
+
+    def show_cookie_window(self):
+        self.close_current()
+        self.current_window = CookieView(self)
+        self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='main'))
+
+    def show_main_window(self):
+        self.close_current()
+        self.current_window = MainView(self)
+        self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing())
+        
+    def on_main_close(self):
+        self.root.destroy()
+        
     def show_settings(self):
         self.previous_window = self.current_window
         self.previous_window.withdraw()
         self.current_window = SettingsView(self.previous_window)
-    
-    def show_cache_window(self):
-        self.close_current()
-        self.current_window = CacheView(self)
-    
-    def show_cookie_window(self):
-        self.close_current()
-        self.current_window = CookieView(self)
-    
-    def show_main_window(self):
-        self.close_current()
-        self.current_window = MainView(self)
-    
+
+    def on_closing(self, next:str=None):
+        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
+        if self.confirmation.get() == "Yes":
+            self.root.destroy()
+        else:
+            #---TEMP---#
+            if next == 'cookie':
+                self.show_cookie_window()
+            elif next == 'main':
+                self.show_main_window()
+            else:
+                return
+            #---TEMP---#
+        
+
     def close_current(self):
         if self.current_window is not None:
             self.current_window.withdraw()
