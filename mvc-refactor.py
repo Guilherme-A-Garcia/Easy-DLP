@@ -120,7 +120,6 @@ class Controller:
             else:
                 return
             #---TEMP---#
-        
 
     def close_current(self):
         if self.current_window is not None:
@@ -141,8 +140,8 @@ class CacheView(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 160)
         self.resizable(False,False)
 
-        # self.settings_frame = SettingsFrame(self, self.controller)
-        # self.settings_frame.pack(anchor="w", padx=3)
+        self.settings_frame = SettingsButtonFrame(self, self.controller)
+        self.settings_frame.pack(anchor="w", padx=3)
 
         self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
         self.cache_main_lb.pack(pady=(5))
@@ -167,7 +166,6 @@ class CacheView(ctk.CTkToplevel):
         # simple_handling(self.file_search_b, "<Return>", lambda:self.app.write_cache(rewrite=False))
         
         self.cache_entry.focus_set()
-        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
 
 class CookieView(ctk.CTkToplevel):
@@ -184,8 +182,8 @@ class CookieView(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 258)
         self.resizable(False,False)
 
-        # self.settings_frame = SettingsFrame(self, self.app)
-        # self.settings_frame.pack(anchor="w", padx=3)
+        self.settings_frame = SettingsButtonFrame(self, self.controller)
+        self.settings_frame.pack(anchor="w", padx=3)
 
         self.cookie_main_labelp1 = ctk.CTkLabel(self, text='If you wish to bypass age restriction,', font=('', 22))
         self.cookie_main_labelp2 = ctk.CTkLabel(self, text='select your browser to import cookies from.', font=('', 22))
@@ -225,8 +223,8 @@ class MainView(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 220)
         self.resizable(False,False)
 
-        # self.settings_frame = SettingsFrame(self, self.app)
-        # self.settings_frame.pack(anchor="w", padx=3)
+        self.settings_frame = SettingsButtonFrame(self, self.controller)
+        self.settings_frame.pack(anchor="w", padx=3)
 
         self.main_label = ctk.CTkLabel(self, text='Insert URL', font=('', 35))
         self.main_label.pack()
@@ -352,17 +350,29 @@ class UpdatingView(ctk.CTkToplevel):
         self.progress_bar.pack(pady=10)
         self.progress_bar.start()
         
-        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
         
 class SettingsButtonFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
-        super().__init__(parent, controller.root)
-        self.controller = controller
+        super().__init__(parent, fg_color="transparent")
+        self.controller = controller.root
+        self.parent = parent
+        
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(current_dir, "menu.png")
+        
+        self.menu_image = ctk.CTkImage(Image.open(image_path), size=(25, 25))
+        
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+                
+        # self.menu = ctk.CTkButton(self, image=self.menu_image, fg_color="transparent", bg_color="transparent", hover=False, text="", command=self.app.show_settings, width=0)
+        self.menu = ctk.CTkButton(self, image=self.menu_image, fg_color="transparent", bg_color="transparent", hover=False, text="", width=0)
+        self.menu.grid(row=0, column=0, padx=0)
 
 class ThemeButtonFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
-        super().__init__(parent, controller.root)
+        super().__init__(parent)
         self.controller = controller
         
 class CacheModel:
