@@ -105,7 +105,7 @@ class Controller:
     def show_settings(self):
         self.previous_window = self.current_window
         self.previous_window.withdraw()
-        self.current_window = SettingsView(self.previous_window)
+        self.current_window = SettingsView(self.previous_window, self)
 
     def on_closing(self, next:str=None):
         self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
@@ -274,8 +274,8 @@ class SettingsView(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 330)
         self.resizable(False,False)
 
-        # self.themes = ThemeFrame(self, self.app)
-        # self.themes.grid(row=0, column=0, padx=5, sticky="nw")
+        self.themes = ThemeFrame(self, self.controller)
+        self.themes.grid(row=0, column=0, padx=5, sticky="nw")
         
         self.settings_label = ctk.CTkLabel(self, text="Settings", font=('', 35))
         self.settings_label.grid(sticky="nsew", row=1, columnspan=2)
@@ -374,6 +374,15 @@ class ThemeButtonFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.initial_theme = ctk.get_appearance_mode()
+        self.theme_variable = ctk.StringVar(value=self.initial_theme)
+        # self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.app.set_theme(parent), offvalue="Dark", onvalue="Light")
+        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, offvalue="Dark", onvalue="Light")
+        self.theme_switch.grid(row=0, column=0, padx=0)
         
 class CacheModel:
     def __init__(self):
