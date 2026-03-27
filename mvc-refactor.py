@@ -14,6 +14,8 @@ def main():
     app = Controller()
     app.root.mainloop()
 
+# ---------------- UTILITY FUNCTIONS ---------------- #
+
 def dynamic_resolution(d_root, d_width, d_height):
     screen_height = d_root.winfo_screenheight()
     screen_width = d_root.winfo_screenwidth()
@@ -75,7 +77,7 @@ def success_msg(text):
     success.get()
 
 
- # ---------------- CONTROLLER ---------------- #
+# ---------------- CONTROLLER ---------------- #
 
 class Controller:
     CURRENT_VERSION = "v4.0.0"
@@ -104,11 +106,24 @@ class Controller:
         except InvalidBinaryDirectory as e:
             err_msg(f"Error: {e}")
     
+    def controller_write_cache(self, rewrite:bool):
+        path = self.current_window.cache_dir_filedialog()
+        
+        if rewrite:
+            try:
+                self.cache_model.write_cache(path=path)
+            except InvalidBinaryDirectory:
+                err_msg(f'Error: {e}')
+        else:
+            self.current_window.cache_entry.insert(0, path)
+    
     def show_cache_window(self):
         self.close_current()
         self.current_window = CacheView(self)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='cookie'))
         self.current_window.cache_enter_b.configure(command=lambda: self.controller_cache_enter(self.current_window.cache_entry.get()))
+        self.current_window.file_search_b.configure(command=lambda: self.controller_write_cache(rewrite=False))
+        simple_handling(self.current_window.cache_entry, "<Return>",lambda: self.controller_cache_enter(self.current_window.cache_entry.get()))
 
     def show_cookie_window(self):
         self.close_current()
@@ -145,7 +160,8 @@ class Controller:
             self.current_window.after(50, self.current_window.destroy)
             self.current_window = None
 
- # ---------------- VIEWS ---------------- #
+# ---------------- VIEWS ---------------- #
+
 class CacheView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
@@ -167,25 +183,25 @@ class CacheView(ctk.CTkToplevel):
 
         self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
         self.cache_entry.pack(pady=10, fill="both", padx=20)
-        # simple_handling(self.cache_entry, "<Return>", self.cache_enter)
 
         self.cache_frame = ctk.CTkFrame(self, bg_color="transparent", fg_color="transparent")
         self.cache_frame.pack()
         self.cache_frame.grid_rowconfigure(0, weight=1)
         self.cache_frame.grid_columnconfigure(0, weight=1)
 
-        # self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=lambda:self.app.write_cache(rewrite=False), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
 
         self.cache_enter_b.grid(row=0, column=0, padx=(0, 10))
         self.file_search_b.grid(row=0, column=1)
-        # simple_handling(self.cache_enter_b, "<Return>", self.cache_enter)
-        # simple_handling(self.file_search_b, "<Return>", lambda:self.app.write_cache(rewrite=False))
         
         self.cache_entry.focus_set()
         self.attributes('-alpha', 1)
-
+    
+    def cache_dir_filedialog(self):
+        result = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
+        return result
+    
 class CookieView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
@@ -402,14 +418,15 @@ class ThemeButtonFrame(ctk.CTkFrame):
         self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, offvalue="Dark", onvalue="Light")
         self.theme_switch.grid(row=0, column=0, padx=0)
 
- # ---------------- MODELS ---------------- #   
+# ---------------- MODELS ---------------- #   
+ 
 class CacheModel:
     def __init__(self):
         pass
         
     def cache_enter(self, cache_entry):
         if not cache_entry:
-            raise InvalidBinaryDirectory("Please, insert the path to your YT-DLP binary directory.")
+            raise InvalidBinaryDirectory("Please insert the path to your YT-DLP binary directory.")
         elif not os.path.exists(cache_entry):
             raise InvalidBinaryDirectory("Invalid YT-DLP directory.")
         else:
@@ -419,6 +436,21 @@ class CacheModel:
                 return {"success": True}
             except Exception as e:
                 return {'success': False, "error": str(e)}
+    
+    def write_cache(self, path):
+        if not path or not os.path.exists(path):
+            raise InvalidBinaryDirectory("Invalid YT-DLP directory path.")
+        
+        if os.path.exists('cache.txt'):
+            with open('cache.txt', 'w') as file:
+                file.write(path)
+                file.close()
+            return {'success': "The YT-DLP path has been successfully rewritten!"}
+        else:
+            with open('cache.txt', 'w') as file:
+                file.write(path)
+                file.close()
+            return {'success': "The YT-DLP path has been successfully written!"} 
 
 class CookieModel:
     def __init__(self):
