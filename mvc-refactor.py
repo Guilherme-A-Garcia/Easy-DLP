@@ -81,16 +81,31 @@ class Controller:
         self.current_window = None
         self.root = ctk.CTk()
         self.root.withdraw()
+        
+        self.cache_model = CacheModel()
 
         if os.path.exists("cache.txt"):
             self.show_cookie_window()
         else:
             self.show_cache_window()
     
+    def controller_cache_enter(self, cache_entry:str):
+        path = cache_entry.strip()
+        
+        try:
+            result = self.cache_model.cache_enter(path)
+            if result["success"]:
+                self.show_cookie_window()
+            else:
+                err_msg(f"Error: {result["error"]}")
+        except InvalidBinaryDirectory as e:
+            err_msg(f"Error: {e}")
+    
     def show_cache_window(self):
         self.close_current()
         self.current_window = CacheView(self)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='cookie'))
+        self.current_window.cache_enter_b.configure(command=lambda: self.controller_cache_enter(self.current_window.cache_entry.get()))
 
     def show_cookie_window(self):
         self.close_current()
@@ -155,7 +170,6 @@ class CacheView(ctk.CTkToplevel):
         self.cache_frame.grid_rowconfigure(0, weight=1)
         self.cache_frame.grid_columnconfigure(0, weight=1)
 
-        # self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), command=self.cache_enter, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         # self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), command=lambda:self.app.write_cache(rewrite=False), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cache_enter_b = ctk.CTkButton(self.cache_frame, text='Enter', font=('', 15), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.file_search_b = ctk.CTkButton(self.cache_frame, text='Search', font=('', 15), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
@@ -387,6 +401,19 @@ class ThemeButtonFrame(ctk.CTkFrame):
 class CacheModel:
     def __init__(self):
         pass
+        
+    def cache_enter(self, cache_entry):
+        if not cache_entry:
+            raise InvalidBinaryDirectory("Please, insert the path to your YT-DLP binary directory.")
+        elif not os.path.exists(cache_entry):
+            raise InvalidBinaryDirectory("Invalid YT-DLP directory.")
+        else:
+            try:
+                with open('cache.txt', 'w') as file:
+                    file.write(cache_entry)
+                return {"success": True}
+            except Exception as e:
+                return {'success': False, "error": str(e)}
 
 class CookieModel:
     def __init__(self):
@@ -404,6 +431,11 @@ class UpdatingModel:
     def __init__(self):
         pass
 
+class UserError(Exception):
+    pass
+
+class InvalidBinaryDirectory(UserError):
+    pass
 
 if __name__ == "__main__":
     main()
