@@ -102,9 +102,6 @@ class Controller:
         self.current_window = MainView(self)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing())
         
-    def on_main_close(self):
-        self.root.destroy()
-        
     def show_settings(self):
         self.previous_window = self.current_window
         self.previous_window.withdraw()
