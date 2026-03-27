@@ -74,6 +74,9 @@ def success_msg(text):
     success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
     success.get()
 
+
+ # ---------------- CONTROLLER ---------------- #
+
 class Controller:
     CURRENT_VERSION = "v4.0.0"
     def __init__(self):
@@ -141,7 +144,8 @@ class Controller:
             self.current_window.withdraw()
             self.current_window.after(50, self.current_window.destroy)
             self.current_window = None
-    
+
+ # ---------------- VIEWS ---------------- #
 class CacheView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
@@ -397,7 +401,8 @@ class ThemeButtonFrame(ctk.CTkFrame):
         # self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.app.set_theme(parent), offvalue="Dark", onvalue="Light")
         self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, offvalue="Dark", onvalue="Light")
         self.theme_switch.grid(row=0, column=0, padx=0)
-        
+
+ # ---------------- MODELS ---------------- #   
 class CacheModel:
     def __init__(self):
         pass
@@ -430,6 +435,8 @@ class SettingsModel:
 class UpdatingModel:
     def __init__(self):
         pass
+
+# ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
     pass
