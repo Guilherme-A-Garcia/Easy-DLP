@@ -101,7 +101,10 @@ class Controller:
             self.show_cache_window()
 
     def controller_download(self, url):
-        self.main_model.download(url, options=None)
+        try:
+            self.main_model.download(url, options=None)
+        except EmptyURL as e:
+            err_msg(text=f'Error: {e}')
 
     def controller_cache_enter(self, cache_entry:str):
         path = cache_entry.strip()
@@ -473,7 +476,9 @@ class MainModel:
         pass
     
     def download(self, url, options=None):
-        pass
+        if not url:
+            raise EmptyURL("URL field is empty.")
+        
 
 class SettingsModel:
     def __init__(self):
@@ -493,6 +498,9 @@ class UserError(Exception):
     pass
 
 class InvalidBinaryDirectory(UserError):
+    pass
+
+class EmptyURL(UserError):
     pass
 
 if __name__ == "__main__":
