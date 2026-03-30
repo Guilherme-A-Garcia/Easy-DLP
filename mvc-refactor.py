@@ -11,7 +11,11 @@ import os
 
 def main():
     ctk.set_appearance_mode("System")
-    app = Controller()
+    
+    app_state = AppStateModel()
+    cache_model = CacheModel()
+    
+    app = Controller(app_state, cache_model)
     app.root.mainloop()
 
 # ---------------- UTILITY FUNCTIONS ---------------- #
@@ -81,14 +85,14 @@ def success_msg(text):
 
 class Controller:
     CURRENT_VERSION = "v4.0.0"
-    def __init__(self):
+    def __init__(self, app_state, cache_model):
+        self.app_state = app_state
+        self.cache_model = cache_model
         self.different_version = False
         self.current_window = None
         self.root = ctk.CTk()
         self.root.withdraw()
         
-        self.app_state = AppStateModel()
-        self.cache_model = CacheModel()
 
         if os.path.exists("cache.txt"):
             self.show_cookie_window()
