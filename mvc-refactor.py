@@ -102,7 +102,7 @@ class Controller:
 
     def controller_download(self, url):
         try:
-            self.main_model.download(url, options=None)
+            self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
         except EmptyURL as e:
             err_msg(text=f'Error: {e}')
 
@@ -475,9 +475,27 @@ class MainModel:
     def __init__(self):
         pass
     
-    def download(self, url, options=None):
+    def download(self, url, cookies, options=None):
         if not url:
             raise EmptyURL("URL field is empty.")
+    
+        with open("cache.txt", 'r') as file:
+            self.path_from_cache = file.readline().strip()
+            file.close()
+        
+        self.cmd_parts = ['yt-dlp', '--quiet', '--no-warnings']
+            
+        if is_linux():
+            self.cmd_parts[0] = './yt-dlp'
+        
+        if cookies != 'None':
+            if is_linux():
+                self.cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
+            else:
+                self.cmd_parts += ['--cookies-from-browser', cookies]
+
+        self.cmd_parts.append(url)
+        print(self.cmd_parts)
         
 
 class SettingsModel:
