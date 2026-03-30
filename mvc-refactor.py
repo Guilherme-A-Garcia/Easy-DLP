@@ -466,10 +466,6 @@ class CacheModel:
                 file.close()
             return {'success': "The YT-DLP path has been successfully written!"} 
 
-class CookieModel:
-    def __init__(self):
-        pass
-
 class MainModel:
     def __init__(self):
         pass
