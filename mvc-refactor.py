@@ -100,6 +100,9 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def controller_download(self, url):
+        self.main_model.download(url, options=None)
+
     def controller_cache_enter(self, cache_entry:str):
         path = cache_entry.strip()
         
@@ -153,7 +156,8 @@ class Controller:
         self.close_current()
         self.current_window = MainView(self)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing())
-        
+        self.current_window.main_download.configure(command=lambda:self.controller_download(url=self.current_window.main_entry.get().strip()))
+
     def show_settings(self):
         self.previous_window = self.current_window
         self.previous_window.withdraw()
