@@ -103,6 +103,9 @@ class Controller:
     def controller_download(self, url):
         try:
             self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
+        except MissingCache as e:
+            err_msg(text=f'Error: {e}')
+            self.controller_write_cache(rewrite=True)
         except EmptyURL as e:
             err_msg(text=f'Error: {e}')
 
@@ -119,7 +122,7 @@ class Controller:
             err_msg(f"Error: {e}")
     
     def controller_write_cache(self, rewrite:bool):
-        path = self.current_window.cache_dir_filedialog()
+        path = self.filedialog_askdir(title='Select your YT-DLP folder')
         
         if rewrite:
             try:
@@ -139,6 +142,10 @@ class Controller:
             self.msg = CTkMessagebox(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
             self.msg.get()
         self.show_main_window()
+    
+    def filedialog_askdir(self, title):
+        result = ctk.filedialog.askdirectory(title=title)
+        return result
     
     def show_cache_window(self):
         self.close_current()
@@ -216,10 +223,6 @@ class CacheView(ctk.CTkToplevel):
         
         self.cache_entry.focus_set()
         self.attributes('-alpha', 1)
-    
-    def cache_dir_filedialog(self):
-        result = ctk.filedialog.askdirectory(title='Select your YT-DLP folder')
-        return result
     
 class CookieView(ctk.CTkToplevel):
     def __init__(self, controller):
@@ -478,6 +481,11 @@ class MainModel:
     def download(self, url, cookies, options=None):
         if not url:
             raise EmptyURL("URL field is empty.")
+        
+        if not os.path.exists("cache.txt"):
+            raise MissingCache('Cache file missing.\nPlease, enter your YT-DLP directory and try again.')
+            self.write_cache(rewrite=True)
+            return
     
         with open("cache.txt", 'r') as file:
             self.path_from_cache = file.readline().strip()
@@ -519,6 +527,9 @@ class InvalidBinaryDirectory(UserError):
     pass
 
 class EmptyURL(UserError):
+    pass
+
+class MissingCache(UserError):
     pass
 
 if __name__ == "__main__":
