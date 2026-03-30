@@ -142,6 +142,7 @@ class Controller:
         self.close_current()
         self.current_window = CookieView(self)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='main'))
+        self.current_window.cookie_button.configure(command=self.handle_cookie_next)
 
     def show_main_window(self):
         self.close_current()
