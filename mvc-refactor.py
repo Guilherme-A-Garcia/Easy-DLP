@@ -117,7 +117,15 @@ class Controller:
                 err_msg(f'Error: {e}')
         else:
             self.current_window.cache_entry.insert(0, path)
-    
+
+    def set_cookie_selection(self, value):
+        if 'None' not in value:
+            self.msg = info_msg(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
+            self.msg.get()
+        self.app_state.cookie_selection = value
+        self.show_main_window()
+        print(self.app_state.cookie_selection)
+   
     def show_cache_window(self):
         self.close_current()
         self.current_window = CacheView(self)
