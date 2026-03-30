@@ -87,6 +87,7 @@ class Controller:
         self.root = ctk.CTk()
         self.root.withdraw()
         
+        self.app_state = AppStateModel()
         self.cache_model = CacheModel()
 
         if os.path.exists("cache.txt"):
@@ -242,7 +243,11 @@ class CookieView(ctk.CTkToplevel):
         
         self.cookie_import_menu.focus_set()
         self.attributes('-alpha', 1)
-        
+    
+    def on_cookie_selected(self):
+        value = self.cookie_import_menu.get()
+        self.controller.set_cookie_selection(value)
+    
 class MainView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
