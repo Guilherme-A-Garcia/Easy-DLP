@@ -128,7 +128,6 @@ class Controller:
             self.msg = CTkMessagebox(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
             self.msg.get()
         self.show_main_window()
-        print(selection)
     
     def show_cache_window(self):
         self.close_current()
@@ -143,6 +142,7 @@ class Controller:
         self.current_window = CookieView(self)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='main'))
         self.current_window.cookie_button.configure(command=self.handle_cookie_next)
+        simple_handling(self.current_window.cookie_button, "<Return>", self.handle_cookie_next)
 
     def show_main_window(self):
         self.close_current()
@@ -246,10 +246,8 @@ class CookieView(ctk.CTkToplevel):
         self.cookie_ntc_label = ctk.CTkLabel(self, text='Select "None" to skip the cookie importation.', font=('', 10))
         self.cookie_ntc_label.pack(pady=(0, 5))
 
-        # self.cookie_button = ctk.CTkButton(self, text='Next', font=('', 20), command=self.cookie_next_button, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cookie_button = ctk.CTkButton(self, text='Next', font=('', 20), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.cookie_button.pack(pady=10)
-        # simple_handling(self.cookie_button, "<Return>", self.cookie_next_button)
 
         self.cookie_ntc2_label = ctk.CTkLabel(self, text='Note: You need to be logged-in on YouTube before doing this process.', font=('', 10))
         self.cookie_ntc2_label.pack(pady=(0, 5))
