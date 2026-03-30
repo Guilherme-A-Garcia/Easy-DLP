@@ -159,14 +159,7 @@ class Controller:
         if self.confirmation.get() == "Yes":
             self.root.destroy()
         else:
-            #---TEMP---#
-            if next == 'cookie':
-                self.show_cookie_window()
-            elif next == 'main':
-                self.show_main_window()
-            else:
-                return
-            #---TEMP---#
+            return
 
     def close_current(self):
         if self.current_window is not None:
