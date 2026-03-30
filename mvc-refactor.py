@@ -466,6 +466,9 @@ class CacheModel:
 class MainModel:
     def __init__(self):
         pass
+    
+    def download(self, url, options=None):
+        pass
 
 class SettingsModel:
     def __init__(self):
