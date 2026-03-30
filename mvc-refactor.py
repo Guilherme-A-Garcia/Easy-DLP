@@ -119,13 +119,17 @@ class Controller:
             self.current_window.cache_entry.insert(0, path)
 
     def set_cookie_selection(self, value):
-        if 'None' not in value:
-            self.msg = info_msg(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
-            self.msg.get()
         self.app_state.cookie_selection = value
-        self.show_main_window()
-        print(self.app_state.cookie_selection)
    
+    def handle_cookie_next(self):
+        selection = self.app_state.cookie_selection
+        
+        if selection and selection != 'None':
+            self.msg = CTkMessagebox(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
+            self.msg.get()
+        self.show_main_window()
+        print(selection)
+    
     def show_cache_window(self):
         self.close_current()
         self.current_window = CacheView(self)
@@ -234,7 +238,7 @@ class CookieView(ctk.CTkToplevel):
         self.cookie_main_labelp2.pack(pady=(0, 15))
 
         self.cookie_import_options = ['None', 'brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi', 'whale']
-        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909", font=('', 18))
+        self.cookie_import_menu = ctk.CTkOptionMenu(self, values=self.cookie_import_options, state='readonly', fg_color="#780606", button_color="#580909", font=('', 18), command=self.on_cookie_selected)
         self.cookie_import_menu.set('None')
         self.cookie_import_menu.pack(pady=(5, 0))
 
@@ -252,9 +256,8 @@ class CookieView(ctk.CTkToplevel):
         self.cookie_import_menu.focus_set()
         self.attributes('-alpha', 1)
     
-    def on_cookie_selected(self):
-        value = self.cookie_import_menu.get()
-        self.controller.set_cookie_selection(value)
+    def on_cookie_selected(self, current_value):
+        self.controller.set_cookie_selection(current_value)
     
 class MainView(ctk.CTkToplevel):
     def __init__(self, controller):
