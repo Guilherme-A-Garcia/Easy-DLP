@@ -210,7 +210,7 @@ class CookieView(ctk.CTkToplevel):
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
         
-        # self.final_cookie_selection = self.controller.final_cookie_selection
+        self.final_cookie_selection = ctk.StringVar()
         set_window_icon(self)
         self.title('Cookie importation')
         dynamic_resolution(self, 500, 258)
@@ -241,7 +241,6 @@ class CookieView(ctk.CTkToplevel):
         self.cookie_ntc2_label.pack(pady=(0, 5))
         
         self.cookie_import_menu.focus_set()
-        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
         
 class MainView(ctk.CTkToplevel):
@@ -467,6 +466,10 @@ class SettingsModel:
 class UpdatingModel:
     def __init__(self):
         pass
+
+class AppStateModel:
+    def __init__(self):
+        self.cookie_selection = None
 
 # ---------------- EXCEPTIONS ---------------- #
 
