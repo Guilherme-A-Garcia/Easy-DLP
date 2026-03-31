@@ -504,7 +504,29 @@ class MainModel:
 
         self.cmd_parts.append(url)
         print(self.cmd_parts)
+    
+    def _write_log(self, stderr):
+        with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
+            file.write(stderr.decode('utf-8', errors='ignore'))
+        return os.path.abspath(LOGTXT_CONST)
+    
+    def download_subprocess(self, cmd_parts, path_from_cache):
+        LOGTXT_CONST = 'log.txt'
+        if sys.platform.startswith('win'):
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+            creationflags = subprocess.CREATE_NO_WINDOW
+        else:
+            startupinfo = None
+            creationflags = 0
         
+        self.process = subprocess.Popen(cmd_parts, startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=creationflags, cwd=path_from_cache)
+        _, stderr = self.process.communicate()
+        proc_success = self.process.returncode == 0
+
+        if self.process.returncode != 0:
+            log_path = self._write_log(stderr)
+            raise DownloadError(f'Error: Download failed.\nLog path: {log_path}')
 
 class SettingsModel:
     def __init__(self):
@@ -530,6 +552,9 @@ class EmptyURL(UserError):
     pass
 
 class MissingCache(UserError):
+    pass
+
+class DownloadError(UserError):
     pass
 
 if __name__ == "__main__":
