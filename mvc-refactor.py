@@ -485,8 +485,6 @@ class MainModel:
         
         if not os.path.exists("cache.txt"):
             raise MissingCache('Cache file missing.\nPlease, enter your YT-DLP directory and try again.')
-            self.write_cache(rewrite=True)
-            return
     
         with open("cache.txt", 'r') as file:
             self.path_from_cache = file.readline().strip()
