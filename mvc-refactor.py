@@ -100,6 +100,24 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def _download_success(self):
+        self.current_window.enable_widgets()
+        self.current_window.progress_bar.stop()
+        self.current_window.progress_bar['value'] = 0
+        self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        success_msg("Download completed successfully!")
+    
+    def _download_error(self, error, unexpected=False):
+        self.current_window.disable_widgets()
+        self.current_window.progress_bar.start()
+        self.current_window.progress_bar['value'] = 0
+        self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        
+        if unexpected:
+            err_msg(f'Unexpected error: {error}')
+        else:
+            err_msg(f'Error: {error}')
+
     def controller_download(self, url):
         try:
             self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
