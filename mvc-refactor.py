@@ -100,6 +100,33 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def download_thread(self, cmd_parts, path_from_cache):
+        def check_thread():
+            if self.thread.is_alive():
+                self.root.after(200, check_thread)
+            else:
+                self.current_window.enable_widgets()
+                self.current_window.progress_bar['value'] = 0
+                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        
+        def worker():
+            try:
+                self.main_model.download_subprocess(cmd_parts, path_from_cache)
+                self.root.after(0, lambda: self._download_success())
+            except DownloadError as e:
+                self.root.after(0, lambda e=e: self._download_error(e))
+            except Exception as e:
+                self.root.after(0, lambda e=e: self._download_error(e, unexpected=True))
+
+        self.current_window.disable_widgets()
+        self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
+        self.current_window.progress_bar.start()
+                
+        self.thread = threading.Thread(target=worker, daemon=True)
+        self.thread.start()
+            
+        check_thread()
+
     def _download_success(self):
         self.current_window.enable_widgets()
         self.current_window.progress_bar.stop()
