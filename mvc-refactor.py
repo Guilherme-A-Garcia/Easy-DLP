@@ -496,7 +496,7 @@ class MainModel:
         if is_linux():
             self.cmd_parts[0] = './yt-dlp'
         
-        if cookies != 'None':
+        if cookies and cookies != 'None':
             if is_linux():
                 self.cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
             else:
@@ -538,7 +538,7 @@ class UpdatingModel:
 
 class AppStateModel:
     def __init__(self):
-        self.cookie_selection = None
+        self.cookie_selection = "None"
 
 # ---------------- EXCEPTIONS ---------------- #
 
