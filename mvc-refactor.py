@@ -487,22 +487,22 @@ class MainModel:
             raise MissingCache('Cache file missing.\nPlease, enter your YT-DLP directory and try again.')
     
         with open("cache.txt", 'r') as file:
-            self.path_from_cache = file.readline().strip()
+            path_from_cache = file.readline().strip()
             file.close()
         
-        self.cmd_parts = ['yt-dlp', '--quiet', '--no-warnings']
+        cmd_parts = ['yt-dlp', '--quiet', '--no-warnings']
             
         if is_linux():
-            self.cmd_parts[0] = './yt-dlp'
+            cmd_parts[0] = './yt-dlp'
         
-        if cookies and cookies != 'None':
+        if cookies is not None and cookies != 'None':
             if is_linux():
-                self.cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
+                cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
             else:
-                self.cmd_parts += ['--cookies-from-browser', cookies]
+                cmd_parts += ['--cookies-from-browser', cookies]
 
-        self.cmd_parts.append(url)
-        print(self.cmd_parts)
+        cmd_parts.append(url)
+        return (cmd_parts, path_from_cache)
     
     def _write_log(self, stderr):
         with open(MainModel.LOGTXT_CONST, 'w', encoding='utf-8') as file:
