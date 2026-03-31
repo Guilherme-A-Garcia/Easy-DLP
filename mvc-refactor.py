@@ -146,13 +146,22 @@ class Controller:
             err_msg(f'Error: {error}')
 
     def controller_download(self, url):
+        cmd = []
+        path_from_cache = None
+        
         try:
-            self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
+            cmd_parts, path_from_cache = self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
+            self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
             self.controller_write_cache(rewrite=True)
+            return
         except EmptyURL as e:
             err_msg(text=f'Error: {e}')
+            return
+        except Exception as e:
+            err_msg(text=f'Unexpected error: {e}')
+            return
 
     def controller_cache_enter(self, cache_entry:str):
         path = cache_entry.strip()
