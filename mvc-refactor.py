@@ -475,6 +475,7 @@ class CacheModel:
             return {'success': "The YT-DLP path has been successfully written!"} 
 
 class MainModel:
+    LOGTXT_CONST = 'log.txt'
     def __init__(self):
         pass
     
@@ -506,12 +507,11 @@ class MainModel:
         print(self.cmd_parts)
     
     def _write_log(self, stderr):
-        with open(LOGTXT_CONST, 'w', encoding='utf-8') as file:
+        with open(MainModel.LOGTXT_CONST, 'w', encoding='utf-8') as file:
             file.write(stderr.decode('utf-8', errors='ignore'))
-        return os.path.abspath(LOGTXT_CONST)
+        return os.path.abspath(MainModel.LOGTXT_CONST)
     
     def download_subprocess(self, cmd_parts, path_from_cache):
-        LOGTXT_CONST = 'log.txt'
         if sys.platform.startswith('win'):
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.wShowWindow = subprocess.SW_HIDE
@@ -526,7 +526,7 @@ class MainModel:
 
         if self.process.returncode != 0:
             log_path = self._write_log(stderr)
-            raise DownloadError(f'Error: Download failed.\nLog path: {log_path}')
+            raise DownloadError(f'Download failed.\nLog path: {log_path}')
 
 class SettingsModel:
     def __init__(self):
