@@ -307,6 +307,22 @@ class MainView(ctk.CTkToplevel):
         # self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
 
+    def disable_widgets(self):
+        try:
+            widgets = (self.main_entry, self.settings_frame.menu, self.main_download)
+            for widget in widgets:
+                widget.configure(state="disabled")
+        except AttributeError:
+            pass
+        
+    def enable_widgets(self):
+        try:
+            widgets = (self.main_entry, self.settings_frame.menu, self.main_download)
+            for widget in widgets:
+                widget.configure(state="normal")
+        except AttributeError:
+            pass
+
 class SettingsView(ctk.CTkToplevel):
     def __init__(self, parent, controller):
         super().__init__(parent)
