@@ -109,6 +109,14 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def mp3_disable_checkboxes(self):
+        self.current_window.mp4_var.set(value='off')
+        self.app_state.mp4_state = 'off'
+        self.current_window.mp4_checkbox.configure(state='disabled')
+
+    def mp3_enable_checkboxes(self):
+        self.current_window.mp4_checkbox.configure(state='normal')
+
     def save_settings_changes(self):
         self.set_settings_states(*self.retrieve_settings_states())
         self.current_window.destroy()
