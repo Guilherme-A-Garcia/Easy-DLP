@@ -474,14 +474,13 @@ class SettingsView(ctk.CTkToplevel):
             self.clear_dir.configure(state="disabled")
             self.rewrite.configure(state="disabled")
             
-        self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)  # command=self.controller.save_settings_changes
+        self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.save_button.grid(sticky="ew", row=3, column=0, padx=(70,30))
         
         # self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.discard_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.discard_button.grid(sticky="ew", row=3, column=1, padx=(30,70))
 
-        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.attributes('-alpha', 1)
         
 class UpdatingView(ctk.CTkToplevel):
