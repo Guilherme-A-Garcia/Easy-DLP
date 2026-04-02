@@ -105,6 +105,9 @@ class Controller:
     def retrieve_settings_states(self):
         return self.current_window.mp3_checkbox.get(), self.current_window.mp4_checkbox.get(), self.current_window.playlist_checkbox.get()
 
+    def get_settings_states(self):
+        return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state)
+
     def download_thread(self, cmd_parts, path_from_cache):
         def check_thread():
             if self.thread.is_alive():
@@ -390,8 +393,11 @@ class SettingsView(ctk.CTkToplevel):
         self.rowconfigure(3, weight=1)
         self.columnconfigure((0,1), weight=1)
         
-        # self.current_mp4_value = ctk.StringVar(value=self.app.mp4_checkbox_state.get())
-        # self.current_mp3_value = ctk.StringVar(value=self.app.mp3_checkbox_state.get())
+        mp3, mp4, playlist = self.controller.get_settings_states()
+        
+        self.mp3_var = ctk.StringVar(value=mp3)
+        self.mp4_var = ctk.StringVar(value=mp4)
+        self.playlist_var = ctk.StringVar(value=playlist)
         
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
@@ -401,7 +407,7 @@ class SettingsView(ctk.CTkToplevel):
         dynamic_resolution(self, 500, 330)
         self.resizable(False,False)
 
-        self.themes = ThemeFrame(self, self.controller)
+        self.themes = ThemeButtonFrame(self, self.controller)
         self.themes.grid(row=0, column=0, padx=5, sticky="nw")
         
         self.settings_label = ctk.CTkLabel(self, text="Settings", font=('', 35))
@@ -412,20 +418,17 @@ class SettingsView(ctk.CTkToplevel):
         self.checkbox_frame.columnconfigure(0, weight=1)
         self.checkbox_frame.grid(sticky="nsew", row=2, column=0)
         
-        self.pl_checkbox_state = ctk.StringVar()
-        self.playlist_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.pl_checkbox_state)
+        self.playlist_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.playlist_var)
         self.playlist_checkbox.grid(sticky="w", column=0, row=0, padx=10)
-        self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
+        # self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
         
-        # self.mp4_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp4_value)
-        self.mp4_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202")
+        self.mp4_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.mp4_var)
         self.mp4_checkbox.grid(sticky="w", column=0, row=1, padx=10, pady=10)
         
-        # self.mp3_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Audio only (MP3)", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.current_mp3_value)
-        self.mp3_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Audio only (MP3)", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202")
+        self.mp3_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Audio only (MP3)", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.mp3_var)
         self.mp3_checkbox.grid(sticky="w", column=0, row=2, padx=10)
         # self.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
-        self.verify_mp3_checkbox()
+        # self.verify_mp3_checkbox()
         
         self.right_button_frame = ctk.CTkFrame(self)
         self.right_button_frame.rowconfigure((0,1,2), weight=1)
@@ -443,8 +446,7 @@ class SettingsView(ctk.CTkToplevel):
             self.clear_dir.configure(state="disabled")
             self.rewrite.configure(state="disabled")
             
-        # self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), command=self.save_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
-        self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+        self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)  # command=self.controller.save_settings_changes
         self.save_button.grid(sticky="ew", row=3, column=0, padx=(70,30))
         
         # self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.discard_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
@@ -597,7 +599,7 @@ class MainModel:
             log_path = self._write_log(stderr)
             raise DownloadError(f'Download failed.\nLog path: {log_path}')
 
-class SettingsModel:
+class SettingsModel: # DIRECTION: ADD FEATURES AND IMPLEMENT IN THE DOWNLOAD LOGIC
     def __init__(self):
         pass
 
@@ -605,7 +607,7 @@ class UpdatingModel:
     def __init__(self):
         pass
 
-class AppStateModel:
+class AppStateModel: 
     def __init__(self):
         self.cookie_selection = "None"
         self.mp3_state = 'off'
