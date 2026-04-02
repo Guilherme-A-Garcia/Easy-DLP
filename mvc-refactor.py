@@ -146,6 +146,11 @@ class Controller:
         self.current_window.parent.deiconify()
         self.current_window = self.current_window.parent
 
+    def discard_settings_changes(self):
+        self.previous_window.deiconify()
+        self.close_current()
+        self.current_window = self.previous_window
+
     def set_settings_states(self, mp3, mp4, playlist):
         self.app_state.mp3_state = mp3
         self.app_state.mp4_state = mp4
