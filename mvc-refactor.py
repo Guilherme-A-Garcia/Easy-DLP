@@ -223,7 +223,8 @@ class Controller:
     def show_cache_window(self):
         self.close_current()
         self.current_window = CacheView(self)
-        self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='cookie'))
+        self.current_window.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.current_window.settings_frame.menu.configure(command=self.show_settings)
         self.current_window.cache_enter_b.configure(command=lambda: self.controller_cache_enter(self.current_window.cache_entry.get()))
         self.current_window.file_search_b.configure(command=lambda: self.controller_write_cache(rewrite=False))
         simple_handling(self.current_window.cache_entry, "<Return>",lambda: self.controller_cache_enter(self.current_window.cache_entry.get()))
@@ -231,27 +232,43 @@ class Controller:
     def show_cookie_window(self):
         self.close_current()
         self.current_window = CookieView(self)
-        self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(next='main'))
+        self.current_window.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.current_window.settings_frame.menu.configure(command=self.show_settings)
         self.current_window.cookie_button.configure(command=self.handle_cookie_next)
         simple_handling(self.current_window.cookie_button, "<Return>", self.handle_cookie_next)
 
     def show_main_window(self):
         self.close_current()
         self.current_window = MainView(self)
-        self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing())
+        self.current_window.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.current_window.settings_frame.menu.configure(command=self.show_settings)
         self.current_window.main_download.configure(command=lambda:self.controller_download(url=self.current_window.main_entry.get().strip()))
+        simple_handler(self.current_window.main_entry, "<Return>", lambda:self.controller_download(url=self.current_window.main_entry.get().strip()))
 
     def show_settings(self):
         self.previous_window = self.current_window
         self.previous_window.withdraw()
         self.current_window = SettingsView(self.previous_window, self)
+        self.current_window.save_button.configure(command=self.save_settings_changes)
+        self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
 
-    def on_closing(self, next:str=None):
-        self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
-        if self.confirmation.get() == "Yes":
-            self.root.destroy()
-        else:
-            return
+    def on_closing(self, window:str=None):
+        if not window:
+            self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
+            if self.confirmation.get() == "Yes":
+                self.root.destroy()
+            else:
+                return
+        elif window == 'settings':
+            self.save = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
+            if self.save.get() == "Yes":
+                self.save_settings_changes()
+            elif self.save.get() == "No":
+                self.previous_window.deiconify()
+                self.close_current()
+                self.current_window = self.previous_window
+            else:
+                return
 
     def close_current(self):
         if self.current_window is not None:
