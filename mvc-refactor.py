@@ -101,6 +101,11 @@ class Controller:
             self.show_cookie_window()
         else:
             self.show_cache_window()
+
+    def set_settings_states(self, mp3, mp4, playlist):
+        self.app_state.mp3_state = mp3
+        self.app_state.mp4_state = mp4
+        self.app_state.playlist_state = playlist
     
     def retrieve_settings_states(self):
         return self.current_window.mp3_checkbox.get(), self.current_window.mp4_checkbox.get(), self.current_window.playlist_checkbox.get()
