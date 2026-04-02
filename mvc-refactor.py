@@ -15,8 +15,9 @@ def main():
     app_state = AppStateModel()
     cache_model = CacheModel()
     main_model = MainModel()
+    settings_model = SettingsModel()
     
-    app = Controller(app_state, cache_model, main_model)
+    app = Controller(app_state, cache_model, main_model, settings_model)
     app.root.mainloop()
 
 # ---------------- UTILITY FUNCTIONS ---------------- #
@@ -86,10 +87,11 @@ def success_msg(text):
 
 class Controller:
     CURRENT_VERSION = "v4.0.0"
-    def __init__(self, app_state, cache_model, main_model):
+    def __init__(self, app_state, cache_model, main_model, settings_model):
         self.app_state = app_state
         self.cache_model = cache_model
         self.main_model = main_model
+        self.settings_model = settings_model
         self.different_version = False
         self.current_window = None
         self.root = ctk.CTk()
