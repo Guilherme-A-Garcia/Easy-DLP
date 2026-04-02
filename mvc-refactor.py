@@ -602,7 +602,7 @@ class MainModel:
         if is_linux():
             cmd_parts[0] = './yt-dlp'
         
-        if cookies is not None and cookies != 'None':
+        if cookies and cookies != 'None':
             if is_linux():
                 cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
             else:
