@@ -101,6 +101,9 @@ class Controller:
             self.show_cookie_window()
         else:
             self.show_cache_window()
+    
+    def retrieve_settings_states(self):
+        return self.current_window.mp3_checkbox.get(), self.current_window.mp4_checkbox.get(), self.current_window.playlist_checkbox.get()
 
     def download_thread(self, cmd_parts, path_from_cache):
         def check_thread():
@@ -605,6 +608,9 @@ class UpdatingModel:
 class AppStateModel:
     def __init__(self):
         self.cookie_selection = "None"
+        self.mp3_state = 'off'
+        self.mp4_state = 'off'
+        self.playlist_state = 'off'
 
 # ---------------- EXCEPTIONS ---------------- #
 
