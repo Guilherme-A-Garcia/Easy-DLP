@@ -496,7 +496,6 @@ class SettingsView(ctk.CTkToplevel):
         
         self.playlist_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Playlist mode", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.playlist_var)
         self.playlist_checkbox.grid(sticky="w", column=0, row=0, padx=10)
-        # self.playlist_checkbox.bind('<Button-1>', self.playlist_handler)
         
         self.mp4_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Force MP4", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.mp4_var)
         self.mp4_checkbox.grid(sticky="w", column=0, row=1, padx=10, pady=10)
@@ -523,7 +522,6 @@ class SettingsView(ctk.CTkToplevel):
         self.save_button = ctk.CTkButton(self, text='Save Settings', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.save_button.grid(sticky="ew", row=3, column=0, padx=(70,30))
         
-        # self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), command=self.discard_changes, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.discard_button = ctk.CTkButton(self, text='Discard Settings', font=('', 18), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.discard_button.grid(sticky="ew", row=3, column=1, padx=(30,70))
 
