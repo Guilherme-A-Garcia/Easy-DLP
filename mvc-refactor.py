@@ -193,6 +193,7 @@ class Controller:
         path_from_cache = None
         
         try:
+            self.main_model.receive_states(*self.get_settings_states())
             cmd_parts, path_from_cache = self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
             self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
@@ -601,7 +602,10 @@ class CacheModel:
 class MainModel:
     LOGTXT_CONST = 'log.txt'
     def __init__(self):
-        pass
+        self.states = []
+    
+    def receive_states(self, mp3, mp4, playlist):
+        self.states.append[mp3, mp4, playlist]
     
     def download(self, url, cookies, options=None):
         if not url:
