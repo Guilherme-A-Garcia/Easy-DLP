@@ -287,7 +287,7 @@ class Controller:
         self.current_window.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_window.settings_frame.menu.configure(command=self.show_settings)
         self.current_window.main_download.configure(command=lambda:self.controller_download(url=self.current_window.main_entry.get().strip()))
-        simple_handler(self.current_window.main_entry, "<Return>", lambda:self.controller_download(url=self.current_window.main_entry.get().strip()))
+        simple_handling(self.current_window.main_entry, "<Return>", lambda:self.controller_download(url=self.current_window.main_entry.get().strip()))
 
     def show_settings(self):
         self.previous_window = self.current_window
