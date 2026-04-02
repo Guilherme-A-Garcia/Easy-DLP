@@ -117,6 +117,12 @@ class Controller:
     def mp3_enable_checkboxes(self):
         self.current_window.mp4_checkbox.configure(state='normal')
 
+    def verify_mp3_checkbox(self):
+        if self.app_state.mp3_state == 'on':
+            self.mp3_disable_checkboxes()
+        else:
+            self.mp3_enable_checkboxes()
+
     def save_settings_changes(self):
         self.set_settings_states(*self.retrieve_settings_states())
         self.current_window.destroy()
@@ -266,6 +272,7 @@ class Controller:
         self.current_window = SettingsView(self.previous_window, self)
         self.current_window.save_button.configure(command=self.save_settings_changes)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
+        self.verify_mp3_checkbox()
 
     def on_closing(self, window:str=None):
         if not window:
