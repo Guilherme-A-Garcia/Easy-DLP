@@ -102,6 +102,12 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def save_settings_changes(self):
+        self.set_settings_states(*self.retrieve_settings_states())
+        self.current_window.destroy()
+        self.current_window.parent.deiconify()
+        self.current_window = self.current_window.parent
+
     def set_settings_states(self, mp3, mp4, playlist):
         self.app_state.mp3_state = mp3
         self.app_state.mp4_state = mp4
