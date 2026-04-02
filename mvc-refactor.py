@@ -159,8 +159,8 @@ class Controller:
     def retrieve_settings_states(self):
         return self.current_window.mp3_checkbox.get(), self.current_window.mp4_checkbox.get(), self.current_window.playlist_checkbox.get()
 
-    def get_settings_states(self):
-        return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state)
+    def get_settings_states(self, playlist_dir:bool=False):
+        return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state if not playlist_dir else self.app_state.playlist_directory)
 
     def download_thread(self, cmd_parts, path_from_cache):
         def check_thread():
@@ -212,7 +212,7 @@ class Controller:
         path_from_cache = None
         
         try:
-            self.main_model.receive_states(*self.get_settings_states())
+            self.main_model.receive_states(*self.get_settings_states(playlist_dir=True))
             cmd_parts, path_from_cache = self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
             self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
@@ -296,6 +296,7 @@ class Controller:
         self.current_window.save_button.configure(command=self.save_settings_changes)
         self.current_window.discard_button.configure(command=self.discard_settings_changes)
         self.current_window.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
+        self.current_window.playlist_checkbox.bind("<Button-1>", self.playlist_handler)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         self.verify_mp3_checkbox()
 
@@ -468,7 +469,7 @@ class SettingsView(ctk.CTkToplevel):
         self.rowconfigure(3, weight=1)
         self.columnconfigure((0,1), weight=1)
         
-        mp3, mp4, playlist = self.controller.get_settings_states()
+        mp3, mp4, playlist = self.controller.get_settings_states(playlist_dir=False)
         
         self.mp3_var = ctk.StringVar(value=mp3)
         self.mp4_var = ctk.StringVar(value=mp4)
