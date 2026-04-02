@@ -109,6 +109,9 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def mp3_handler(self, event):
+        self.verify_mp3_checkbox()
+
     def mp3_disable_checkboxes(self):
         self.current_window.mp4_var.set(value='off')
         self.app_state.mp4_state = 'off'
@@ -118,7 +121,7 @@ class Controller:
         self.current_window.mp4_checkbox.configure(state='normal')
 
     def verify_mp3_checkbox(self):
-        if self.app_state.mp3_state == 'on':
+        if self.current_window.mp3_checkbox.get() == 'on':
             self.mp3_disable_checkboxes()
         else:
             self.mp3_enable_checkboxes()
@@ -271,6 +274,7 @@ class Controller:
         self.previous_window.withdraw()
         self.current_window = SettingsView(self.previous_window, self)
         self.current_window.save_button.configure(command=self.save_settings_changes)
+        self.current_window.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         self.verify_mp3_checkbox()
 
@@ -477,8 +481,6 @@ class SettingsView(ctk.CTkToplevel):
         
         self.mp3_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Audio only (MP3)", onvalue='on', offvalue='off', font=('', 14), fg_color="#950808", hover_color="#630202", variable=self.mp3_var)
         self.mp3_checkbox.grid(sticky="w", column=0, row=2, padx=10)
-        # self.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
-        # self.verify_mp3_checkbox()
         
         self.right_button_frame = ctk.CTkFrame(self)
         self.right_button_frame.rowconfigure((0,1,2), weight=1)
