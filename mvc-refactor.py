@@ -109,6 +109,20 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def playlist_handler(self, event):
+        if self.current_window.playlist_var.get() == 'on':
+            self.app_state.playlist_directory = str(self.filedialog_askdir(title='Choose the download location for the playlist')).strip()
+        else:
+            self.app_state.playlist_directory = ''
+            
+        if self.app_state.playlist_directory != '':
+            if not os.path.exists(self.app_state.playlist_directory):
+                err_msg(text='This directory does not exist.')
+                self.app_state.playlist_directory = ''
+                self.current_window.playlist_var.set('off')
+        else:
+            self.current_window.playlist_var.set('off')
+
     def mp3_handler(self, event):
         self.verify_mp3_checkbox()
 
@@ -275,6 +289,7 @@ class Controller:
         self.previous_window.withdraw()
         self.current_window = SettingsView(self.previous_window, self)
         self.current_window.save_button.configure(command=self.save_settings_changes)
+        self.current_window.discard_button.configure(command=self.discard_settings_changes)
         self.current_window.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         self.verify_mp3_checkbox()
@@ -668,6 +683,7 @@ class AppStateModel:
         self.mp3_state = 'off'
         self.mp4_state = 'off'
         self.playlist_state = 'off'
+        self.playlist_directory = ''
 
 # ---------------- EXCEPTIONS ---------------- #
 
