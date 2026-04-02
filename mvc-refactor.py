@@ -623,10 +623,13 @@ class CacheModel:
 class MainModel:
     LOGTXT_CONST = 'log.txt'
     def __init__(self):
-        self.states = []
+        self.states = {'mp3': None, 'mp4': None, 'playlist_dir': None}
     
-    def receive_states(self, mp3, mp4, playlist):
-        self.states.append[mp3, mp4, playlist]
+    def receive_states(self, mp3, mp4, playlist_dir):
+        self.states['mp3'] = mp3
+        self.states['mp4'] = mp4
+        self.states['playlist_dir'] = playlist_dir
+        print(f'States: {self.states}')
     
     def download(self, url, cookies, options=None):
         if not url:
