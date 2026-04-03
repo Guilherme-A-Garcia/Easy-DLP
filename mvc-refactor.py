@@ -317,6 +317,10 @@ class Controller:
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         self.verify_mp3_checkbox()
 
+    def show_updating_window(self):
+        self.close_current()
+        self.current_window = UpdatingView(self)
+
     def on_closing(self, window:str=None):
         if not window:
             self.confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
@@ -705,7 +709,7 @@ class SettingsModel: # DIRECTION: ADD FEATURES AND IMPLEMENT IN THE DOWNLOAD LOG
         if os.path.exists('cache.txt'):
             os.remove('cache.txt')
         else:
-            raise MissingCache('The cache file was either moved or deleted.\nPlease, enter your YT-DLP directory path.')
+            raise MissingCache('The cache file was either moved or deleted. Closing application...\nPlease, follow the standard procedures after reopening the app.')
 
 class UpdatingModel:
     def __init__(self):
