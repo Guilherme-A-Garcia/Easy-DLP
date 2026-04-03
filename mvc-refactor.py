@@ -258,6 +258,7 @@ class Controller:
         if rewrite:
             try:
                 self.cache_model.write_cache(path=path)
+                success_msg('Cache successfully rewritten!')
             except InvalidBinaryDirectory:
                 err_msg(f'Error: {e}')
         else:
@@ -314,6 +315,7 @@ class Controller:
         self.current_window.themes.theme_switch.configure(variable=self.current_window.themes.theme_variable)
         self.current_window.themes.theme_switch.configure(command=lambda: self.set_theme())
         self.current_window.clear_dir.configure(command=self.clear_cache)
+        self.current_window.rewrite.configure(command=lambda:self.controller_write_cache(rewrite=True))
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         self.verify_mp3_checkbox()
 
@@ -617,7 +619,6 @@ class CacheModel:
             try:
                 with open('cache.txt', 'w') as file:
                     file.write(cache_entry)
-                return {"success": True}
             except Exception as e:
                 return {'success': False, "error": str(e)}
     
