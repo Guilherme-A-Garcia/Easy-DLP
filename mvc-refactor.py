@@ -118,6 +118,7 @@ class Controller:
             except MissingCache as e:
                 err_msg(f'Error: {e}')
                 self.root.destroy()
+
     def set_theme(self):
         theme = self.current_window.themes.theme_variable.get()
         self.current_window.settings_set_theme(theme)
@@ -701,7 +702,7 @@ class MainModel:
             log_path = self._write_log(stderr)
             raise DownloadError(f'Download failed.\nLog path: {log_path}')
 
-class SettingsModel: # DIRECTION: ADD FEATURES AND IMPLEMENT IN THE DOWNLOAD LOGIC
+class SettingsModel:
     def __init__(self):
         pass
     
@@ -714,6 +715,33 @@ class SettingsModel: # DIRECTION: ADD FEATURES AND IMPLEMENT IN THE DOWNLOAD LOG
 class UpdatingModel:
     def __init__(self):
         pass
+
+    def get_app_directory(self):
+        if getattr(sys, 'frozen', False):
+            try:
+                path = os.path.abspath(sys.argv[0])
+                dir_path = os.path.dirname(path)
+                if os.path.exists(dir_path):
+                    return dir_path
+            except Exception:
+                pass
+            
+            try:
+                cwd = os.getcwd()
+                if os.path.exists(cwd):
+                    return cwd
+            except Exception:
+                pass
+            
+            try:
+                temp_dir = os.path.dirname(sys.executable)
+                parent = os.path.abspath(os.path.join(temp_dir, '..'))
+                if os.path.exists(parent):
+                    return parent
+            except Exception:
+                pass
+        
+        return os.getcwd()
 
 class AppStateModel:
     def __init__(self):
