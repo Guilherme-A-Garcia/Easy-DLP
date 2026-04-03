@@ -590,7 +590,7 @@ class ThemeButtonFrame(ctk.CTkFrame):
 
         self.initial_theme = ctk.get_appearance_mode()
         self.theme_variable = ctk.StringVar(value=self.initial_theme)
-        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", offvalue="Dark", onvalue="Light", variable=self.theme_variable)
+        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", offvalue="Dark", onvalue="Light")
         self.theme_switch.grid(row=0, column=0, padx=0)
 
 # ---------------- MODELS ---------------- #   
