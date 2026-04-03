@@ -109,6 +109,16 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def clear_cache(self):
+        result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes", button_color="#950808", button_hover_color="#630202", border_width=1)
+        if result.get() == "Yes":
+            try:
+                self.settings_model.clear_cache()
+                self.root.destroy()
+            except MissingCache as e:
+                err_msg(f'Error: {e}')
+                self.controller_write_cache(rewrite=True)
+
     def set_theme(self):
         theme = self.current_window.themes.theme_variable.get()
         self.current_window.settings_set_theme(theme)
@@ -303,6 +313,7 @@ class Controller:
         self.current_window.playlist_checkbox.bind("<Button-1>", self.playlist_handler)
         self.current_window.themes.theme_switch.configure(variable=self.current_window.themes.theme_variable)
         self.current_window.themes.theme_switch.configure(command=lambda: self.set_theme())
+        self.current_window.clear_dir.configure(command=self.clear_cache)
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         self.verify_mp3_checkbox()
 
@@ -700,6 +711,12 @@ class MainModel:
 class SettingsModel: # DIRECTION: ADD FEATURES AND IMPLEMENT IN THE DOWNLOAD LOGIC
     def __init__(self):
         pass
+    
+    def clear_cache(self):
+        if os.path.exists('cache.txt'):
+            os.remove('cache.txt')
+        else:
+            raise MissingCache('The cache file was either moved or deleted.\nPlease, enter your YT-DLP directory path.')
 
 class UpdatingModel:
     def __init__(self):
