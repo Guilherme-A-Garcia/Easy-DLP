@@ -91,7 +91,6 @@ def success_msg(text):
 # ---------------- CONTROLLER ---------------- #
 
 class Controller:
-    CURRENT_VERSION = "v4.0.0"
     def __init__(self, 
                  app_state: AppStateModel,
                  cache_model: CacheModel,
@@ -753,6 +752,20 @@ class UpdatingModel:
             # success_msg('Update finished successfully. Closing application...')
             # self.close_and_rename()
 
+    def auto_version_fetch(self, version):
+        try:
+            req_url = "https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest"
+            req_response = requests.get(req_url)
+            soup = BeautifulSoup(req_response.text, 'html.parser')
+            git_version = soup.find('span', class_='css-truncate-target').text.strip()
+            print(f'Version located in the latest GitHub Release: {git_version}')
+            
+            if git_version != version:
+                self.different_version = True
+        
+        except Exception as e:
+            print(e)
+
     def get_app_directory(self):
         if getattr(sys, 'frozen', False):
             try:
@@ -782,6 +795,8 @@ class UpdatingModel:
 
 class AppStateModel:
     def __init__(self):
+        self.current_version = "v4.0.0"
+
         self.cookie_selection = "None"
         
         self.mp3_state = 'off'
