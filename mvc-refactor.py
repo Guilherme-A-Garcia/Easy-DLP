@@ -117,8 +117,7 @@ class Controller:
                 self.root.destroy()
             except MissingCache as e:
                 err_msg(f'Error: {e}')
-                self.controller_write_cache(rewrite=True)
-
+                self.root.destroy()
     def set_theme(self):
         theme = self.current_window.themes.theme_variable.get()
         self.current_window.settings_set_theme(theme)
@@ -244,13 +243,12 @@ class Controller:
         path = cache_entry.strip()
         
         try:
-            result = self.cache_model.cache_enter(path)
-            if result["success"]:
-                self.show_cookie_window()
-            else:
-                err_msg(f"Error: {result["error"]}")
+            self.cache_model.cache_enter(path)
+            self.show_cookie_window()
         except InvalidBinaryDirectory as e:
             err_msg(f"Error: {e}")
+        except Exception as e:
+            err_msg(f"Unexpected error: {e}")
     
     def controller_write_cache(self, rewrite:bool):
         path = self.filedialog_askdir(title='Select your YT-DLP folder')
@@ -259,7 +257,7 @@ class Controller:
             try:
                 self.cache_model.write_cache(path=path)
                 success_msg('Cache successfully rewritten!')
-            except InvalidBinaryDirectory:
+            except InvalidBinaryDirectory as e:
                 err_msg(f'Error: {e}')
         else:
             self.current_window.cache_entry.insert(0, path)
@@ -616,26 +614,16 @@ class CacheModel:
         elif not os.path.exists(cache_entry):
             raise InvalidBinaryDirectory("Invalid YT-DLP directory.")
         else:
-            try:
-                with open('cache.txt', 'w') as file:
-                    file.write(cache_entry)
-            except Exception as e:
-                return {'success': False, "error": str(e)}
+            with open('cache.txt', 'w') as file:
+                file.write(cache_entry)
     
     def write_cache(self, path):
         if not path or not os.path.exists(path):
             raise InvalidBinaryDirectory("Invalid YT-DLP directory path.")
         
-        if os.path.exists('cache.txt'):
-            with open('cache.txt', 'w') as file:
-                file.write(path)
-                file.close()
-            return {'success': "The YT-DLP path has been successfully rewritten!"}
-        else:
-            with open('cache.txt', 'w') as file:
-                file.write(path)
-                file.close()
-            return {'success': "The YT-DLP path has been successfully written!"} 
+        with open('cache.txt', 'w') as file:
+            file.write(path)
+            file.close()
 
 class MainModel:
     LOGTXT_CONST = 'log.txt'
