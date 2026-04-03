@@ -102,7 +102,6 @@ class Controller:
         self.main_model = main_model
         self.settings_model = settings_model
         self.updating_model = updating_model
-        self.different_version = False
         self.current_window = None
         self.root = ctk.CTk()
         self.root.withdraw()
@@ -111,6 +110,40 @@ class Controller:
             self.show_cookie_window()
         else:
             self.show_cache_window()
+            
+        self.auto_update_thread()
+
+    def controller_auto_version_fetch(self):
+        try:
+            located_version = self.updating_model.auto_version_fetch()
+            if located_version != self.app_state.current_version:
+                self.app_state.different_version = True 
+        except Exception as e:
+            err_msg(f'Unexpected error: {e}')
+
+    def auto_update_thread(self):
+        def update_thread(inputted_thread):
+            if inputted_thread.is_alive():
+                self.root.after(10, lambda: update_thread(inputted_thread))
+            else:
+                print(f"Thread {inputted_thread} finished successfully!")
+                if inputted_thread == self.thread1:
+                    check_update()
+        
+        self.thread1 = threading.Thread(target=self.controller_auto_version_fetch)
+        self.thread1.start()
+        update_thread(self.thread1)
+        
+        def check_update():
+            if self.app_state.different_version:
+                msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
+                if msg.get() == 'Yes':
+                    self.show_updating_window()
+                    self.thread2 = threading.Thread(target=self.controller_update_app)
+                    self.thread2.start()
+                    update_thread(self.thread2)
+                else:
+                    return
 
     def controller_close_and_rename(self):
         try:
@@ -782,17 +815,15 @@ class UpdatingModel:
             os._exit(0)
             os.system('exit')
 
-    def auto_version_fetch(self, version):  # pass verison in Controller!!!
+    def auto_version_fetch(self):
         try:
             req_url = "https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest"
             req_response = requests.get(req_url)
             soup = BeautifulSoup(req_response.text, 'html.parser')
             git_version = soup.find('span', class_='css-truncate-target').text.strip()
             print(f'Version located in the latest GitHub Release: {git_version}')
+            return git_version
             
-            if git_version != version:
-                self.different_version = True
-        
         except Exception as e:
             print(e)
 
@@ -826,6 +857,7 @@ class UpdatingModel:
 class AppStateModel:
     def __init__(self):
         self.current_version = "v4.0.0"
+        self.different_version = False
 
         self.cookie_selection = "None"
         
