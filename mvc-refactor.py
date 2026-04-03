@@ -376,7 +376,6 @@ class CookieView(ctk.CTkToplevel):
         self.bind("<Button-1>", lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
         
-        self.final_cookie_selection = ctk.StringVar()
         set_window_icon(self)
         self.title('Cookie importation')
         dynamic_resolution(self, 500, 258)
@@ -693,7 +692,6 @@ class MainModel:
         
         self.process = subprocess.Popen(cmd_parts, startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=creationflags, cwd=path_from_cache)
         _, stderr = self.process.communicate()
-        proc_success = self.process.returncode == 0
 
         if self.process.returncode != 0:
             log_path = self._write_log(stderr)
