@@ -109,6 +109,10 @@ class Controller:
         else:
             self.show_cache_window()
 
+    def set_theme(self):
+        theme = self.current_window.themes.theme_variable.get()
+        self.current_window.settings_set_theme(theme)
+
     def playlist_handler(self, event):
         if self.current_window.playlist_var.get() == 'on':
             self.app_state.playlist_directory = str(self.filedialog_askdir(title='Choose the download location for the playlist')).strip()
@@ -297,6 +301,8 @@ class Controller:
         self.current_window.discard_button.configure(command=self.discard_settings_changes)
         self.current_window.mp3_checkbox.bind("<Button-1>", self.mp3_handler)
         self.current_window.playlist_checkbox.bind("<Button-1>", self.playlist_handler)
+        self.current_window.themes.theme_switch.configure(variable=self.current_window.themes.theme_variable)
+        self.current_window.themes.theme_switch.configure(command=lambda: self.set_theme())
         self.current_window.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         self.verify_mp3_checkbox()
 
@@ -584,8 +590,7 @@ class ThemeButtonFrame(ctk.CTkFrame):
 
         self.initial_theme = ctk.get_appearance_mode()
         self.theme_variable = ctk.StringVar(value=self.initial_theme)
-        # self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, command=lambda: self.app.set_theme(parent), offvalue="Dark", onvalue="Light")
-        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", variable=self.theme_variable, offvalue="Dark", onvalue="Light")
+        self.theme_switch = ctk.CTkSwitch(self, text="Toggle themes (Dark/Light)", font=("", 14), progress_color="#630202", fg_color="#630202", offvalue="Dark", onvalue="Light", variable=self.theme_variable)
         self.theme_switch.grid(row=0, column=0, padx=0)
 
 # ---------------- MODELS ---------------- #   
