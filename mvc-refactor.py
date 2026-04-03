@@ -16,11 +16,13 @@ def main():
     cache_model = CacheModel()
     main_model = MainModel()
     settings_model = SettingsModel()
+    updating_model = UpdatingModel()
     
     app = Controller(app_state, 
                      cache_model, 
                      main_model, 
-                     settings_model)
+                     settings_model,
+                     updating_model)
     app.root.mainloop()
 
 # ---------------- UTILITY FUNCTIONS ---------------- #
@@ -94,11 +96,13 @@ class Controller:
                  app_state: AppStateModel,
                  cache_model: CacheModel,
                  main_model: MainModel,
-                 settings_model: SettingsModel):
+                 settings_model: SettingsModel,
+                 updating_model: UpdatingModel):
         self.app_state = app_state
         self.cache_model = cache_model
         self.main_model = main_model
         self.settings_model = settings_model
+        self.updating_model = updating_model
         self.different_version = False
         self.current_window = None
         self.root = ctk.CTk()
@@ -108,6 +112,15 @@ class Controller:
             self.show_cookie_window()
         else:
             self.show_cache_window()
+
+    def update_app(self):
+        try:
+            self.updating_model.update_app()
+            success_msg('Update finished successfully. Closing application...')
+            # self.close_and_rename()
+        except URLLibError as e:
+            err_msg(e)
+            self.root.destroy()
 
     def clear_cache(self):
         result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes", button_color="#950808", button_hover_color="#630202", border_width=1)
@@ -715,6 +728,30 @@ class SettingsModel:
 class UpdatingModel:
     def __init__(self):
         pass
+
+    def update_app(self):
+        url =  ''
+        file_path = ''
+        cwd = self.get_app_directory()
+
+        if os.path.exists(cwd):
+            print("Resolved update directory:", cwd)
+
+            if is_linux():
+                url = 'https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest/download/Easy-DLP-x86_64.AppImage'
+                file_path = os.path.join(cwd, 'Easy-DLP-x86_64-NEW.AppImage')
+            else:
+                url = 'https://github.com/Guilherme-A-Garcia/Easy-DLP/releases/latest/download/Easy-DLP.exe'
+                file_path = os.path.join(cwd, 'Easy-DLP-NEW.exe')
+
+            print("Downloading to:", file_path)
+            
+            try:
+                urllib.request.urlretrieve(url, file_path)
+            except Exception as e:
+                raise URLLibError(f"An error occurred while downloading the update, the application will close: {e}")
+            # success_msg('Update finished successfully. Closing application...')
+            # self.close_and_rename()
 
     def get_app_directory(self):
         if getattr(sys, 'frozen', False):
