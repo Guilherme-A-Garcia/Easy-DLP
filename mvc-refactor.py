@@ -575,7 +575,6 @@ class SettingsButtonFrame(ctk.CTkFrame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
                 
-        # self.menu = ctk.CTkButton(self, image=self.menu_image, fg_color="transparent", bg_color="transparent", hover=False, text="", command=self.app.show_settings, width=0)
         self.menu = ctk.CTkButton(self, image=self.menu_image, fg_color="transparent", bg_color="transparent", hover=False, text="", width=0)
         self.menu.grid(row=0, column=0, padx=0)
 
@@ -654,6 +653,20 @@ class MainModel:
         if is_linux():
             cmd_parts[0] = './yt-dlp'
         
+        if self.states.get('mp3') == 'on':
+            cmd_parts += ['--extract-audio', '--audio-format', 'mp3']
+        
+        if self.states.get('mp4') == 'on':
+            cmd_parts += ['-S', '+vcodec:h264', '--audio-format', 'aac', '--merge-output-format', 'mp4']
+        
+        if not self.states.get('playlist_dir'):
+            cmd_parts += ['--no-playlist', '--playlist-end', '1']
+        else:
+            if is_linux():
+                cmd_parts += ['-o', f"{self.states['playlist_dir']}/%(playlist)s/%(title)s.%(ext)s"]
+            else:
+                cmd_parts += ['-o', f"{self.states['playlist_dir']}\\%%(playlist)s\\%%(title)s.%%(ext)s"]
+        
         if cookies and cookies != 'None':
             if is_linux():
                 cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
@@ -661,6 +674,7 @@ class MainModel:
                 cmd_parts += ['--cookies-from-browser', cookies]
 
         cmd_parts.append(url)
+        print(f'Final command: {cmd_parts}')
         return (cmd_parts, path_from_cache)
     
     def _write_log(self, stderr):
