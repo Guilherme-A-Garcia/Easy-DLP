@@ -527,6 +527,9 @@ class SettingsView(ctk.CTkToplevel):
 
         self.attributes('-alpha', 1)
         
+    def settings_set_theme(self, theme:str):
+        ctk.set_appearance_mode(theme)
+        
 class UpdatingView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
@@ -572,8 +575,9 @@ class SettingsButtonFrame(ctk.CTkFrame):
 
 class ThemeButtonFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
-        super().__init__(parent)
+        super().__init__(parent, fg_color='transparent')
         self.controller = controller
+        self.parent = parent
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -684,11 +688,13 @@ class UpdatingModel:
     def __init__(self):
         pass
 
-class AppStateModel: 
+class AppStateModel:
     def __init__(self):
         self.cookie_selection = "None"
+        
         self.mp3_state = 'off'
         self.mp4_state = 'off'
+        
         self.playlist_state = 'off'
         self.playlist_directory = ''
 
