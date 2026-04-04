@@ -243,7 +243,7 @@ class Controller:
         def worker():
             try:
                 self.main_model.download_subprocess(cmd_parts, path_from_cache)
-                self.root.after(0, lambda: self._download_success())
+                self.root.after(0, lambda: self._download_success(path_from_cache))
             except DownloadError as e:
                 self.root.after(0, lambda e=e: self._download_error(e))
             except Exception as e:
@@ -258,12 +258,15 @@ class Controller:
             
         check_thread()
 
-    def _download_success(self):
+    def _download_success(self, cache):
         self.current_window.enable_widgets()
         self.current_window.progress_bar.stop()
         self.current_window.progress_bar['value'] = 0
         self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        success_msg("Download completed successfully!")
+        if self.app_state.playlist_state == 'off':
+            success_msg(f"File successfully downloaded to {cache}")
+        else:
+            success_msg(f"Playlist successfully downloaded to {self.app_state.playlist_directory}")
     
     def _download_error(self, error, unexpected=False):
         self.current_window.disable_widgets()
