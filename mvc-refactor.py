@@ -881,6 +881,31 @@ class WindowManager:
         self.current_view = None
         self.previous_view = None
 
+    def show_cache_window(self):
+        self.close_current()
+        self.current_view = CacheView(self.controller)
+        self._wire_cache_window()
+
+    def show_cookie_window(self):
+        self.close_current()
+        self.current_view = CookieView(self.controller)
+        self._wire_cookie_window()
+
+    def show_main_window(self):
+        self.close_current()
+        self.current_view = MainView(self.controller)
+        self._wire_main_window()
+
+    def show_settings(self):
+        self.previous_view = self.current_view
+        self.previous_view.withdraw()
+        self.current_view = SettingsView(self.previous_view, self.controller)
+        self._wire_settings_window()
+
+    def show_updating_window(self):
+        self.close_current()
+        self.current_view = UpdatingView(self.controller)
+
     def on_closing(self, window:str=None):
         if not window:
             confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
