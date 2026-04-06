@@ -878,6 +878,45 @@ class WindowManager:
     def __init__(self, root, controller):
         self.controller = controller
         self.root = root
+        self.current_view = None
+        self.previous_view = None
+
+    def _wire_cache_window(self):
+        if window == '':
+            self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
+            self.current_view.settings_frame.menu.configure(command=self.show_settings)
+            self.current_view.cache_enter_b.configure(command=lambda: self.controller.controller_cache_enter(self.current_view.cache_entry.get()))
+            self.current_view.file_search_b.configure(command=lambda: self.controller.controller_write_cache(rewrite=False))
+            simple_handling(self.current_view.cache_entry, "<Return>",lambda: self.controller.controller_cache_enter(self.current_view.cache_entry.get()))
+
+    def _wire_cookie_window(self):
+            self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
+            self.current_view.settings_frame.menu.configure(command=self.show_settings)
+            self.current_view.cookie_button.configure(command=self.controller.handle_cookie_next)
+            simple_handling(self.current_view.cookie_button, "<Return>", self.controller.handle_cookie_next)
+
+    def _wire_main_window(self):
+            self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
+            self.current_view.settings_frame.menu.configure(command=self.show_settings)
+            self.current_view.main_download.configure(command=lambda:self.controller.controller_download(url=self.current_view.main_entry.get().strip()))
+            simple_handling(self.current_view.main_entry, "<Return>", lambda:self.controller.controller_download(url=self.current_view.main_entry.get().strip()))
+
+    def _wire_settings_window(self):
+            self.current_view.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
+            
+            self.current_view.save_button.configure(command=self.controller.save_settings_changes)
+            self.current_view.discard_button.configure(command=self.controller.discard_settings_changes)
+            
+            self.current_view.mp3_checkbox.bind("<Button-1>", self.controller.mp3_handler)
+            self.current_view.playlist_checkbox.bind("<Button-1>", self.controller.playlist_handler)
+            
+            self.current_view.themes.theme_switch.configure(variable=self.current_view.themes.theme_variable)
+            self.current_view.themes.theme_switch.configure(command=lambda: self.controller.set_theme())
+            
+            self.current_view.clear_dir.configure(command=self.controller.clear_cache)
+            self.current_view.rewrite.configure(command=lambda:self.controller.controller_write_cache(rewrite=True))
+            
+            self.controller.verify_mp3_checkbox()
 
 # ---------------- EXCEPTIONS ---------------- #
 
