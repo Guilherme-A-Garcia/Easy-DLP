@@ -881,6 +881,31 @@ class WindowManager:
         self.current_view = None
         self.previous_view = None
 
+    def on_closing(self, window:str=None):
+        if not window:
+            confirmation = CTkMessagebox(title="Exit confirmation", message="Exit application?", icon='warning', option_1="No", option_2="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
+            if confirmation.get() == "Yes":
+                self.root.destroy()
+            else:
+                return
+        elif window == 'settings':
+            save_prompt = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
+            choice = save_prompt.get()
+            if choice == "Yes":
+                self.controller.save_settings_changes()
+            elif choice == "No":
+                self.previous_view.deiconify()
+                self.close_current()
+                self.current_view = self.previous_view
+            else:
+                return
+
+    def close_current(self):
+        if self.current_view is not None:
+            self.current_view.withdraw()
+            self.current_view.after(50, self.current_view.destroy)
+            self.current_view = None
+
     def _wire_cache_window(self):
         if window == '':
             self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
