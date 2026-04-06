@@ -102,9 +102,11 @@ class Controller:
         self.main_model = main_model
         self.settings_model = settings_model
         self.updating_model = updating_model
-        self.current_window = None
+        self.current_window = None  # <---- DELETE ONCE WINDOWMANAGER IS IMPLEMENTED
         self.root = ctk.CTk()
         self.root.withdraw()
+        
+        self.window_manager = WindowManager(self.root, self)
 
         if os.path.exists("cache.txt"):
             self.show_cookie_window()
@@ -869,6 +871,13 @@ class AppStateModel:
         
         self.playlist_state = 'off'
         self.playlist_directory = ''
+
+# ---------------- SERVICES/MANAGERS ---------------- #
+
+class WindowManager:
+    def __init__(self, root, controller):
+        self.controller = controller
+        self.root = root
 
 # ---------------- EXCEPTIONS ---------------- #
 
