@@ -102,17 +102,17 @@ class Controller:
         self.main_model = main_model
         self.settings_model = settings_model
         self.updating_model = updating_model
-        
+
         self.root = ctk.CTk()
         self.root.withdraw()
-        
+
         self.window_manager = WindowManager(self.root, self)
 
         if os.path.exists("cache.txt"):
-            self.show_cookie_window()
+            self.window_manager.show_cookie_window()
         else:
-            self.show_cache_window()
-            
+            self.window_manager.show_cache_window()
+
         self.auto_update_thread()
 
     def controller_auto_version_fetch(self):
@@ -140,7 +140,7 @@ class Controller:
             if self.app_state.different_version:
                 msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
                 if msg.get() == 'Yes':
-                    self.show_updating_window()
+                    self.window_manager.show_updating_window()
                     self.thread2 = threading.Thread(target=self.controller_update_app)
                     self.thread2.start()
                     update_thread(self.thread2)
@@ -150,8 +150,8 @@ class Controller:
     def controller_close_and_rename(self):
         try:
             self.updating_model.close_and_rename()
-            if self.current_window is not None:
-                self.current_window.destroy()
+            if self.window_manager.current_view is not None:
+                self.window_manager.current_view.destroy()
                 self.root.destroy()
                 sys.exit()
         except Exception as e:
@@ -177,11 +177,11 @@ class Controller:
                 self.root.destroy()
 
     def set_theme(self):
-        theme = self.current_window.themes.theme_variable.get()
-        self.current_window.settings_set_theme(theme)
+        theme = self.window_manager.current_view.themes.theme_variable.get()
+        self.window_manager.current_view.settings_set_theme(theme)
 
     def playlist_handler(self, event):
-        if self.current_window.playlist_var.get() == 'on':
+        if self.window_manager.current_view.playlist_var.get() == 'on':
             self.app_state.playlist_directory = str(self.filedialog_askdir(title='Choose the download location for the playlist')).strip()
         else:
             self.app_state.playlist_directory = ''
@@ -190,45 +190,45 @@ class Controller:
             if not os.path.exists(self.app_state.playlist_directory):
                 err_msg(text='This directory does not exist.')
                 self.app_state.playlist_directory = ''
-                self.current_window.playlist_var.set('off')
+                self.window_manager.current_view.playlist_var.set('off')
         else:
-            self.current_window.playlist_var.set('off')
+            self.window_manager.current_view.playlist_var.set('off')
 
     def mp3_handler(self, event):
         self.verify_mp3_checkbox()
 
     def mp3_disable_checkboxes(self):
-        self.current_window.mp4_var.set(value='off')
+        self.window_manager.current_view.mp4_var.set(value='off')
         self.app_state.mp4_state = 'off'
-        self.current_window.mp4_checkbox.configure(state='disabled')
+        self.window_manager.current_view.mp4_checkbox.configure(state='disabled')
 
     def mp3_enable_checkboxes(self):
-        self.current_window.mp4_checkbox.configure(state='normal')
+        self.window_manager.current_view.mp4_checkbox.configure(state='normal')
 
     def verify_mp3_checkbox(self):
-        if self.current_window.mp3_checkbox.get() == 'on':
+        if self.window_manager.current_view.mp3_checkbox.get() == 'on':
             self.mp3_disable_checkboxes()
         else:
             self.mp3_enable_checkboxes()
 
     def save_settings_changes(self):
         self.set_settings_states(*self.retrieve_settings_states())
-        self.current_window.destroy()
-        self.current_window.parent.deiconify()
-        self.current_window = self.current_window.parent
+        self.window_manager.current_view.destroy()
+        self.window_manager.current_view.parent.deiconify()
+        self.window_manager.current_view = self.window_manager.current_view.parent
 
     def discard_settings_changes(self):
-        self.previous_window.deiconify()
-        self.close_current()
-        self.current_window = self.previous_window
+        self.window_manager.previous_view.deiconify()
+        self.window_manager.close_current()
+        self.window_manager.current_view = self.window_manager.previous_view
 
     def set_settings_states(self, mp3, mp4, playlist):
         self.app_state.mp3_state = mp3
         self.app_state.mp4_state = mp4
         self.app_state.playlist_state = playlist
-    
+
     def retrieve_settings_states(self):
-        return self.current_window.mp3_checkbox.get(), self.current_window.mp4_checkbox.get(), self.current_window.playlist_checkbox.get()
+        return self.window_manager.current_view.mp3_checkbox.get(), self.window_manager.current_view.mp4_checkbox.get(), self.window_manager.current_view.playlist_checkbox.get()
 
     def get_settings_states(self, playlist_dir:bool=False):
         return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state if not playlist_dir else self.app_state.playlist_directory)
@@ -238,9 +238,9 @@ class Controller:
             if self.thread.is_alive():
                 self.root.after(200, check_thread)
             else:
-                self.current_window.enable_widgets()
-                self.current_window.progress_bar['value'] = 0
-                self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+                self.window_manager.current_view.enable_widgets()
+                self.window_manager.current_view.progress_bar['value'] = 0
+                self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
         
         def worker():
             try:
@@ -251,9 +251,9 @@ class Controller:
             except Exception as e:
                 self.root.after(0, lambda e=e: self._download_error(e, unexpected=True))
 
-        self.current_window.disable_widgets()
-        self.current_window.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
-        self.current_window.progress_bar.start()
+        self.window_manager.current_view.disable_widgets()
+        self.window_manager.current_view.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
+        self.window_manager.current_view.progress_bar.start()
                 
         self.thread = threading.Thread(target=worker, daemon=True)
         self.thread.start()
@@ -261,20 +261,20 @@ class Controller:
         check_thread()
 
     def _download_success(self, cache):
-        self.current_window.enable_widgets()
-        self.current_window.progress_bar.stop()
-        self.current_window.progress_bar['value'] = 0
-        self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        self.window_manager.current_view.enable_widgets()
+        self.window_manager.current_view.progress_bar.stop()
+        self.window_manager.current_view.progress_bar['value'] = 0
+        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
         if self.app_state.playlist_state == 'off':
             success_msg(f"File successfully downloaded to {cache}")
         else:
             success_msg(f"Playlist successfully downloaded to {self.app_state.playlist_directory}")
-    
+
     def _download_error(self, error, unexpected=False):
-        self.current_window.disable_widgets()
-        self.current_window.progress_bar.start()
-        self.current_window.progress_bar['value'] = 0
-        self.current_window.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        self.window_manager.current_view.disable_widgets()
+        self.window_manager.current_view.progress_bar.start()
+        self.window_manager.current_view.progress_bar['value'] = 0
+        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
         
         if unexpected:
             err_msg(f'Unexpected error: {error}')
@@ -305,12 +305,12 @@ class Controller:
         
         try:
             self.cache_model.cache_enter(path)
-            self.show_cookie_window()
+            self.window_manager.show_cookie_window()
         except InvalidBinaryDirectory as e:
             err_msg(f"Error: {e}")
         except Exception as e:
             err_msg(f"Unexpected error: {e}")
-    
+
     def controller_write_cache(self, rewrite:bool):
         path = self.filedialog_askdir(title='Select your YT-DLP folder')
         
@@ -321,19 +321,19 @@ class Controller:
             except InvalidBinaryDirectory as e:
                 err_msg(f'Error: {e}')
         else:
-            self.current_window.cache_entry.insert(0, path)
+            self.window_manager.current_view.cache_entry.insert(0, path)
 
     def set_cookie_selection(self, value):
         self.app_state.cookie_selection = value
-   
+
     def handle_cookie_next(self):
         selection = self.app_state.cookie_selection
         
         if selection and selection != 'None':
             self.msg = CTkMessagebox(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
             self.msg.get()
-        self.show_main_window()
-    
+        self.window_manager.show_main_window()
+
     def filedialog_askdir(self, title):
         result = ctk.filedialog.askdirectory(title=title)
         return result
@@ -375,7 +375,7 @@ class CacheView(ctk.CTkToplevel):
         
         self.cache_entry.focus_set()
         self.attributes('-alpha', 1)
-    
+
 class CookieView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
@@ -416,7 +416,7 @@ class CookieView(ctk.CTkToplevel):
     
     def on_cookie_selected(self, current_value):
         self.controller.set_cookie_selection(current_value)
-    
+
 class MainView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
@@ -542,7 +542,7 @@ class SettingsView(ctk.CTkToplevel):
         
     def settings_set_theme(self, theme:str):
         ctk.set_appearance_mode(theme)
-        
+
 class UpdatingView(ctk.CTkToplevel):
     def __init__(self, controller):
         super().__init__(controller.root)
@@ -567,7 +567,7 @@ class UpdatingView(ctk.CTkToplevel):
         self.progress_bar.start()
         
         self.attributes('-alpha', 1)
-        
+
 class SettingsButtonFrame(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent, fg_color="transparent")
