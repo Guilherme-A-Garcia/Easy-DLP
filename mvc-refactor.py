@@ -915,6 +915,16 @@ class DownloaderService:
         else:
             success_msg(f"Playlist successfully downloaded to {self.controller.app_state.playlist_directory}")
 
+    def _download_error(self, error, unexpected=False):
+        self.window_manager.current_view.enable_widgets()
+        self.window_manager.current_view.progress_bar.stop()
+        self.window_manager.current_view.progress_bar['value'] = 0
+        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        
+        if unexpected:
+            err_msg(f'Unexpected error: {error}')
+        else:
+            err_msg(f'Error: {error}')
         
 # ---------------- EXCEPTIONS ---------------- #
 
