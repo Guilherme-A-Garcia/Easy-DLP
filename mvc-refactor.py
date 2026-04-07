@@ -107,7 +107,7 @@ class Controller:
         self.root.withdraw()
 
         self.window_manager = WindowManager(self.root, self)
-        self.downloader_service = DownloaderService()
+        self.downloader_service = DownloaderService(self, self.main_model, self.window_manager)
 
         if os.path.exists("cache.txt"):
             self.window_manager.show_cookie_window()
@@ -902,8 +902,11 @@ class WindowManager:
             self.controller.verify_mp3_checkbox()
 
 class DownloaderService:
-    def __init__(self):
-        pass
+    LOGTXT_CONST = 'log.txt'
+    def __init__(self, controller, main_model, window_manager):
+        self.controller = controller
+        self.main_model = main_model
+        self.window_manager = window_manager
     
     def download(self, url):
         cmd = []
