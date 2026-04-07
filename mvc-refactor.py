@@ -924,6 +924,33 @@ class DownloaderService:
             err_msg(text=f'Unexpected error: {e}')
             return
 
+    def download_thread(self, cmd_parts, path_from_cache):
+        def check_thread():
+            if self.thread.is_alive():
+                self.controller.root.after(200, check_thread)
+            else:
+                self.window_manager.current_view.enable_widgets()
+                self.window_manager.current_view.progress_bar['value'] = 0
+                self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        
+        def worker():
+            try:
+                self.download_subprocess(cmd_parts, path_from_cache)
+                self.controller.root.after(0, lambda: self._download_success(path_from_cache))
+            except DownloadError as e:
+                self.controller.root.after(0, lambda e=e: self._download_error(e))
+            except Exception as e:
+                self.controller.root.after(0, lambda e=e: self._download_error(e, unexpected=True))
+
+        self.window_manager.current_view.disable_widgets()
+        self.window_manager.current_view.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
+        self.window_manager.current_view.progress_bar.start()
+                
+        self.thread = threading.Thread(target=worker, daemon=True)
+        self.thread.start()
+            
+        check_thread()
+
     def _download_success(self, cache):
         self.window_manager.current_view.enable_widgets()
         self.window_manager.current_view.progress_bar.stop()
