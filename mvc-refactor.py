@@ -951,6 +951,11 @@ class DownloaderService:
             
         check_thread()
 
+    def _write_log(self, stderr):
+        with open(self.LOGTXT_CONST, 'w', encoding='utf-8') as file:
+            file.write(stderr.decode('utf-8', errors='ignore'))
+        return os.path.abspath(self.LOGTXT_CONST)
+
     def _download_success(self, cache):
         self.window_manager.current_view.enable_widgets()
         self.window_manager.current_view.progress_bar.stop()
