@@ -624,7 +624,6 @@ class CacheModel:
             file.close()
 
 class MainModel:
-    LOGTXT_CONST = 'log.txt'
     def __init__(self):
         self.states = {'mp3': None, 'mp4': None, 'playlist_dir': None}
     
@@ -634,7 +633,7 @@ class MainModel:
         self.states['playlist_dir'] = playlist_dir
         print(f'States: {self.states}')
     
-    def download(self, url, cookies, options=None):
+    def generate_command(self, url, cookies, options=None):
         if not url:
             raise EmptyURL("URL field is empty.")
         
@@ -673,27 +672,6 @@ class MainModel:
         cmd_parts.append(url)
         print(f'Final command: {cmd_parts}')
         return (cmd_parts, path_from_cache)
-    
-    def _write_log(self, stderr):
-        with open(MainModel.LOGTXT_CONST, 'w', encoding='utf-8') as file:
-            file.write(stderr.decode('utf-8', errors='ignore'))
-        return os.path.abspath(MainModel.LOGTXT_CONST)
-    
-    def download_subprocess(self, cmd_parts, path_from_cache):
-        if sys.platform.startswith('win'):
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.wShowWindow = subprocess.SW_HIDE
-            creationflags = subprocess.CREATE_NO_WINDOW
-        else:
-            startupinfo = None
-            creationflags = 0
-        
-        self.process = subprocess.Popen(cmd_parts, startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=creationflags, cwd=path_from_cache)
-        _, stderr = self.process.communicate()
-
-        if self.process.returncode != 0:
-            log_path = self._write_log(stderr)
-            raise DownloadError(f'Download failed.\nLog path: {log_path}')
 
 class SettingsModel:
     def __init__(self):
