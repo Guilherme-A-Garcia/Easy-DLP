@@ -116,7 +116,7 @@ class Controller:
 
         self.auto_update_thread()
 
-    def controller_auto_version_fetch(self):
+    def auto_version_fetch(self):
         try:
             located_version = self.updating_model.auto_version_fetch()
             if located_version != self.app_state.current_version:
@@ -133,7 +133,7 @@ class Controller:
                 if inputted_thread == self.thread1:
                     check_update()
         
-        self.thread1 = threading.Thread(target=self.controller_auto_version_fetch)
+        self.thread1 = threading.Thread(target=self.auto_version_fetch)
         self.thread1.start()
         update_thread(self.thread1)
         
@@ -142,13 +142,13 @@ class Controller:
                 msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
                 if msg.get() == 'Yes':
                     self.window_manager.show_updating_window()
-                    self.thread2 = threading.Thread(target=self.controller_update_app)
+                    self.thread2 = threading.Thread(target=self.update_app)
                     self.thread2.start()
                     update_thread(self.thread2)
                 else:
                     return
 
-    def controller_close_and_rename(self):
+    def close_and_rename(self):
         try:
             self.updating_model.close_and_rename()
             if self.window_manager.current_view is not None:
@@ -158,11 +158,11 @@ class Controller:
         except Exception as e:
             err_msg(f'Unexpected error: {e}')
 
-    def controller_update_app(self):
+    def update_app(self):
         try:
             self.updating_model.update_app()
             success_msg('Update finished successfully. Closing application...')
-            self.controller_close_and_rename()
+            self.close_and_rename()
         except URLLibError as e:
             err_msg(e)
             self.root.destroy()
@@ -234,74 +234,10 @@ class Controller:
     def get_settings_states(self, playlist_dir:bool=False):
         return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state if not playlist_dir else self.app_state.playlist_directory)
 
-    def download_thread(self, cmd_parts, path_from_cache):
-        def check_thread():
-            if self.thread.is_alive():
-                self.root.after(200, check_thread)
-            else:
-                self.window_manager.current_view.enable_widgets()
-                self.window_manager.current_view.progress_bar['value'] = 0
-                self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        
-        def worker():
-            try:
-                self.main_model.download_subprocess(cmd_parts, path_from_cache)
-                self.root.after(0, lambda: self._download_success(path_from_cache))
-            except DownloadError as e:
-                self.root.after(0, lambda e=e: self._download_error(e))
-            except Exception as e:
-                self.root.after(0, lambda e=e: self._download_error(e, unexpected=True))
+    def download(self, url):
+        self.downloader_service.download(url)
 
-        self.window_manager.current_view.disable_widgets()
-        self.window_manager.current_view.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
-        self.window_manager.current_view.progress_bar.start()
-                
-        self.thread = threading.Thread(target=worker, daemon=True)
-        self.thread.start()
-            
-        check_thread()
-
-    def _download_success(self, cache):
-        self.window_manager.current_view.enable_widgets()
-        self.window_manager.current_view.progress_bar.stop()
-        self.window_manager.current_view.progress_bar['value'] = 0
-        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        if self.app_state.playlist_state == 'off':
-            success_msg(f"File successfully downloaded to {cache}")
-        else:
-            success_msg(f"Playlist successfully downloaded to {self.app_state.playlist_directory}")
-
-    def _download_error(self, error, unexpected=False):
-        self.window_manager.current_view.disable_widgets()
-        self.window_manager.current_view.progress_bar.start()
-        self.window_manager.current_view.progress_bar['value'] = 0
-        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        
-        if unexpected:
-            err_msg(f'Unexpected error: {error}')
-        else:
-            err_msg(f'Error: {error}')
-
-    def controller_download(self, url):
-        cmd = []
-        path_from_cache = None
-        
-        try:
-            self.main_model.receive_states(*self.get_settings_states(playlist_dir=True))
-            cmd_parts, path_from_cache = self.main_model.download(url, cookies=self.app_state.cookie_selection, options=None)
-            self.download_thread(cmd_parts, path_from_cache)
-        except MissingCache as e:
-            err_msg(text=f'Error: {e}')
-            self.controller_write_cache(rewrite=True)
-            return
-        except EmptyURL as e:
-            err_msg(text=f'Error: {e}')
-            return
-        except Exception as e:
-            err_msg(text=f'Unexpected error: {e}')
-            return
-
-    def controller_cache_enter(self, cache_entry:str):
+    def cache_enter(self, cache_entry:str):
         path = cache_entry.strip()
         
         try:
@@ -312,7 +248,7 @@ class Controller:
         except Exception as e:
             err_msg(f"Unexpected error: {e}")
 
-    def controller_write_cache(self, rewrite:bool):
+    def write_cache(self, rewrite:bool):
         path = self.filedialog_askdir(title='Select your YT-DLP folder')
         
         if rewrite:
@@ -522,11 +458,9 @@ class SettingsView(ctk.CTkToplevel):
         self.right_button_frame.columnconfigure(0, weight=1)
         self.right_button_frame.grid(sticky="nsew", row=2, column=1)
         
-        # self.clear_dir = ctk.CTkButton(self.right_button_frame, text='Clear path', font=('', 18), width=50, command=self.app.clear_cache, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.clear_dir = ctk.CTkButton(self.right_button_frame, text='Clear path', font=('', 18), width=50, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.clear_dir.grid(row=0)
-        # simple_handling(self.clear_dir, "<Return>", self.app.clear_cache)
-        # self.rewrite = ctk.CTkButton(self.right_button_frame, text='Rewrite path', font=('', 18), width=50, command=lambda:self.app.write_cache(rewrite=True), fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
+
         self.rewrite = ctk.CTkButton(self.right_button_frame, text='Rewrite path', font=('', 18), width=50, fg_color="#950808", hover_color="#630202", corner_radius=10, border_color="#440000", border_width=1)
         self.rewrite.grid(row=1)
         if hasattr(self.parent, 'cache_main_lb'):
@@ -845,9 +779,9 @@ class WindowManager:
     def _wire_cache_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
-        self.current_view.cache_enter_b.configure(command=lambda: self.controller.controller_cache_enter(self.current_view.cache_entry.get()))
-        self.current_view.file_search_b.configure(command=lambda: self.controller.controller_write_cache(rewrite=False))
-        simple_handling(self.current_view.cache_entry, "<Return>",lambda: self.controller.controller_cache_enter(self.current_view.cache_entry.get()))
+        self.current_view.cache_enter_b.configure(command=lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
+        self.current_view.file_search_b.configure(command=lambda: self.controller.write_cache(rewrite=False))
+        simple_handling(self.current_view.cache_entry, "<Return>",lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
 
     def _wire_cookie_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -858,8 +792,8 @@ class WindowManager:
     def _wire_main_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
-        self.current_view.main_download.configure(command=lambda:self.controller.controller_download(url=self.current_view.main_entry.get().strip()))
-        simple_handling(self.current_view.main_entry, "<Return>", lambda:self.controller.controller_download(url=self.current_view.main_entry.get().strip()))
+        self.current_view.main_download.configure(command=lambda:self.controller.download(url=self.current_view.main_entry.get().strip()))
+        simple_handling(self.current_view.main_entry, "<Return>", lambda:self.controller.download(url=self.current_view.main_entry.get().strip()))
 
     def _wire_settings_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
@@ -874,7 +808,7 @@ class WindowManager:
         self.current_view.themes.theme_switch.configure(command=lambda: self.controller.set_theme())
         
         self.current_view.clear_dir.configure(command=self.controller.clear_cache)
-        self.current_view.rewrite.configure(command=lambda:self.controller.controller_write_cache(rewrite=True))
+        self.current_view.rewrite.configure(command=lambda:self.controller.write_cache(rewrite=True))
         
         self.controller.verify_mp3_checkbox()
 
@@ -895,7 +829,7 @@ class DownloaderService:
             self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
-            self.controller.controller_write_cache(rewrite=True)
+            self.controller.write_cache(rewrite=True)
             return
         except EmptyURL as e:
             err_msg(text=f'Error: {e}')
