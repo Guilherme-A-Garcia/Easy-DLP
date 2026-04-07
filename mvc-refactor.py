@@ -904,6 +904,17 @@ class WindowManager:
 class DownloaderService:
     def __init__(self):
         pass
+
+    def _download_success(self, cache):
+        self.window_manager.current_view.enable_widgets()
+        self.window_manager.current_view.progress_bar.stop()
+        self.window_manager.current_view.progress_bar['value'] = 0
+        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+        if self.controller.app_state.playlist_state == 'off':
+            success_msg(f"File successfully downloaded to {cache}")
+        else:
+            success_msg(f"Playlist successfully downloaded to {self.controller.app_state.playlist_directory}")
+
         
 # ---------------- EXCEPTIONS ---------------- #
 
