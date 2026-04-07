@@ -904,6 +904,25 @@ class WindowManager:
 class DownloaderService:
     def __init__(self):
         pass
+    
+    def download(self, url):
+        cmd = []
+        path_from_cache = None
+        
+        try:
+            self.main_model.receive_states(*self.controller.get_settings_states(playlist_dir=True))
+            cmd_parts, path_from_cache = self.main_model.generate_command(url, cookies=self.controller.app_state.cookie_selection, options=None)
+            self.download_thread(cmd_parts, path_from_cache)
+        except MissingCache as e:
+            err_msg(text=f'Error: {e}')
+            self.controller.controller_write_cache(rewrite=True)
+            return
+        except EmptyURL as e:
+            err_msg(text=f'Error: {e}')
+            return
+        except Exception as e:
+            err_msg(text=f'Unexpected error: {e}')
+            return
 
     def _download_success(self, cache):
         self.window_manager.current_view.enable_widgets()
