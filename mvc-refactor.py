@@ -958,6 +958,12 @@ class SettingsService:
             self.mp3_disable_checkboxes()
         else:
             self.mp3_enable_checkboxes()
+            
+    def save_settings_changes(self):
+        self.set_settings_states(*self.retrieve_settings_states())
+        self.window_manager.current_view.destroy()
+        self.window_manager.current_view.parent.deiconify()
+        self.window_manager.current_view = self.window_manager.current_view.parent
         
 # ---------------- EXCEPTIONS ---------------- #
 
