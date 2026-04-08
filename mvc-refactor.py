@@ -168,72 +168,8 @@ class Controller:
             err_msg(e)
             self.root.destroy()
 
-    def clear_cache(self):
-        result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes", button_color="#950808", button_hover_color="#630202", border_width=1)
-        if result.get() == "Yes":
-            try:
-                self.settings_model.clear_cache()
-                self.root.destroy()
-            except MissingCache as e:
-                err_msg(f'Error: {e}')
-                self.root.destroy()
-
-    def set_theme(self):
-        theme = self.window_manager.current_view.themes.theme_variable.get()
-        self.window_manager.current_view.settings_set_theme(theme)
-
-    def playlist_handler(self, event):
-        if self.window_manager.current_view.playlist_var.get() == 'on':
-            self.app_state.playlist_directory = str(self.filedialog_askdir(title='Choose the download location for the playlist')).strip()
-        else:
-            self.app_state.playlist_directory = ''
-            
-        if self.app_state.playlist_directory != '':
-            if not os.path.exists(self.app_state.playlist_directory):
-                err_msg(text='This directory does not exist.')
-                self.app_state.playlist_directory = ''
-                self.window_manager.current_view.playlist_var.set('off')
-        else:
-            self.window_manager.current_view.playlist_var.set('off')
-
-    def mp3_handler(self, event):
-        self.verify_mp3_checkbox()
-
-    def mp3_disable_checkboxes(self):
-        self.window_manager.current_view.mp4_var.set(value='off')
-        self.app_state.mp4_state = 'off'
-        self.window_manager.current_view.mp4_checkbox.configure(state='disabled')
-
-    def mp3_enable_checkboxes(self):
-        self.window_manager.current_view.mp4_checkbox.configure(state='normal')
-
-    def verify_mp3_checkbox(self):
-        if self.window_manager.current_view.mp3_checkbox.get() == 'on':
-            self.mp3_disable_checkboxes()
-        else:
-            self.mp3_enable_checkboxes()
-
-    def save_settings_changes(self):
-        self.set_settings_states(*self.retrieve_settings_states())
-        self.window_manager.current_view.destroy()
-        self.window_manager.current_view.parent.deiconify()
-        self.window_manager.current_view = self.window_manager.current_view.parent
-
-    def discard_settings_changes(self):
-        self.window_manager.previous_view.deiconify()
-        self.window_manager.close_current()
-        self.window_manager.current_view = self.window_manager.previous_view
-
-    def set_settings_states(self, mp3, mp4, playlist):
-        self.app_state.mp3_state = mp3
-        self.app_state.mp4_state = mp4
-        self.app_state.playlist_state = playlist
-
-    def retrieve_settings_states(self):
-        return self.window_manager.current_view.mp3_checkbox.get(), self.window_manager.current_view.mp4_checkbox.get(), self.window_manager.current_view.playlist_checkbox.get()
-
-    def get_settings_states(self, playlist_dir:bool=False):
-        return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state if not playlist_dir else self.app_state.playlist_directory)
+    def return_theme_value(self):
+        return self.window_manager.current_view.themes.theme_variable.get()
 
     def download(self, url):
         self.downloader_service.download(url)
@@ -420,7 +356,7 @@ class SettingsView(ctk.CTkToplevel):
         self.rowconfigure(3, weight=1)
         self.columnconfigure((0,1), weight=1)
         
-        mp3, mp4, playlist = self.controller.get_settings_states(playlist_dir=False)
+        mp3, mp4, playlist = self.controller.settings_service.get_settings_states(playlist_dir=False)
         
         self.mp3_var = ctk.StringVar(value=mp3)
         self.mp4_var = ctk.StringVar(value=mp4)
