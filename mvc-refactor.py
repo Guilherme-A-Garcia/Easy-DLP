@@ -108,6 +108,7 @@ class Controller:
 
         self.window_manager = WindowManager(self.root, self)
         self.downloader_service = DownloaderService(self, self.main_model, self.window_manager)
+        self.settings_service = SettingsService(self, self.app_state, self.window_manager)
 
         if os.path.exists("cache.txt"):
             self.window_manager.show_cookie_window()
@@ -906,6 +907,12 @@ class DownloaderService:
             err_msg(f'Unexpected error: {error}')
         else:
             err_msg(f'Error: {error}')
+
+class SettingsService:
+    def __init__(self, controller, app_state, window_manager):
+        self.controller = controller
+        self.app_state = app_state
+        self.window_manager = window_manager
         
 # ---------------- EXCEPTIONS ---------------- #
 
