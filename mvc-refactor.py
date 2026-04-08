@@ -913,6 +913,16 @@ class SettingsService:
         self.controller = controller
         self.app_state = app_state
         self.window_manager = window_manager
+
+    def clear_cache(self):
+        result = CTkMessagebox(title='Confirmation', message='Clearing your YT-DLP path will close the application, would you like to continue?', option_1="No", option_2="Yes", button_color="#950808", button_hover_color="#630202", border_width=1)
+        if result.get() == "Yes":
+            try:
+                self.controller.settings_model.clear_cache()
+                self.controller.root.destroy()
+            except MissingCache as e:
+                err_msg(f'Error: {e}')
+                self.controller.root.destroy()
         
 # ---------------- EXCEPTIONS ---------------- #
 
