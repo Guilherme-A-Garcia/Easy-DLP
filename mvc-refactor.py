@@ -941,6 +941,10 @@ class SettingsService:
                 self.window_manager.current_view.playlist_var.set('off')
         else:
             self.window_manager.current_view.playlist_var.set('off')
+            
+    def mp3_handler(self, event):
+        self.verify_mp3_checkbox()
+
         
 # ---------------- EXCEPTIONS ---------------- #
 
