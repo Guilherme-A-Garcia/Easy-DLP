@@ -974,6 +974,9 @@ class SettingsService:
         self.app_state.mp3_state = mp3
         self.app_state.mp4_state = mp4
         self.app_state.playlist_state = playlist
+    
+    def retrieve_settings_states(self):
+        return self.window_manager.current_view.mp3_checkbox.get(), self.window_manager.current_view.mp4_checkbox.get(), self.window_manager.current_view.playlist_checkbox.get()
 
 # ---------------- EXCEPTIONS ---------------- #
 
