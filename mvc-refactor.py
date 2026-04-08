@@ -927,13 +927,13 @@ class SettingsService:
     def set_theme(self):
         theme = self.controller.return_theme_value()
         self.window_manager.current_view.settings_set_theme(theme)
-    
+
     def playlist_handler(self, event):
         if self.window_manager.current_view.playlist_var.get() == 'on':
             self.app_state.playlist_directory = str(self.controller.filedialog_askdir(title='Choose the download location for the playlist')).strip()
         else:
             self.app_state.playlist_directory = ''
-            
+
         if self.app_state.playlist_directory != '':
             if not os.path.exists(self.app_state.playlist_directory):
                 err_msg(text='This directory does not exist.')
@@ -941,7 +941,7 @@ class SettingsService:
                 self.window_manager.current_view.playlist_var.set('off')
         else:
             self.window_manager.current_view.playlist_var.set('off')
-            
+
     def mp3_handler(self, event):
         self.verify_mp3_checkbox()
 
@@ -952,13 +952,13 @@ class SettingsService:
 
     def mp3_enable_checkboxes(self):
         self.window_manager.current_view.mp4_checkbox.configure(state='normal')
-        
+
     def verify_mp3_checkbox(self):
         if self.window_manager.current_view.mp3_checkbox.get() == 'on':
             self.mp3_disable_checkboxes()
         else:
             self.mp3_enable_checkboxes()
-            
+
     def save_settings_changes(self):
         self.set_settings_states(*self.retrieve_settings_states())
         self.window_manager.current_view.destroy()
@@ -969,7 +969,12 @@ class SettingsService:
         self.window_manager.previous_view.deiconify()
         self.window_manager.close_current()
         self.window_manager.current_view = self.window_manager.previous_view
-        
+
+    def set_settings_states(self, mp3, mp4, playlist):
+        self.app_state.mp3_state = mp3
+        self.app_state.mp4_state = mp4
+        self.app_state.playlist_state = playlist
+
 # ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
