@@ -945,6 +945,13 @@ class SettingsService:
     def mp3_handler(self, event):
         self.verify_mp3_checkbox()
 
+    def mp3_disable_checkboxes(self):
+        self.window_manager.current_view.mp4_var.set(value='off')
+        self.app_state.mp4_state = 'off'
+        self.window_manager.current_view.mp4_checkbox.configure(state='disabled')
+
+    def mp3_enable_checkboxes(self):
+        self.window_manager.current_view.mp4_checkbox.configure(state='normal')
         
 # ---------------- EXCEPTIONS ---------------- #
 
