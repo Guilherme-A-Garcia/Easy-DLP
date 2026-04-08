@@ -761,7 +761,7 @@ class DownloaderService:
         path_from_cache = None
         
         try:
-            self.main_model.receive_states(*self.controller.get_settings_states(playlist_dir=True))
+            self.main_model.receive_states(*self.controller.settings_service.get_settings_states(playlist_dir=True))
             cmd_parts, path_from_cache = self.main_model.generate_command(url, cookies=self.controller.app_state.cookie_selection, options=None)
             self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
@@ -869,7 +869,7 @@ class SettingsService:
             self.app_state.playlist_directory = str(self.controller.filedialog_askdir(title='Choose the download location for the playlist')).strip()
         else:
             self.app_state.playlist_directory = ''
-
+            
         if self.app_state.playlist_directory != '':
             if not os.path.exists(self.app_state.playlist_directory):
                 err_msg(text='This directory does not exist.')
@@ -910,7 +910,7 @@ class SettingsService:
         self.app_state.mp3_state = mp3
         self.app_state.mp4_state = mp4
         self.app_state.playlist_state = playlist
-    
+
     def retrieve_settings_states(self):
         return self.window_manager.current_view.mp3_checkbox.get(), self.window_manager.current_view.mp4_checkbox.get(), self.window_manager.current_view.playlist_checkbox.get()
 
