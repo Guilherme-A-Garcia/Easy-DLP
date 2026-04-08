@@ -978,6 +978,9 @@ class SettingsService:
     def retrieve_settings_states(self):
         return self.window_manager.current_view.mp3_checkbox.get(), self.window_manager.current_view.mp4_checkbox.get(), self.window_manager.current_view.playlist_checkbox.get()
 
+    def get_settings_states(self, playlist_dir:bool=False):
+        return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state if not playlist_dir else self.app_state.playlist_directory)
+
 # ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
