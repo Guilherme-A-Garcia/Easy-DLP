@@ -964,6 +964,11 @@ class SettingsService:
         self.window_manager.current_view.destroy()
         self.window_manager.current_view.parent.deiconify()
         self.window_manager.current_view = self.window_manager.current_view.parent
+
+    def discard_settings_changes(self):
+        self.window_manager.previous_view.deiconify()
+        self.window_manager.close_current()
+        self.window_manager.current_view = self.window_manager.previous_view
         
 # ---------------- EXCEPTIONS ---------------- #
 
