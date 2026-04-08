@@ -927,6 +927,20 @@ class SettingsService:
     def set_theme(self):
         theme = self.controller.return_theme_value()
         self.window_manager.current_view.settings_set_theme(theme)
+    
+    def playlist_handler(self, event):
+        if self.window_manager.current_view.playlist_var.get() == 'on':
+            self.app_state.playlist_directory = str(self.controller.filedialog_askdir(title='Choose the download location for the playlist')).strip()
+        else:
+            self.app_state.playlist_directory = ''
+            
+        if self.app_state.playlist_directory != '':
+            if not os.path.exists(self.app_state.playlist_directory):
+                err_msg(text='This directory does not exist.')
+                self.app_state.playlist_directory = ''
+                self.window_manager.current_view.playlist_var.set('off')
+        else:
+            self.window_manager.current_view.playlist_var.set('off')
         
 # ---------------- EXCEPTIONS ---------------- #
 
