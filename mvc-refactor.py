@@ -953,6 +953,12 @@ class SettingsService:
     def mp3_enable_checkboxes(self):
         self.window_manager.current_view.mp4_checkbox.configure(state='normal')
         
+    def verify_mp3_checkbox(self):
+        if self.window_manager.current_view.mp3_checkbox.get() == 'on':
+            self.mp3_disable_checkboxes()
+        else:
+            self.mp3_enable_checkboxes()
+        
 # ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
