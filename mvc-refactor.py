@@ -799,19 +799,19 @@ class WindowManager:
     def _wire_settings_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         
-        self.current_view.save_button.configure(command=self.controller.save_settings_changes)
-        self.current_view.discard_button.configure(command=self.controller.discard_settings_changes)
+        self.current_view.save_button.configure(command=self.controller.settings_service.save_settings_changes)
+        self.current_view.discard_button.configure(command=self.controller.settings_service.discard_settings_changes)
         
-        self.current_view.mp3_checkbox.bind("<Button-1>", self.controller.mp3_handler)
-        self.current_view.playlist_checkbox.bind("<Button-1>", self.controller.playlist_handler)
+        self.current_view.mp3_checkbox.bind("<Button-1>", self.controller.settings_service.mp3_handler)
+        self.current_view.playlist_checkbox.bind("<Button-1>", self.controller.settings_service.playlist_handler)
         
         self.current_view.themes.theme_switch.configure(variable=self.current_view.themes.theme_variable)
-        self.current_view.themes.theme_switch.configure(command=lambda: self.controller.set_theme())
+        self.current_view.themes.theme_switch.configure(command=lambda: self.controller.settings_service.set_theme())
         
-        self.current_view.clear_dir.configure(command=self.controller.clear_cache)
+        self.current_view.clear_dir.configure(command=self.controller.settings_service.clear_cache)
         self.current_view.rewrite.configure(command=lambda:self.controller.write_cache(rewrite=True))
         
-        self.controller.verify_mp3_checkbox()
+        self.controller.settings_service.verify_mp3_checkbox()
 
 class DownloaderService:
     LOGTXT_CONST = 'log.txt'
