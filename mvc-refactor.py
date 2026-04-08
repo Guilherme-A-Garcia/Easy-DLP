@@ -923,6 +923,10 @@ class SettingsService:
             except MissingCache as e:
                 err_msg(f'Error: {e}')
                 self.controller.root.destroy()
+
+    def set_theme(self):
+        theme = self.controller.return_theme_value()
+        self.window_manager.current_view.settings_set_theme(theme)
         
 # ---------------- EXCEPTIONS ---------------- #
 
