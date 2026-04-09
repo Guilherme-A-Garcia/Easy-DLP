@@ -958,6 +958,16 @@ class UpdateService:
                 else:
                     return
 
+    def close_and_rename(self):
+        try:
+            self.updating_model.close_and_rename()
+            if self.window_manager.current_view is not None:
+                self.window_manager.current_view.destroy()
+                self.root.destroy()
+                sys.exit()
+        except Exception as e:
+            err_msg(f'Unexpected error: {e}')
+
 # ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
