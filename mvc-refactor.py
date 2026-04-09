@@ -925,6 +925,15 @@ class UpdateService:
         self.app_state = app_state
         self.window_manager = window_manager
 
+    def auto_version_fetch(self):
+        try:
+            located_version = self.updating_model.auto_version_fetch()
+            if located_version != self.app_state.current_version:
+                self.app_state.different_version = True
+        except Exception as e:
+            err_msg(f'Unexpected error: {e}')
+
+
 # ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
