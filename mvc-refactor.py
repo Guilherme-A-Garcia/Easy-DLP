@@ -942,6 +942,9 @@ class CookieService:
         self.window_manager = window_manager
         self.app_state = app_state
 
+    def set_cookie_selection(self, value):
+        self.app_state.cookie_selection = value
+
 # ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
