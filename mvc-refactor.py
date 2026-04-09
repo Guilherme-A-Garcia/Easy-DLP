@@ -116,7 +116,7 @@ class Controller:
         else:
             self.window_manager.show_cache_window()
 
-        self.auto_update_thread()
+        self.run_auto_update()
 
     def run_auto_update(self):
         self.update_service.auto_update_thread()
