@@ -110,7 +110,7 @@ class Controller:
         self.downloader_service = DownloaderService(self, self.main_model, self.window_manager)
         self.settings_service = SettingsService(self, self.app_state, self.window_manager)
         self.update_service = UpdateService(self, self.updating_model, self.app_state, self.window_manager)
-        self.cache_service = CacheService()
+        self.cache_service = CacheService(self, self.cache_model, self.window_manager)
 
         if os.path.exists("cache.txt"):
             self.window_manager.show_cookie_window()
@@ -931,8 +931,11 @@ class UpdateService:
             self.root.destroy()
 
 class CacheService:
-    def __init__(self):
-        pass
+    def __init__(self, controller, cache_model, window_manager):
+        self.controller = controller
+        self.cache_model = cache_model
+        self.window_manager = window_manager
+
 
 # ---------------- EXCEPTIONS ---------------- #
 
