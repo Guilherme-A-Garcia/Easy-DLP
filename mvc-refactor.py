@@ -947,6 +947,18 @@ class CacheService:
         except Exception as e:
             err_msg(f"Unexpected error: {e}")
 
+    def write_cache(self, rewrite:bool):
+        path = self.controller.filedialog_askdir(title='Select your YT-DLP folder')
+        
+        if rewrite:
+            try:
+                self.cache_model.write_cache(path=path)
+                success_msg('Cache successfully rewritten!')
+            except InvalidBinaryDirectory as e:
+                err_msg(f'Error: {e}')
+        else:
+            self.window_manager.current_view.cache_entry.insert(0, path)
+
 
 # ---------------- EXCEPTIONS ---------------- #
 
