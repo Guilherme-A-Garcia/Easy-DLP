@@ -936,6 +936,17 @@ class CacheService:
         self.cache_model = cache_model
         self.window_manager = window_manager
 
+    def cache_enter(self, cache_entry:str):
+        path = cache_entry.strip()
+        
+        try:
+            self.cache_model.cache_enter(path)
+            self.window_manager.show_cookie_window()
+        except InvalidBinaryDirectory as e:
+            err_msg(f"Error: {e}")
+        except Exception as e:
+            err_msg(f"Unexpected error: {e}")
+
 
 # ---------------- EXCEPTIONS ---------------- #
 
