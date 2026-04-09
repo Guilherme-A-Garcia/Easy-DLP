@@ -655,8 +655,8 @@ class WindowManager:
     def _wire_cookie_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
-        self.current_view.cookie_button.configure(command=self.controller.handle_cookie_next)
-        simple_handling(self.current_view.cookie_button, "<Return>", self.controller.handle_cookie_next)
+        self.current_view.cookie_button.configure(command=self.controller.cookie_service.handle_cookie_next)
+        simple_handling(self.current_view.cookie_button, "<Return>", self.controller.cookie_service.handle_cookie_next)
 
     def _wire_main_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
