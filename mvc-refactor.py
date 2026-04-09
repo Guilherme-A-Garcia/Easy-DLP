@@ -132,14 +132,6 @@ class Controller:
     def set_cookie_selection(self, value):
         self.cookie_service.set_cookie_selection(value)
 
-    def handle_cookie_next(self):
-        selection = self.app_state.cookie_selection
-        
-        if selection and selection != 'None':
-            self.msg = CTkMessagebox(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
-            self.msg.get()
-        self.window_manager.show_main_window()
-
     def filedialog_askdir(self, title):
         result = ctk.filedialog.askdirectory(title=title)
         return result
