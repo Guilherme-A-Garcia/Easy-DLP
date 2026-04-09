@@ -111,7 +111,7 @@ class Controller:
         self.settings_service = SettingsService(self, self.app_state, self.window_manager)
         self.update_service = UpdateService(self, self.updating_model, self.app_state, self.window_manager)
         self.cache_service = CacheService(self, self.cache_model, self.window_manager)
-        self.cookie_service = CookieService(self, self.cache_model, self.window_manager)
+        self.cookie_service = CookieService(self.window_manager, self.app_state)
 
         if os.path.exists("cache.txt"):
             self.window_manager.show_cookie_window()
@@ -938,8 +938,9 @@ class CacheService:
             self.window_manager.current_view.cache_entry.insert(0, path)
 
 class CookieService:
-    def __init__(controller, cache_model, window_manager):
-        pass
+    def __init__(self, window_manager, app_state):
+        self.window_manager = window_manager
+        self.app_state = app_state
 
 # ---------------- EXCEPTIONS ---------------- #
 
