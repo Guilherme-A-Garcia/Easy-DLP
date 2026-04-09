@@ -671,7 +671,7 @@ class WindowManager:
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
         self.current_view.cache_enter_b.configure(command=lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
-        self.current_view.file_search_b.configure(command=lambda: self.controller.write_cache(rewrite=False))
+        self.current_view.file_search_b.configure(command=lambda: self.controller.cache_service.write_cache(rewrite=False))
         simple_handling(self.current_view.cache_entry, "<Return>",lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
 
     def _wire_cookie_window(self):
@@ -699,7 +699,7 @@ class WindowManager:
         self.current_view.themes.theme_switch.configure(command=lambda: self.controller.settings_service.set_theme())
         
         self.current_view.clear_dir.configure(command=self.controller.settings_service.clear_cache)
-        self.current_view.rewrite.configure(command=lambda:self.controller.write_cache(rewrite=True))
+        self.current_view.rewrite.configure(command=lambda:self.controller.cache_service.write_cache(rewrite=True))
         
         self.controller.settings_service.verify_mp3_checkbox()
 
@@ -720,7 +720,7 @@ class DownloaderService:
             self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
-            self.controller.write_cache(rewrite=True)
+            self.controller.cache_service.write_cache(rewrite=True)
             return
         except EmptyURL as e:
             err_msg(text=f'Error: {e}')
@@ -958,7 +958,6 @@ class CacheService:
                 err_msg(f'Error: {e}')
         else:
             self.window_manager.current_view.cache_entry.insert(0, path)
-
 
 # ---------------- EXCEPTIONS ---------------- #
 
