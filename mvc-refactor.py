@@ -130,7 +130,7 @@ class Controller:
         self.downloader_service.download(url)
 
     def set_cookie_selection(self, value):
-        self.app_state.cookie_selection = value
+        self.cookie_service.set_cookie_selection(value)
 
     def handle_cookie_next(self):
         selection = self.app_state.cookie_selection
