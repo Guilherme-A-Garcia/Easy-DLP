@@ -128,29 +128,6 @@ class Controller:
     def download(self, url):
         self.downloader_service.download(url)
 
-    def cache_enter(self, cache_entry:str):
-        path = cache_entry.strip()
-        
-        try:
-            self.cache_model.cache_enter(path)
-            self.window_manager.show_cookie_window()
-        except InvalidBinaryDirectory as e:
-            err_msg(f"Error: {e}")
-        except Exception as e:
-            err_msg(f"Unexpected error: {e}")
-
-    def write_cache(self, rewrite:bool):
-        path = self.filedialog_askdir(title='Select your YT-DLP folder')
-        
-        if rewrite:
-            try:
-                self.cache_model.write_cache(path=path)
-                success_msg('Cache successfully rewritten!')
-            except InvalidBinaryDirectory as e:
-                err_msg(f'Error: {e}')
-        else:
-            self.window_manager.current_view.cache_entry.insert(0, path)
-
     def set_cookie_selection(self, value):
         self.app_state.cookie_selection = value
 
