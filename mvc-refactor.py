@@ -630,7 +630,7 @@ class WindowManager:
             save_prompt = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
             choice = save_prompt.get()
             if choice == "Yes":
-                self.controller.save_settings_changes()
+                self.controller.settings_service.save_settings_changes()
             elif choice == "No":
                 self.previous_view.deiconify()
                 self.close_current()
