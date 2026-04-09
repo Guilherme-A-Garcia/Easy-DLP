@@ -968,6 +968,15 @@ class UpdateService:
         except Exception as e:
             err_msg(f'Unexpected error: {e}')
 
+    def update_app(self):
+        try:
+            self.updating_model.update_app()
+            success_msg('Update finished successfully. Closing application...')
+            self.close_and_rename()
+        except URLLibError as e:
+            err_msg(e)
+            self.root.destroy()
+
 # ---------------- EXCEPTIONS ---------------- #
 
 class UserError(Exception):
