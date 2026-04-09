@@ -118,6 +118,9 @@ class Controller:
 
         self.auto_update_thread()
 
+    def run_auto_update(self):
+        self.update_service.auto_update_thread()
+
     def return_theme_value(self):
         return self.window_manager.current_view.themes.theme_variable.get()
 
