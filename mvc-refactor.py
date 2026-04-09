@@ -118,57 +118,6 @@ class Controller:
 
         self.auto_update_thread()
 
-    def auto_version_fetch(self):
-        try:
-            located_version = self.updating_model.auto_version_fetch()
-            if located_version != self.app_state.current_version:
-                self.app_state.different_version = True 
-        except Exception as e:
-            err_msg(f'Unexpected error: {e}')
-
-    def auto_update_thread(self):
-        def update_thread(inputted_thread):
-            if inputted_thread.is_alive():
-                self.root.after(10, lambda: update_thread(inputted_thread))
-            else:
-                print(f"Thread {inputted_thread} finished successfully!")
-                if inputted_thread == self.thread1:
-                    check_update()
-        
-        self.thread1 = threading.Thread(target=self.auto_version_fetch)
-        self.thread1.start()
-        update_thread(self.thread1)
-        
-        def check_update():
-            if self.app_state.different_version:
-                msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
-                if msg.get() == 'Yes':
-                    self.window_manager.show_updating_window()
-                    self.thread2 = threading.Thread(target=self.update_app)
-                    self.thread2.start()
-                    update_thread(self.thread2)
-                else:
-                    return
-
-    def close_and_rename(self):
-        try:
-            self.updating_model.close_and_rename()
-            if self.window_manager.current_view is not None:
-                self.window_manager.current_view.destroy()
-                self.root.destroy()
-                sys.exit()
-        except Exception as e:
-            err_msg(f'Unexpected error: {e}')
-
-    def update_app(self):
-        try:
-            self.updating_model.update_app()
-            success_msg('Update finished successfully. Closing application...')
-            self.close_and_rename()
-        except URLLibError as e:
-            err_msg(e)
-            self.root.destroy()
-
     def return_theme_value(self):
         return self.window_manager.current_view.themes.theme_variable.get()
 
