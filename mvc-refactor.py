@@ -108,15 +108,7 @@ class Controller:
 
         self.service_container = ServiceContainer(self, cache_model, main_model, settings_model, updating_model, app_state)
 
-        if os.path.exists("cache.txt"):
-            self.service_container.window_manager.show_cookie_window()
-        else:
-            self.service_container.window_manager.show_cache_window()
-
-        self.run_auto_update()
-
-    def run_auto_update(self):
-        self.service_container.update_service.auto_update_thread()
+        self.service_container.window_manager._start_app()
 
     def return_theme_value(self):
         return self.window_manager.current_view.themes.theme_variable.get()
@@ -650,6 +642,10 @@ class WindowManager:
             self.current_view.withdraw()
             self.current_view.after(50, self.current_view.destroy)
             self.current_view = None
+
+    def _start_app(self):
+        self._show_initial_window()
+        self.controller.service_container.update_service.auto_update_thread()
 
     def _show_initial_window(self):
         if os.path.exists("cache.txt"):
