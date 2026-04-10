@@ -857,7 +857,6 @@ class SettingsService:
 
 class UpdateService:
     def __init__(self, updating_model, app_state, window_manager):
-        self.controller = controller
         self.updating_model = updating_model
         self.app_state = app_state
         self.window_manager = window_manager
