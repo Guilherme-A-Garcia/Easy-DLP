@@ -124,6 +124,9 @@ class Controller:
     def download(self, url):
         self.downloader_service.download(url)
 
+    def cache_enter(self, entry:str):
+        self.service_container.cache_service.cache_enter(entry)
+
     def set_cookie_selection(self, value):
         self.cookie_service.set_cookie_selection(value)
 
