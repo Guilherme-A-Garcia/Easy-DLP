@@ -589,7 +589,14 @@ class ServiceContainer:
         self.main_model = main_model
         self.settings_model = settings_model
         self.updating_model = updating_model
-        self.app_state = app_state  
+        self.app_state = app_state
+        
+        self.window_manager = WindowManager(self.controller.root, self.controller)
+        self.downloader_service = DownloaderService(self.controller, self.main_model, self.window_manager)
+        self.settings_service = SettingsService(self.controller, self.app_state, self.window_manager)
+        self.update_service = UpdateService(self.updating_model, self.app_state, self.window_manager)
+        self.cache_service = CacheService(self.controller, self.cache_model, self.window_manager)
+        self.cookie_service = CookieService(self.window_manager, self.app_state)
         
 
 class WindowManager:
@@ -854,7 +861,7 @@ class SettingsService:
         return (self.app_state.mp3_state, self.app_state.mp4_state, self.app_state.playlist_state if not playlist_dir else self.app_state.playlist_directory)
 
 class UpdateService:
-    def __init__(self, controller, updating_model, app_state, window_manager):
+    def __init__(self, updating_model, app_state, window_manager):
         self.controller = controller
         self.updating_model = updating_model
         self.app_state = app_state
@@ -871,7 +878,7 @@ class UpdateService:
     def auto_update_thread(self):
         def update_thread(inputted_thread):
             if inputted_thread.is_alive():
-                self.controller.root.after(10, lambda: update_thread(inputted_thread))
+                self.window_manager.current_view.after(10, lambda: update_thread(inputted_thread))
             else:
                 print(f"Thread {inputted_thread} finished successfully!")
                 if inputted_thread == self.thread1:
