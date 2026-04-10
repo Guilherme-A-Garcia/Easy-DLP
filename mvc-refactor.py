@@ -651,6 +651,12 @@ class WindowManager:
             self.current_view.after(50, self.current_view.destroy)
             self.current_view = None
 
+    def _show_initial_window(self):
+        if os.path.exists("cache.txt"):
+            self.show_cookie_window()
+        else:
+            self.show_cache_window()
+
     def _wire_cache_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
