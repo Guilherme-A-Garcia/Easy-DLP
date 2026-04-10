@@ -638,7 +638,7 @@ class WindowManager:
             save_prompt = CTkMessagebox(title="Save settings", message="Save settings?", icon='warning', option_1="Cancel", option_2="No", option_3="Yes", option_focus=1, button_color="#950808", button_hover_color="#630202", border_width=1)
             choice = save_prompt.get()
             if choice == "Yes":
-                self.controller.settings_service.save_settings_changes()
+                self.controller.service_container.settings_service.save_settings_changes()
             elif choice == "No":
                 self.previous_view.deiconify()
                 self.close_current()
@@ -656,14 +656,14 @@ class WindowManager:
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
         self.current_view.cache_enter_b.configure(command=lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
-        self.current_view.file_search_b.configure(command=lambda: self.controller.cache_service.write_cache(rewrite=False))
+        self.current_view.file_search_b.configure(command=lambda: self.controller.service_container.cache_service.write_cache(rewrite=False))
         simple_handling(self.current_view.cache_entry, "<Return>",lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
 
     def _wire_cookie_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
-        self.current_view.cookie_button.configure(command=self.controller.cookie_service.handle_cookie_next)
-        simple_handling(self.current_view.cookie_button, "<Return>", self.controller.cookie_service.handle_cookie_next)
+        self.current_view.cookie_button.configure(command=self.controller.service_container.cookie_service.handle_cookie_next)
+        simple_handling(self.current_view.cookie_button, "<Return>", self.controller.service_container.cookie_service.handle_cookie_next)
 
     def _wire_main_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -674,19 +674,19 @@ class WindowManager:
     def _wire_settings_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
         
-        self.current_view.save_button.configure(command=self.controller.settings_service.save_settings_changes)
-        self.current_view.discard_button.configure(command=self.controller.settings_service.discard_settings_changes)
+        self.current_view.save_button.configure(command=self.controller.service_container.settings_service.save_settings_changes)
+        self.current_view.discard_button.configure(command=self.controller.service_container.settings_service.discard_settings_changes)
         
-        self.current_view.mp3_checkbox.bind("<Button-1>", self.controller.settings_service.mp3_handler)
-        self.current_view.playlist_checkbox.bind("<Button-1>", self.controller.settings_service.playlist_handler)
+        self.current_view.mp3_checkbox.bind("<Button-1>", self.controller.service_container.settings_service.mp3_handler)
+        self.current_view.playlist_checkbox.bind("<Button-1>", self.controller.service_container.settings_service.playlist_handler)
         
         self.current_view.themes.theme_switch.configure(variable=self.current_view.themes.theme_variable)
-        self.current_view.themes.theme_switch.configure(command=lambda: self.controller.settings_service.set_theme())
+        self.current_view.themes.theme_switch.configure(command=lambda: self.controller.service_container.settings_service.set_theme())
         
-        self.current_view.clear_dir.configure(command=self.controller.settings_service.clear_cache)
-        self.current_view.rewrite.configure(command=lambda:self.controller.cache_service.write_cache(rewrite=True))
+        self.current_view.clear_dir.configure(command=self.controller.service_container.settings_service.clear_cache)
+        self.current_view.rewrite.configure(command=lambda:self.controller.service_container.cache_service.write_cache(rewrite=True))
         
-        self.controller.settings_service.verify_mp3_checkbox()
+        self.controller.service_container.settings_service.verify_mp3_checkbox()
 
 class DownloaderService:
     LOGTXT_CONST = 'log.txt'
