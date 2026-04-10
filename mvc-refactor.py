@@ -593,7 +593,6 @@ class ServiceContainer:
         self.update_service = UpdateService(self.updating_model, self.app_state, self.window_manager)
         self.cache_service = CacheService(self.controller, self.cache_model, self.window_manager)
         self.cookie_service = CookieService(self.window_manager, self.app_state)
-        
 
 class WindowManager:
     def __init__(self, root, controller):
@@ -700,12 +699,12 @@ class DownloaderService:
         path_from_cache = None
         
         try:
-            self.main_model.receive_states(*self.controller.settings_service.get_settings_states(playlist_dir=True))
+            self.main_model.receive_states(*self.controller.service_container.settings_service.get_settings_states(playlist_dir=True))
             cmd_parts, path_from_cache = self.main_model.generate_command(url, cookies=self.controller.app_state.cookie_selection, options=None)
             self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
-            self.controller.cache_service.write_cache(rewrite=True)
+            self.controller.service_container.cache_service.write_cache(rewrite=True)
             return
         except EmptyURL as e:
             err_msg(text=f'Error: {e}')
