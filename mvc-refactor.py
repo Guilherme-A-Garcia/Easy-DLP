@@ -109,26 +109,26 @@ class Controller:
         self.service_container = ServiceContainer(self, cache_model, main_model, settings_model, updating_model, app_state)
 
         if os.path.exists("cache.txt"):
-            self.window_manager.show_cookie_window()
+            self.service_container.window_manager.show_cookie_window()
         else:
-            self.window_manager.show_cache_window()
+            self.service_container.window_manager.show_cache_window()
 
         self.run_auto_update()
 
     def run_auto_update(self):
-        self.update_service.auto_update_thread()
+        self.service_container.update_service.auto_update_thread()
 
     def return_theme_value(self):
         return self.window_manager.current_view.themes.theme_variable.get()
 
     def download(self, url):
-        self.downloader_service.download(url)
+        self.service_container.downloader_service.download(url)
 
     def cache_enter(self, entry:str):
         self.service_container.cache_service.cache_enter(entry)
 
     def set_cookie_selection(self, value):
-        self.cookie_service.set_cookie_selection(value)
+        self.service_container.cookie_service.set_cookie_selection(value)
 
     def filedialog_askdir(self, title):
         result = ctk.filedialog.askdirectory(title=title)
