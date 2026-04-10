@@ -110,9 +110,6 @@ class Controller:
 
         self.service_container.window_manager._start_app()
 
-    def return_theme_value(self):
-        return self.window_manager.current_view.themes.theme_variable.get()
-
     def download(self, url):
         self.service_container.downloader_service.download(url)
 
@@ -270,7 +267,7 @@ class SettingsView(ctk.CTkToplevel):
         self.rowconfigure(3, weight=1)
         self.columnconfigure((0,1), weight=1)
         
-        mp3, mp4, playlist = self.controller.settings_service.get_settings_states(playlist_dir=False)
+        mp3, mp4, playlist = self.controller.service_container.settings_service.get_settings_states(playlist_dir=False)
         
         self.mp3_var = ctk.StringVar(value=mp3)
         self.mp4_var = ctk.StringVar(value=mp4)
@@ -643,6 +640,13 @@ class WindowManager:
             self.current_view.after(50, self.current_view.destroy)
             self.current_view = None
 
+    def _get_theme(self):
+        try:
+            if hasattr(self.current_view, 'themes'):
+                return self.current_view.themes.theme_variable.get()
+        except Exception:
+            pass
+
     def _start_app(self):
         self._show_initial_window()
         self.controller.service_container.update_service.auto_update_thread()
@@ -801,7 +805,7 @@ class SettingsService:
                 self.controller.root.destroy()
 
     def set_theme(self):
-        theme = self.controller.return_theme_value()
+        theme = self.window_manager._get_theme()
         self.window_manager.current_view.settings_set_theme(theme)
 
     def playlist_handler(self, event):
