@@ -106,6 +106,8 @@ class Controller:
         self.root = ctk.CTk()
         self.root.withdraw()
 
+        self.service_container = ServiceContainer(self, cache_model, main_model, settings_model, updating_model, app_state)
+        
         self.window_manager = WindowManager(self.root, self)
         self.downloader_service = DownloaderService(self, self.main_model, self.window_manager)
         self.settings_service = SettingsService(self, self.app_state, self.window_manager)
@@ -579,6 +581,16 @@ class AppStateModel:
         self.playlist_directory = ''
 
 # ---------------- SERVICES/MANAGERS ---------------- #
+
+class ServiceContainer:
+    def __init__(self, controller, cache_model, main_model, settings_model, updating_model, app_state):
+        self.controller = controller
+        self.cache_model = cache_model
+        self.main_model = main_model
+        self.settings_model = settings_model
+        self.updating_model = updating_model
+        self.app_state = app_state  
+        
 
 class WindowManager:
     def __init__(self, root, controller):
