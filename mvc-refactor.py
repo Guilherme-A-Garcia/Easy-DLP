@@ -107,13 +107,6 @@ class Controller:
         self.root.withdraw()
 
         self.service_container = ServiceContainer(self, cache_model, main_model, settings_model, updating_model, app_state)
-        
-        self.window_manager = WindowManager(self.root, self)
-        self.downloader_service = DownloaderService(self, self.main_model, self.window_manager)
-        self.settings_service = SettingsService(self, self.app_state, self.window_manager)
-        self.update_service = UpdateService(self, self.updating_model, self.app_state, self.window_manager)
-        self.cache_service = CacheService(self, self.cache_model, self.window_manager)
-        self.cookie_service = CookieService(self.window_manager, self.app_state)
 
         if os.path.exists("cache.txt"):
             self.window_manager.show_cookie_window()
