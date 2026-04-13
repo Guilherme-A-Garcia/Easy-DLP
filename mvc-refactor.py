@@ -393,9 +393,6 @@ class ThemeButtonFrame(ctk.CTkFrame):
 # ---------------- MODELS ---------------- #   
  
 class CacheModel:
-    def __init__(self):
-        pass
-        
     def cache_enter(self, cache_entry):
         if not cache_entry:
             raise InvalidBinaryDirectory("Please insert the path to your YT-DLP binary directory.")
@@ -464,9 +461,6 @@ class MainModel:
         return (cmd_parts, path_from_cache)
 
 class SettingsModel:
-    def __init__(self):
-        pass
-    
     def clear_cache(self):
         if os.path.exists(CACHE_FILE):
             os.remove(CACHE_FILE)
@@ -474,9 +468,6 @@ class SettingsModel:
             raise MissingCache('The cache file was either moved or deleted. Closing application...\nPlease, follow the standard procedures after reopening the app.')
 
 class UpdatingModel:
-    def __init__(self):
-        pass
-
     def update_app(self):
         url =  ''
         file_path = ''
