@@ -708,7 +708,7 @@ class DownloaderService:
         self.window_manager = window_manager
     
     def download(self, url):
-        cmd = []
+        cmd_parts = []
         path_from_cache = None
         
         try:
