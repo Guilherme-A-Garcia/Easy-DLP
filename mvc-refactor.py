@@ -985,5 +985,8 @@ class MissingCache(UserError):
 class DownloadError(UserError):
     pass
 
+class URLLibError(UserError):
+    pass
+
 if __name__ == "__main__":
     main()
