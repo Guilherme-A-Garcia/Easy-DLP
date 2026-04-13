@@ -11,6 +11,7 @@ import sys
 import os
 
 LEFT_CLICK = "<Button-1>"
+CACHE_FILE = "cache.txt"
 
 def main():
     ctk.set_appearance_mode("System")
@@ -400,14 +401,14 @@ class CacheModel:
         elif not os.path.exists(cache_entry):
             raise InvalidBinaryDirectory("Invalid YT-DLP directory.")
         else:
-            with open('cache.txt', 'w') as file:
+            with open(CACHE_FILE, 'w') as file:
                 file.write(cache_entry)
     
     def write_cache(self, path):
         if not path or not os.path.exists(path):
             raise InvalidBinaryDirectory("Invalid YT-DLP directory path.")
         
-        with open('cache.txt', 'w') as file:
+        with open(CACHE_FILE, 'w') as file:
             file.write(path)
             file.close()
 
@@ -425,10 +426,10 @@ class MainModel:
         if not url:
             raise EmptyURL("URL field is empty.")
         
-        if not os.path.exists("cache.txt"):
+        if not os.path.exists(CACHE_FILE):
             raise MissingCache('Cache file missing.\nPlease, enter your YT-DLP directory and try again.')
     
-        with open("cache.txt", 'r') as file:
+        with open(CACHE_FILE, 'r') as file:
             path_from_cache = file.readline().strip()
             file.close()
         
@@ -466,8 +467,8 @@ class SettingsModel:
         pass
     
     def clear_cache(self):
-        if os.path.exists('cache.txt'):
-            os.remove('cache.txt')
+        if os.path.exists(CACHE_FILE):
+            os.remove(CACHE_FILE)
         else:
             raise MissingCache('The cache file was either moved or deleted. Closing application...\nPlease, follow the standard procedures after reopening the app.')
 
@@ -658,7 +659,7 @@ class WindowManager:
         self.controller.service_container.update_service.auto_update_thread()
 
     def _show_initial_window(self):
-        if os.path.exists("cache.txt"):
+        if os.path.exists(CACHE_FILE):
             self.show_cookie_window()
         else:
             self.show_cache_window()
