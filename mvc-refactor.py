@@ -10,6 +10,8 @@ import requests
 import sys
 import os
 
+LEFT_CLICK = "<Button-1>"
+
 def main():
     ctk.set_appearance_mode("System")
     
@@ -134,7 +136,7 @@ class CacheView(ctk.CTkToplevel):
         super().__init__(controller.root)
         self.controller = controller
         
-        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.bind(LEFT_CLICK, lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
 
         set_window_icon(self)
@@ -170,7 +172,7 @@ class CookieView(ctk.CTkToplevel):
         super().__init__(controller.root)
         self.controller = controller
 
-        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.bind(LEFT_CLICK, lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
         
         set_window_icon(self)
@@ -211,7 +213,7 @@ class MainView(ctk.CTkToplevel):
         super().__init__(controller.root)
         self.controller = controller
         
-        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.bind(LEFT_CLICK, lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
 
         set_window_icon(self)
@@ -277,7 +279,7 @@ class SettingsView(ctk.CTkToplevel):
         self.mp4_var = ctk.StringVar(value=mp4)
         self.playlist_var = ctk.StringVar(value=playlist)
         
-        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.bind(LEFT_CLICK, lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
 
         set_window_icon(self)
@@ -335,7 +337,7 @@ class UpdatingView(ctk.CTkToplevel):
         super().__init__(controller.root)
         self.controller = controller
         
-        self.bind("<Button-1>", lambda e: e.widget.focus())
+        self.bind(LEFT_CLICK, lambda e: e.widget.focus())
         self.attributes('-alpha', 0)
         
         set_window_icon(self)
@@ -686,8 +688,8 @@ class WindowManager:
         self.current_view.save_button.configure(command=self.controller.service_container.settings_service.save_settings_changes)
         self.current_view.discard_button.configure(command=self.controller.service_container.settings_service.discard_settings_changes)
         
-        self.current_view.mp3_checkbox.bind("<Button-1>", self.controller.service_container.settings_service.mp3_handler)
-        self.current_view.playlist_checkbox.bind("<Button-1>", self.controller.service_container.settings_service.playlist_handler)
+        self.current_view.mp3_checkbox.bind(LEFT_CLICK, self.controller.service_container.settings_service.mp3_handler)
+        self.current_view.playlist_checkbox.bind(LEFT_CLICK, self.controller.service_container.settings_service.playlist_handler)
         
         self.current_view.themes.theme_switch.configure(variable=self.current_view.themes.theme_variable)
         self.current_view.themes.theme_switch.configure(command=lambda: self.controller.service_container.settings_service.set_theme())
