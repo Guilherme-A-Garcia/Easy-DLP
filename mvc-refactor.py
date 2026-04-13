@@ -12,6 +12,7 @@ import os
 
 LEFT_CLICK = "<Button-1>"
 CACHE_FILE = "cache.txt"
+RETURN_KEY = "<Return>"
 
 def main():
     ctk.set_appearance_mode("System")
@@ -669,19 +670,19 @@ class WindowManager:
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
         self.current_view.cache_enter_b.configure(command=lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
         self.current_view.file_search_b.configure(command=lambda: self.controller.service_container.cache_service.write_cache(rewrite=False))
-        simple_handling(self.current_view.cache_entry, "<Return>",lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
+        simple_handling(self.current_view.cache_entry, RETURN_KEY,lambda: self.controller.cache_enter(self.current_view.cache_entry.get()))
 
     def _wire_cookie_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
         self.current_view.cookie_button.configure(command=self.controller.service_container.cookie_service.handle_cookie_next)
-        simple_handling(self.current_view.cookie_button, "<Return>", self.controller.service_container.cookie_service.handle_cookie_next)
+        simple_handling(self.current_view.cookie_button, RETURN_KEY, self.controller.service_container.cookie_service.handle_cookie_next)
 
     def _wire_main_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.current_view.settings_frame.menu.configure(command=self.show_settings)
         self.current_view.main_download.configure(command=lambda:self.controller.download(url=self.current_view.main_entry.get().strip()))
-        simple_handling(self.current_view.main_entry, "<Return>", lambda:self.controller.download(url=self.current_view.main_entry.get().strip()))
+        simple_handling(self.current_view.main_entry, RETURN_KEY, lambda:self.controller.download(url=self.current_view.main_entry.get().strip()))
 
     def _wire_settings_window(self):
         self.current_view.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(window='settings'))
