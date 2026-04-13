@@ -35,7 +35,21 @@ def dynamic_resolution(d_root, d_width, d_height):
     d_root.geometry(f"{d_width}x{d_height}+{x}+{y}")
 
 def simple_handling(widget, key, event):
-    widget.bind(key, lambda e: event())    
+    widget.bind(key, lambda e: event())
+
+def get_icon(is_linux:bool):
+    if is_linux:
+        icon = 'icon.png'
+    else:
+        icon = 'icon.ico'
+
+    if getattr(sys, 'frozen', False):
+        icon_path = os.path.join(os.path.dirname(sys.executable), icon)
+        if not os.path.exists(icon_path):
+            icon_path = os.path.join(os.getcwd(), icon)
+    else:
+        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), icon)
+    return icon_path
 
 def set_window_icon(root):
     """Runtime icon loading for Nuitka"""
@@ -47,12 +61,7 @@ def set_window_icon(root):
     
     try:
         if is_linux():
-            if getattr(sys, 'frozen', False):
-                icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.png')
-                if not os.path.exists(icon_path):
-                    icon_path = os.path.join(os.getcwd(), 'icon.png')
-            else:
-                icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
+            icon_path = get_icon(True)
             
             if os.path.exists(icon_path):
                 pil_img = Image.open(icon_path).convert("RGBA")
@@ -60,12 +69,7 @@ def set_window_icon(root):
                 root.after(300, root.iconphoto(False, imagetk))
 
         else:
-            if getattr(sys, 'frozen', False):
-                icon_path = os.path.join(os.path.dirname(sys.executable), 'icon.ico')
-                if not os.path.exists(icon_path):
-                    icon_path = os.path.join(os.getcwd(), 'icon.ico')
-            else:
-                icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.ico')
+            icon_path = get_icon(False)
         
             if os.path.exists(icon_path):
                 root.after(300, win_set_icon)
@@ -86,7 +90,6 @@ def info_msg(text):
 def success_msg(text):
     success = CTkMessagebox(title='Success', message=text, icon="check", option_focus=1, button_color="#950808", button_hover_color="#630202")
     success.get()
-
 
 # ---------------- CONTROLLER ---------------- #
 
