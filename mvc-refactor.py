@@ -428,10 +428,22 @@ class MainModel:
             raise MissingCache('Cache file missing.\nPlease, enter your YT-DLP directory and try again.')
     
         with open(CACHE_FILE, 'r') as file:
-            path_from_cache = file.readline().strip()
-            file.close()
+            yt_dlp_dir = file.readline().strip()
         
-        cmd_parts = ['yt-dlp', '--quiet', '--no-warnings']
+        if not yt_dlp_dir or not os.path.exists(yt_dlp_dir):
+            raise InvalidBinaryDirectory("Invalid YT-DLP directory in cache.")
+
+        if is_linux():
+            executable = os.path.join(yt_dlp_dir, 'yt-dlp')
+        else:
+            executable = os.path.join(yt_dlp_dir, 'yt-dlp.exe')
+            if not os.path.exists(executable):
+                executable = os.path.join(yt_dlp_dir, 'yt-dlp')
+        
+        if not os.path.exists(executable):
+            raise InvalidBinaryDirectory(f"yt-dlp executable not found in:\n{yt_dlp_dir}")
+        
+        cmd_parts = [executable, '--quiet', '--no-warnings']
             
         if is_linux():
             cmd_parts[0] = './yt-dlp'
@@ -458,7 +470,7 @@ class MainModel:
 
         cmd_parts.append(url)
         print(f'Final command: {cmd_parts}')
-        return (cmd_parts, path_from_cache)
+        return (cmd_parts, yt_dlp_dir)
 
 class SettingsModel:
     def clear_cache(self):
