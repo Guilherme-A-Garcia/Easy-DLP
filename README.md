@@ -100,7 +100,7 @@ If you plan on using the source code version, you must install the [latest Pytho
 - - [x] Playlist support;
 - - [x] Add a settings tab;
 - - [x] Add an auto-update system;
-  - [ ] Do a major MVC OOP refactor;
+  - [x] Do a major MVC OOP refactor;
 - - [ ] Step up the game to PySide6.
 
 ## How to Contribute
