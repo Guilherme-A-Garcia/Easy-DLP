@@ -7,8 +7,14 @@ import urllib.request
 import subprocess
 import threading
 import requests
+import yt_dlp
 import sys
 import os
+
+  # Next direction: DITCH YT-DLP BINARIES COMPLETELY; USE THE YT-DLP API INSTEAD!
+  # To do that, replace command generation with option generation, ditch subprocess, keep OS verification;
+  # Make a yt-dlp execution method, pass as target for threading;
+  # Repurpose cache generation from yt-dlp location to download location
 
 LEFT_CLICK = "<Button-1>"
 CACHE_FILE = "cache.txt"
