@@ -954,7 +954,7 @@ class CacheService:
             err_msg(f"Unexpected error: {e}")
 
     def write_cache(self, rewrite:bool):
-        path = self.controller.filedialog_askdir(title='Select your YT-DLP folder')
+        path = self.controller.filedialog_askdir(title='Select the destination for your downloads')
         
         if rewrite:
             try:
