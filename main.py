@@ -401,16 +401,16 @@ class ThemeButtonFrame(ctk.CTkFrame):
 class CacheModel:
     def cache_enter(self, cache_entry):
         if not cache_entry:
-            raise InvalidBinaryDirectory("Please insert the path to your YT-DLP binary directory.")
+            raise InvalidBinaryDirectory("Please insert a directory for your downloads.")
         elif not os.path.exists(cache_entry):
-            raise InvalidBinaryDirectory("Invalid YT-DLP directory.")
+            raise InvalidBinaryDirectory("Invalid directory.")
         else:
             with open(CACHE_FILE, 'w') as file:
                 file.write(cache_entry)
     
     def write_cache(self, path):
         if not path or not os.path.exists(path):
-            raise InvalidBinaryDirectory("Invalid YT-DLP directory path.")
+            raise InvalidBinaryDirectory("Invalid directory.")
         
         with open(CACHE_FILE, 'w') as file:
             file.write(path)
