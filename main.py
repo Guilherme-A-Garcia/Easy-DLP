@@ -148,14 +148,14 @@ class CacheView(ctk.CTkToplevel):
         self.attributes('-alpha', 0)
 
         set_window_icon(self)
-        self.title('YT-DLP Path Directory Cache')
+        self.title('Download Directory Cache')
         dynamic_resolution(self, 500, 160)
         self.resizable(False,False)
 
         self.settings_frame = SettingsButtonFrame(self, self.controller)
         self.settings_frame.pack(anchor="w", padx=3)
 
-        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
+        self.cache_main_lb = ctk.CTkLabel(self, text='Set download directory', font=('', 25))
         self.cache_main_lb.pack(pady=(5))
 
         self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
