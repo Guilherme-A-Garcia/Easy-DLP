@@ -444,9 +444,6 @@ class MainModel:
             'format': 'bestvideo+bestaudio/best',
             'outtmpl': os.path.join(path_from_cache, '%(title)s.%(ext)s')
         }
-
-        if is_linux():
-            cmd_parts[0] = './yt-dlp'
         
         if self.states.get('mp3') == 'on':
             yt_dlp_opts['postprocessors'] = [{
