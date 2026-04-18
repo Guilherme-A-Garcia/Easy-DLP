@@ -716,13 +716,13 @@ class DownloaderService:
         self.window_manager = window_manager
     
     def call_download(self, url):
-        cmd_parts = []
+        yt_dlp_opts = []
         path_from_cache = None
         
         try:
             self.main_model.receive_states(*self.controller.service_container.settings_service.get_settings_states(playlist_dir=True))
-            cmd_parts, path_from_cache = self.main_model.generate_options(url, cookies=self.controller.app_state.cookie_selection)
-            self.download_thread(cmd_parts, path_from_cache)
+            yt_dlp_opts, path_from_cache = self.main_model.generate_command(url, cookies=self.controller.app_state.cookie_selection)
+            self.download_thread(yt_dlp_opts, path_from_cache, url)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
             self.controller.service_container.cache_service.write_cache(rewrite=True)
@@ -734,7 +734,7 @@ class DownloaderService:
             err_msg(text=f'Unexpected error: {e}')
             return
 
-    def download_thread(self, cmd_parts, path_from_cache):
+    def download_thread(self, yt_dlp_opts, path_from_cache, url):
         def check_thread():
             if self.thread.is_alive():
                 self.controller.root.after(200, check_thread)
@@ -745,7 +745,7 @@ class DownloaderService:
         
         def worker():
             try:
-                self.download_subprocess(cmd_parts, path_from_cache)
+                self.download(yt_dlp_opts, path_from_cache, url)
                 self.controller.root.after(0, lambda: self._download_success(path_from_cache))
             except DownloadError as e:
                 self.controller.root.after(0, lambda e=e: self._download_error(e))
@@ -760,6 +760,13 @@ class DownloaderService:
         self.thread.start()
             
         check_thread()
+
+    def download(self, yt_dlp_opts, path_from_cache, url):
+        with yt_dlp.YoutubeDL(yt_dlp_opts) as ytdl:
+            try:
+                ytdl.download()
+            except Exception as e:
+                err_msg(f'Error: {e}')
 
     def download_subprocess(self, cmd_parts, path_from_cache):
         if sys.platform.startswith('win'):
