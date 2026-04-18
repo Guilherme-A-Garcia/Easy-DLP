@@ -439,7 +439,12 @@ class MainModel:
         
         if not path_from_cache or not os.path.exists(path_from_cache):
             raise InvalidBinaryDirectory("Invalid directory in cache.")
-            
+
+        yt_dlp_opts = {
+            'format': 'bestvideo+bestaudio/best',
+            'outtmpl': os.path.join(path_from_cache, '%(title)s.%(ext)s')
+        }
+
         if is_linux():
             cmd_parts[0] = './yt-dlp'
         
@@ -465,7 +470,7 @@ class MainModel:
 
         cmd_parts.append(url)
         print(f'Final command: {cmd_parts}')
-        return (cmd_parts, path_from_cache)
+        return (yt_dlp_opts, path_from_cache)
 
 class SettingsModel:
     def clear_cache(self):
