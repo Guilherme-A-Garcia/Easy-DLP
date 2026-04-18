@@ -7,6 +7,7 @@ import urllib.request
 import subprocess
 import threading
 import requests
+import shutil
 import yt_dlp
 import sys
 import os
