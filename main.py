@@ -427,7 +427,7 @@ class MainModel:
         self.states['playlist_dir'] = playlist_dir
         print(f'States: {self.states}')
     
-    def generate_command(self, url, cookies):
+    def generate_options(self, url, cookies):
         if not url:
             raise EmptyURL("URL field is empty.")
         
@@ -721,7 +721,7 @@ class DownloaderService:
         
         try:
             self.main_model.receive_states(*self.controller.service_container.settings_service.get_settings_states(playlist_dir=True))
-            cmd_parts, path_from_cache = self.main_model.generate_command(url, cookies=self.controller.app_state.cookie_selection)
+            cmd_parts, path_from_cache = self.main_model.generate_options(url, cookies=self.controller.app_state.cookie_selection)
             self.download_thread(cmd_parts, path_from_cache)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
