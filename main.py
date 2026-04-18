@@ -439,18 +439,6 @@ class MainModel:
         
         if not path_from_cache or not os.path.exists(path_from_cache):
             raise InvalidBinaryDirectory("Invalid directory in cache.")
-
-        if is_linux():
-            executable = os.path.join(yt_dlp_dir, 'yt-dlp')
-        else:
-            executable = os.path.join(yt_dlp_dir, 'yt-dlp.exe')
-            if not os.path.exists(executable):
-                executable = os.path.join(yt_dlp_dir, 'yt-dlp')
-        
-        if not os.path.exists(executable):
-            raise InvalidBinaryDirectory(f"yt-dlp executable not found in:\n{yt_dlp_dir}")
-        
-        cmd_parts = [executable, '--quiet', '--no-warnings']
             
         if is_linux():
             cmd_parts[0] = './yt-dlp'
