@@ -465,21 +465,18 @@ class MainModel:
                 'key': 'FFmpegMerger',}]
         
         if not self.states.get('playlist_dir'):
-            cmd_parts += ['--no-playlist', '--playlist-end', '1']
+            yt_dlp_opts['noplaylist'] = True
+            yt_dlp_opts['playlist_end'] = 1
         else:
-            if is_linux():
-                cmd_parts += ['-o', f"{self.states['playlist_dir']}/%(playlist)s/%(title)s.%(ext)s"]
-            else:
-                cmd_parts += ['-o', f"{self.states['playlist_dir']}\\%%(playlist)s\\%%(title)s.%%(ext)s"]
+            yt_dlp_opts['outtmpl'] = f"{self.states['playlist_dir']}/%(playlist)s/%(title)s.%(ext)s"
         
         if cookies and cookies != 'None':
-            if is_linux():
-                cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
-            else:
-                cmd_parts += ['--cookies-from-browser', cookies]
+            yt_dlp_opts['cookiesfrombrowser'] = (cookies,)
+            
+            if is_linux() and shutil.which('node'):
+                yt_dlp_opts['js_runtime'] = 'node'
 
-        cmd_parts.append(url)
-        print(f'Final command: {cmd_parts}')
+        print(f'Final options: {yt_dlp_opts}')
         return (yt_dlp_opts, path_from_cache)
 
 class SettingsModel:
