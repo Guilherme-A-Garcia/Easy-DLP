@@ -449,10 +449,20 @@ class MainModel:
             cmd_parts[0] = './yt-dlp'
         
         if self.states.get('mp3') == 'on':
-            cmd_parts += ['--extract-audio', '--audio-format', 'mp3']
-        
-        if self.states.get('mp4') == 'on':
-            cmd_parts += ['-S', '+vcodec:h264', '--audio-format', 'aac', '--merge-output-format', 'mp4']
+            yt_dlp_opts['postprocessors'] = [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '320'
+            }]
+        elif self.states.get('mp4') == 'on':
+            yt_dlp_opts['format_sort'] = ['+vcodec:h264']
+            yt_dlp_opts['merge_output_format'] = 'mp4'
+            yt_dlp_opts['postprocessors'] = [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'aac',
+            }, 
+            {
+                'key': 'FFmpegMerger',}]
         
         if not self.states.get('playlist_dir'):
             cmd_parts += ['--no-playlist', '--playlist-end', '1']
