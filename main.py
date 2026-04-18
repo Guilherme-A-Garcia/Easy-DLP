@@ -126,7 +126,7 @@ class Controller:
         self.service_container.window_manager._start_app()
 
     def download(self, url):
-        self.service_container.downloader_service.download(url)
+        self.service_container.downloader_service.call_download(url)
 
     def cache_enter(self, entry:str):
         self.service_container.cache_service.cache_enter(entry)
@@ -718,7 +718,7 @@ class DownloaderService:
         self.main_model = main_model
         self.window_manager = window_manager
     
-    def download(self, url):
+    def call_download(self, url):
         cmd_parts = []
         path_from_cache = None
         
