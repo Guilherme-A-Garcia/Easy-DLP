@@ -819,7 +819,7 @@ class SettingsService:
             self.app_state.playlist_directory = str(self.controller.filedialog_askdir(title='Choose the download location for the playlist')).strip()
         else:
             self.app_state.playlist_directory = ''
-            
+
         if self.app_state.playlist_directory != '':
             if not os.path.exists(self.app_state.playlist_directory):
                 err_msg(text='This directory does not exist.')
@@ -889,11 +889,11 @@ class UpdateService:
                 print(f"Thread {inputted_thread} finished successfully!")
                 if inputted_thread == self.thread1:
                     check_update()
-        
+
         self.thread1 = threading.Thread(target=self.auto_version_fetch)
         self.thread1.start()
         update_thread(self.thread1)
-        
+
         def check_update():
             if self.app_state.different_version:
                 msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
@@ -933,7 +933,7 @@ class CacheService:
 
     def cache_enter(self, cache_entry:str):
         path = cache_entry.strip()
-        
+
         try:
             self.cache_model.cache_enter(path)
             self.window_manager.show_cookie_window()
@@ -944,7 +944,7 @@ class CacheService:
 
     def write_cache(self, rewrite:bool):
         path = self.controller.filedialog_askdir(title='Select the destination for your downloads')
-        
+
         if rewrite:
             try:
                 self.cache_model.write_cache(path=path)
@@ -964,7 +964,7 @@ class CookieService:
 
     def handle_cookie_next(self):
         selection = self.app_state.cookie_selection
-        
+
         if selection and selection != 'None':
             self.msg = CTkMessagebox(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
             self.msg.get()
@@ -989,6 +989,42 @@ class DownloadError(UserError):
 
 class URLLibError(UserError):
     pass
+
+# ---------------- LOGGER ---------------- #
+
+class Logger:
+    def __init__(self):
+        self.error_filename = 'EDLP.log'
+
+        if os.path.exists(os.path.abspath(self.error_filename)):
+            self.error_path = os.path.abspath(self.error_filename)
+        else:
+            cwd = get_app_directory()
+            self.error_path = os.path.join(cwd, self.error_filename)
+
+        if os.path.exists(self.error_path):
+            try:
+                os.remove(self.error_path)
+            except Exception:
+                pass
+
+    def debug(self, msg):
+        if msg.startswith('[debug] '):
+            pass
+        else:
+            self.info(msg)
+
+    def info(self, msg):
+        with open(self.error_filename, 'a', encoding='utf-8') as file:
+            file.write(f'info: {msg}\n')
+
+    def warning(self, msg):
+        with open(self.error_filename, 'a', encoding='utf-8') as file:
+            file.write(f'WARNING: {msg}\n')
+
+    def error(self, msg):
+        with open(self.error_filename, 'a', encoding='utf-8') as file:
+            file.write(f'ERROR: {msg}\n')
 
 if __name__ == "__main__":
     main()
