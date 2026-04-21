@@ -476,11 +476,14 @@ class MainModel:
         log_path = yt_dlp_opts['logger'].error_path
 
         if self.states.get('mp3') == 'on':
-            yt_dlp_opts['postprocessors'] = [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '320'
-            }]
+            yt_dlp_opts.update({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '320',
+                }],
+            })
         elif self.states.get('mp4') == 'on':
             yt_dlp_opts.update({
                 'format': 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]',
