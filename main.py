@@ -732,7 +732,7 @@ class DownloaderService:
         
         try:
             self.main_model.receive_states(*self.controller.service_container.settings_service.get_settings_states(playlist_dir=True))
-            yt_dlp_opts, path_from_cache = self.main_model.generate_command(url, cookies=self.controller.app_state.cookie_selection)
+            yt_dlp_opts, path_from_cache = self.main_model.generate_options(url, cookies=self.controller.app_state.cookie_selection)
             self.download_thread(yt_dlp_opts, path_from_cache, url)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
