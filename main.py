@@ -512,7 +512,7 @@ class MainModel:
             yt_dlp_opts['js_runtime'] = 'deno'
 
         print(f'Final options: {yt_dlp_opts}')
-        return (yt_dlp_opts, path_from_cache)
+        return (yt_dlp_opts, path_from_cache, log_path)
 
 class SettingsModel:
     def clear_cache(self):
@@ -720,7 +720,6 @@ class WindowManager:
         self.controller.service_container.settings_service.verify_mp3_checkbox()
 
 class DownloaderService:
-    LOGTXT_CONST = 'log.txt'
     def __init__(self, controller, main_model, window_manager):
         self.controller = controller
         self.main_model = main_model
@@ -729,11 +728,11 @@ class DownloaderService:
     def call_download(self, url):
         yt_dlp_opts = []
         path_from_cache = None
-        
+
         try:
             self.main_model.receive_states(*self.controller.service_container.settings_service.get_settings_states(playlist_dir=True))
-            yt_dlp_opts, path_from_cache = self.main_model.generate_options(url, cookies=self.controller.app_state.cookie_selection)
-            self.download_thread(yt_dlp_opts, path_from_cache, url)
+            yt_dlp_opts, path_from_cache, log_path = self.main_model.generate_options(url, cookies=self.controller.app_state.cookie_selection)
+            self.download_thread(yt_dlp_opts, path_from_cache, url, log_path)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
             self.controller.service_container.cache_service.write_cache(rewrite=True)
@@ -745,65 +744,43 @@ class DownloaderService:
             err_msg(text=f'Unexpected error: {e}')
             return
 
-    def download_thread(self, yt_dlp_opts, path_from_cache, url):
+    def download_thread(self, yt_dlp_opts, path_from_cache, url, log_path):
         def check_thread():
             if self.thread.is_alive():
                 self.controller.root.after(200, check_thread)
             else:
-                self.window_manager.current_view.enable_widgets()
-                self.window_manager.current_view.progress_bar['value'] = 0
-                self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        
-        def worker():
-            try:
-                self.download(yt_dlp_opts, path_from_cache, url)
-                self.controller.root.after(0, lambda: self._download_success(path_from_cache))
-            except DownloadError as e:
-                self.controller.root.after(0, lambda e=e: self._download_error(e))
-            except Exception as e:
-                self.controller.root.after(0, lambda e=e: self._download_error(e, unexpected=True))
+                self._resume_ui()
 
         self.window_manager.current_view.disable_widgets()
         self.window_manager.current_view.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
         self.window_manager.current_view.progress_bar.start()
-                
-        self.thread = threading.Thread(target=worker, daemon=True)
+
+        self.thread = threading.Thread(target=self.download, daemon=True, args=(yt_dlp_opts, path_from_cache, url, log_path))
         self.thread.start()
-            
+
         check_thread()
 
-    def download(self, yt_dlp_opts, path_from_cache, url):
+    def download(self, yt_dlp_opts, path_from_cache, url, log_path):
         with yt_dlp.YoutubeDL(yt_dlp_opts) as ytdl:
             try:
-                ytdl.download()
-            except Exception as e:
-                err_msg(f'Error: {e}')
+                ytdl.download(url)
+                self._download_success(path_from_cache)
+            except Exception:
+                err_msg(f'An error has occurred while downloading the file(s).\nA log was generated in this path: {log_path}')
+                self._resume_ui()
 
-    def _write_log(self, stderr):
-        with open(self.LOGTXT_CONST, 'w', encoding='utf-8') as file:
-            file.write(stderr.decode('utf-8', errors='ignore'))
-        return os.path.abspath(self.LOGTXT_CONST)
-
-    def _download_success(self, cache):
+    def _resume_ui(self):
         self.window_manager.current_view.enable_widgets()
         self.window_manager.current_view.progress_bar.stop()
         self.window_manager.current_view.progress_bar['value'] = 0
         self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+
+    def _download_success(self, cache):
+        self._resume_ui()
         if self.controller.app_state.playlist_state == 'off':
             success_msg(f"File successfully downloaded to {cache}")
         else:
             success_msg(f"Playlist successfully downloaded to {self.controller.app_state.playlist_directory}")
-
-    def _download_error(self, error, unexpected=False):
-        self.window_manager.current_view.enable_widgets()
-        self.window_manager.current_view.progress_bar.stop()
-        self.window_manager.current_view.progress_bar['value'] = 0
-        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        
-        if unexpected:
-            err_msg(f'Unexpected error: {error}')
-        else:
-            err_msg(f'Error: {error}')
 
 class SettingsService:
     def __init__(self, controller, app_state, window_manager):
