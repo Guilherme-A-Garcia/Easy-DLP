@@ -482,14 +482,10 @@ class MainModel:
                 'preferredquality': '320'
             }]
         elif self.states.get('mp4') == 'on':
-            yt_dlp_opts['format_sort'] = ['+vcodec:h264']
-            yt_dlp_opts['merge_output_format'] = 'mp4'
-            yt_dlp_opts['postprocessors'] = [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'aac',
-            },
-            {
-                'key': 'FFmpegMerger',}]
+            yt_dlp_opts.update({
+                'format': 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]',
+                'merge_output_format': 'mp4',
+            })
 
         if not self.states.get('playlist_dir'):
             yt_dlp_opts['noplaylist'] = True
@@ -763,7 +759,7 @@ class DownloaderService:
     def download(self, yt_dlp_opts, path_from_cache, url, log_path):
         with yt_dlp.YoutubeDL(yt_dlp_opts) as ytdl:
             try:
-                ytdl.download(url)
+                ytdl.download([url])
                 self._download_success(path_from_cache)
             except Exception:
                 err_msg(f'An error has occurred while downloading the file(s).\nA log was generated in this path: {log_path}')
