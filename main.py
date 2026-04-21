@@ -39,6 +39,33 @@ def main():
 
 # ---------------- UTILITY FUNCTIONS ---------------- #
 
+def get_app_directory():
+    if getattr(sys, 'frozen', False):
+        try:
+            path = os.path.abspath(sys.argv[0])
+            dir_path = os.path.dirname(path)
+            if os.path.exists(dir_path):
+                return dir_path
+        except Exception:
+            pass
+
+        try:
+            cwd = os.getcwd()
+            if os.path.exists(cwd):
+                return cwd
+        except Exception:
+            pass
+
+        try:
+            temp_dir = os.path.dirname(sys.executable)
+            parent = os.path.abspath(os.path.join(temp_dir, '..'))
+            if os.path.exists(parent):
+                return parent
+        except Exception:
+            pass
+
+    return os.getcwd()
+
 def dynamic_resolution(d_root, d_width, d_height):
     screen_height = d_root.winfo_screenheight()
     screen_width = d_root.winfo_screenwidth()
@@ -498,7 +525,7 @@ class UpdatingModel:
     def update_app(self):
         url =  ''
         file_path = ''
-        cwd = self.get_app_directory()
+        cwd = get_app_directory()
 
         if os.path.exists(cwd):
             print("Resolved update directory:", cwd)
@@ -527,7 +554,7 @@ class UpdatingModel:
             subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, close_fds=True)
             os._exit(0)
         else:
-            cwd = self.get_app_directory()
+            cwd = get_app_directory()
             
             new_file = 'Easy-DLP-NEW.exe'
             file_name = 'Easy-DLP.exe'
@@ -550,33 +577,6 @@ class UpdatingModel:
             
         except Exception as e:
             print(e)
-
-    def get_app_directory(self):
-        if getattr(sys, 'frozen', False):
-            try:
-                path = os.path.abspath(sys.argv[0])
-                dir_path = os.path.dirname(path)
-                if os.path.exists(dir_path):
-                    return dir_path
-            except Exception:
-                pass
-            
-            try:
-                cwd = os.getcwd()
-                if os.path.exists(cwd):
-                    return cwd
-            except Exception:
-                pass
-            
-            try:
-                temp_dir = os.path.dirname(sys.executable)
-                parent = os.path.abspath(os.path.join(temp_dir, '..'))
-                if os.path.exists(parent):
-                    return parent
-            except Exception:
-                pass
-        
-        return os.getcwd()
 
 class AppStateModel:
     def __init__(self):
