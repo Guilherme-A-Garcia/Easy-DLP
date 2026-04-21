@@ -420,23 +420,23 @@ class CacheModel:
 class MainModel:
     def __init__(self):
         self.states = {'mp3': None, 'mp4': None, 'playlist_dir': None}
-    
+
     def receive_states(self, mp3, mp4, playlist_dir):
         self.states['mp3'] = mp3
         self.states['mp4'] = mp4
         self.states['playlist_dir'] = playlist_dir
         print(f'States: {self.states}')
-    
+
     def generate_options(self, url, cookies):
         if not url:
             raise EmptyURL("URL field is empty.")
-        
+
         if not os.path.exists(CACHE_FILE):
             raise MissingCache('Cache file missing.\nPlease, enter your YT-DLP directory and try again.')
-    
+
         with open(CACHE_FILE, 'r') as file:
             path_from_cache = file.readline().strip()
-        
+
         if not path_from_cache or not os.path.exists(path_from_cache):
             raise InvalidBinaryDirectory("Invalid directory in cache.")
 
@@ -445,7 +445,9 @@ class MainModel:
             'format': 'best',
             'outtmpl': os.path.join(path_from_cache, '%(title)s.%(ext)s')
         }
-        
+
+        log_path = yt_dlp_opts['logger'].error_path
+
         if self.states.get('mp3') == 'on':
             yt_dlp_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
@@ -458,21 +460,29 @@ class MainModel:
             yt_dlp_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'aac',
-            }, 
+            },
             {
                 'key': 'FFmpegMerger',}]
-        
+
         if not self.states.get('playlist_dir'):
             yt_dlp_opts['noplaylist'] = True
             yt_dlp_opts['playlist_end'] = 1
         else:
             yt_dlp_opts['outtmpl'] = f"{self.states['playlist_dir']}/%(playlist)s/%(title)s.%(ext)s"
-        
+
         if cookies and cookies != 'None':
             yt_dlp_opts['cookiesfrombrowser'] = (cookies,)
-            
-            if is_linux() and shutil.which('node'):
-                yt_dlp_opts['js_runtime'] = 'node'
+
+        runtimes = ['bun', 'node', 'qjs']
+        for runtime in runtimes:
+            if shutil.which(runtime):
+                if runtime == 'qjs':
+                    yt_dlp_opts['js_runtime'] = 'quickjs'
+                else:
+                    yt_dlp_opts['js_runtime'] = runtime
+                break
+        else:
+            yt_dlp_opts['js_runtime'] = 'deno'
 
         print(f'Final options: {yt_dlp_opts}')
         return (yt_dlp_opts, path_from_cache)
