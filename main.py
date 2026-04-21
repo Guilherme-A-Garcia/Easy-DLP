@@ -441,6 +441,7 @@ class MainModel:
             raise InvalidBinaryDirectory("Invalid directory in cache.")
 
         yt_dlp_opts = {
+            'logger': Logger(),
             'format': 'bestvideo+bestaudio/best',
             'outtmpl': os.path.join(path_from_cache, '%(title)s.%(ext)s')
         }
