@@ -442,7 +442,7 @@ class MainModel:
 
         yt_dlp_opts = {
             'logger': Logger(),
-            'format': 'bestvideo+bestaudio/best',
+            'format': 'best',
             'outtmpl': os.path.join(path_from_cache, '%(title)s.%(ext)s')
         }
         
