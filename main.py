@@ -580,7 +580,7 @@ class UpdatingModel:
 
 class AppStateModel:
     def __init__(self):
-        self.current_version = "v4.0.0"
+        self.current_version = "v5.0.0"
         self.different_version = False
 
         self.cookie_selection = "None"
