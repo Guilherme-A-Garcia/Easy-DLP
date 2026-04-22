@@ -7,6 +7,8 @@ import urllib.request
 import subprocess
 import threading
 import requests
+import shutil
+import yt_dlp
 import sys
 import os
 
@@ -31,6 +33,33 @@ def main():
     app.root.mainloop()
 
 # ---------------- UTILITY FUNCTIONS ---------------- #
+
+def get_app_directory():
+    if getattr(sys, 'frozen', False):
+        try:
+            path = os.path.abspath(sys.argv[0])
+            dir_path = os.path.dirname(path)
+            if os.path.exists(dir_path):
+                return dir_path
+        except Exception:
+            pass
+
+        try:
+            cwd = os.getcwd()
+            if os.path.exists(cwd):
+                return cwd
+        except Exception:
+            pass
+
+        try:
+            temp_dir = os.path.dirname(sys.executable)
+            parent = os.path.abspath(os.path.join(temp_dir, '..'))
+            if os.path.exists(parent):
+                return parent
+        except Exception:
+            pass
+
+    return os.getcwd()
 
 def dynamic_resolution(d_root, d_width, d_height):
     screen_height = d_root.winfo_screenheight()
@@ -119,7 +148,7 @@ class Controller:
         self.service_container.window_manager._start_app()
 
     def download(self, url):
-        self.service_container.downloader_service.download(url)
+        self.service_container.downloader_service.call_download(url)
 
     def cache_enter(self, entry:str):
         self.service_container.cache_service.cache_enter(entry)
@@ -142,14 +171,14 @@ class CacheView(ctk.CTkToplevel):
         self.attributes('-alpha', 0)
 
         set_window_icon(self)
-        self.title('YT-DLP Path Directory Cache')
+        self.title('Download Directory Cache')
         dynamic_resolution(self, 500, 160)
         self.resizable(False,False)
 
         self.settings_frame = SettingsButtonFrame(self, self.controller)
         self.settings_frame.pack(anchor="w", padx=3)
 
-        self.cache_main_lb = ctk.CTkLabel(self, text='Insert the path to your YT-DLP file', font=('', 25))
+        self.cache_main_lb = ctk.CTkLabel(self, text='Set download directory', font=('', 25))
         self.cache_main_lb.pack(pady=(5))
 
         self.cache_entry = ctk.CTkEntry(self, font=('', 14), insertwidth=1)
@@ -395,16 +424,16 @@ class ThemeButtonFrame(ctk.CTkFrame):
 class CacheModel:
     def cache_enter(self, cache_entry):
         if not cache_entry:
-            raise InvalidBinaryDirectory("Please insert the path to your YT-DLP binary directory.")
+            raise InvalidBinaryDirectory("Please insert a directory for your downloads.")
         elif not os.path.exists(cache_entry):
-            raise InvalidBinaryDirectory("Invalid YT-DLP directory.")
+            raise InvalidBinaryDirectory("Invalid directory.")
         else:
             with open(CACHE_FILE, 'w') as file:
                 file.write(cache_entry)
     
     def write_cache(self, path):
         if not path or not os.path.exists(path):
-            raise InvalidBinaryDirectory("Invalid YT-DLP directory path.")
+            raise InvalidBinaryDirectory("Invalid directory.")
         
         with open(CACHE_FILE, 'w') as file:
             file.write(path)
@@ -413,64 +442,71 @@ class CacheModel:
 class MainModel:
     def __init__(self):
         self.states = {'mp3': None, 'mp4': None, 'playlist_dir': None}
-    
+
     def receive_states(self, mp3, mp4, playlist_dir):
         self.states['mp3'] = mp3
         self.states['mp4'] = mp4
         self.states['playlist_dir'] = playlist_dir
         print(f'States: {self.states}')
-    
-    def generate_command(self, url, cookies):
+
+    def generate_options(self, url, cookies):
         if not url:
             raise EmptyURL("URL field is empty.")
-        
+
         if not os.path.exists(CACHE_FILE):
             raise MissingCache('Cache file missing.\nPlease, enter your YT-DLP directory and try again.')
-    
+
         with open(CACHE_FILE, 'r') as file:
-            yt_dlp_dir = file.readline().strip()
-        
-        if not yt_dlp_dir or not os.path.exists(yt_dlp_dir):
-            raise InvalidBinaryDirectory("Invalid YT-DLP directory in cache.")
+            path_from_cache = file.readline().strip()
 
-        if is_linux():
-            executable = os.path.join(yt_dlp_dir, 'yt-dlp')
-        else:
-            executable = os.path.join(yt_dlp_dir, 'yt-dlp.exe')
-            if not os.path.exists(executable):
-                executable = os.path.join(yt_dlp_dir, 'yt-dlp')
-        
-        if not os.path.exists(executable):
-            raise InvalidBinaryDirectory(f"yt-dlp executable not found in:\n{yt_dlp_dir}")
-        
-        cmd_parts = [executable, '--quiet', '--no-warnings']
-            
-        if is_linux():
-            cmd_parts[0] = './yt-dlp'
-        
+        if not path_from_cache or not os.path.exists(path_from_cache):
+            raise InvalidBinaryDirectory("Invalid directory in cache.")
+
+        yt_dlp_opts = {
+            'logger': Logger(),
+            'format': 'best',
+            'outtmpl': os.path.join(path_from_cache, '%(title)s.%(ext)s')
+        }
+
+        log_path = yt_dlp_opts['logger'].error_path
+
         if self.states.get('mp3') == 'on':
-            cmd_parts += ['--extract-audio', '--audio-format', 'mp3']
-        
-        if self.states.get('mp4') == 'on':
-            cmd_parts += ['-S', '+vcodec:h264', '--audio-format', 'aac', '--merge-output-format', 'mp4']
-        
-        if not self.states.get('playlist_dir'):
-            cmd_parts += ['--no-playlist', '--playlist-end', '1']
-        else:
-            if is_linux():
-                cmd_parts += ['-o', f"{self.states['playlist_dir']}/%(playlist)s/%(title)s.%(ext)s"]
-            else:
-                cmd_parts += ['-o', f"{self.states['playlist_dir']}\\%%(playlist)s\\%%(title)s.%%(ext)s"]
-        
-        if cookies and cookies != 'None':
-            if is_linux():
-                cmd_parts += ['--js-runtime', 'node', '--cookies-from-browser', cookies]
-            else:
-                cmd_parts += ['--cookies-from-browser', cookies]
+            yt_dlp_opts.update({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '320',
+                }],
+            })
+        elif self.states.get('mp4') == 'on':
+            yt_dlp_opts.update({
+                'format': 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]',
+                'merge_output_format': 'mp4',
+            })
 
-        cmd_parts.append(url)
-        print(f'Final command: {cmd_parts}')
-        return (cmd_parts, yt_dlp_dir)
+        if not self.states.get('playlist_dir'):
+            yt_dlp_opts['noplaylist'] = True
+            yt_dlp_opts['playlist_end'] = 1
+        else:
+            yt_dlp_opts['outtmpl'] = f"{self.states['playlist_dir']}/%(playlist)s/%(title)s.%(ext)s"
+
+        if cookies and cookies != 'None':
+            yt_dlp_opts['cookiesfrombrowser'] = (cookies,)
+
+        runtimes = ['bun', 'node', 'qjs']
+        for runtime in runtimes:
+            if shutil.which(runtime):
+                if runtime == 'qjs':
+                    yt_dlp_opts['js_runtime'] = 'quickjs'
+                else:
+                    yt_dlp_opts['js_runtime'] = runtime
+                break
+        else:
+            yt_dlp_opts['js_runtime'] = 'deno'
+
+        print(f'Final options: {yt_dlp_opts}')
+        return (yt_dlp_opts, path_from_cache, log_path)
 
 class SettingsModel:
     def clear_cache(self):
@@ -483,7 +519,7 @@ class UpdatingModel:
     def update_app(self):
         url =  ''
         file_path = ''
-        cwd = self.get_app_directory()
+        cwd = get_app_directory()
 
         if os.path.exists(cwd):
             print("Resolved update directory:", cwd)
@@ -512,7 +548,7 @@ class UpdatingModel:
             subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True, close_fds=True)
             os._exit(0)
         else:
-            cwd = self.get_app_directory()
+            cwd = get_app_directory()
             
             new_file = 'Easy-DLP-NEW.exe'
             file_name = 'Easy-DLP.exe'
@@ -536,36 +572,9 @@ class UpdatingModel:
         except Exception as e:
             print(e)
 
-    def get_app_directory(self):
-        if getattr(sys, 'frozen', False):
-            try:
-                path = os.path.abspath(sys.argv[0])
-                dir_path = os.path.dirname(path)
-                if os.path.exists(dir_path):
-                    return dir_path
-            except Exception:
-                pass
-            
-            try:
-                cwd = os.getcwd()
-                if os.path.exists(cwd):
-                    return cwd
-            except Exception:
-                pass
-            
-            try:
-                temp_dir = os.path.dirname(sys.executable)
-                parent = os.path.abspath(os.path.join(temp_dir, '..'))
-                if os.path.exists(parent):
-                    return parent
-            except Exception:
-                pass
-        
-        return os.getcwd()
-
 class AppStateModel:
     def __init__(self):
-        self.current_version = "v4.0.0"
+        self.current_version = "v5.0.0"
         self.different_version = False
 
         self.cookie_selection = "None"
@@ -705,20 +714,19 @@ class WindowManager:
         self.controller.service_container.settings_service.verify_mp3_checkbox()
 
 class DownloaderService:
-    LOGTXT_CONST = 'log.txt'
     def __init__(self, controller, main_model, window_manager):
         self.controller = controller
         self.main_model = main_model
         self.window_manager = window_manager
     
-    def download(self, url):
-        cmd_parts = []
+    def call_download(self, url):
+        yt_dlp_opts = []
         path_from_cache = None
-        
+
         try:
             self.main_model.receive_states(*self.controller.service_container.settings_service.get_settings_states(playlist_dir=True))
-            cmd_parts, path_from_cache = self.main_model.generate_command(url, cookies=self.controller.app_state.cookie_selection)
-            self.download_thread(cmd_parts, path_from_cache)
+            yt_dlp_opts, path_from_cache, log_path = self.main_model.generate_options(url, cookies=self.controller.app_state.cookie_selection)
+            self.download_thread(yt_dlp_opts, path_from_cache, url, log_path)
         except MissingCache as e:
             err_msg(text=f'Error: {e}')
             self.controller.service_container.cache_service.write_cache(rewrite=True)
@@ -730,74 +738,43 @@ class DownloaderService:
             err_msg(text=f'Unexpected error: {e}')
             return
 
-    def download_thread(self, cmd_parts, path_from_cache):
+    def download_thread(self, yt_dlp_opts, path_from_cache, url, log_path):
         def check_thread():
             if self.thread.is_alive():
                 self.controller.root.after(200, check_thread)
             else:
-                self.window_manager.current_view.enable_widgets()
-                self.window_manager.current_view.progress_bar['value'] = 0
-                self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        
-        def worker():
-            try:
-                self.download_subprocess(cmd_parts, path_from_cache)
-                self.controller.root.after(0, lambda: self._download_success(path_from_cache))
-            except DownloadError as e:
-                self.controller.root.after(0, lambda e=e: self._download_error(e))
-            except Exception as e:
-                self.controller.root.after(0, lambda e=e: self._download_error(e, unexpected=True))
+                self._resume_ui()
 
         self.window_manager.current_view.disable_widgets()
         self.window_manager.current_view.progress_bar.configure(progress_color="#770505", fg_color="#808080", mode="indeterminate")
         self.window_manager.current_view.progress_bar.start()
-                
-        self.thread = threading.Thread(target=worker, daemon=True)
+
+        self.thread = threading.Thread(target=self.download, daemon=True, args=(yt_dlp_opts, path_from_cache, url, log_path))
         self.thread.start()
-            
+
         check_thread()
 
-    def download_subprocess(self, cmd_parts, path_from_cache):
-        if sys.platform.startswith('win'):
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.wShowWindow = subprocess.SW_HIDE
-            creationflags = subprocess.CREATE_NO_WINDOW
-        else:
-            startupinfo = None
-            creationflags = 0
-        
-        self.process = subprocess.Popen(cmd_parts, startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, creationflags=creationflags, cwd=path_from_cache)
-        _, stderr = self.process.communicate()
+    def download(self, yt_dlp_opts, path_from_cache, url, log_path):
+        with yt_dlp.YoutubeDL(yt_dlp_opts) as ytdl:
+            try:
+                ytdl.download([url])
+                self._download_success(path_from_cache)
+            except Exception:
+                err_msg(f'An error has occurred while downloading the file(s).\nA log was generated in this path: {log_path}')
+                self._resume_ui()
 
-        if self.process.returncode != 0:
-            log_path = self._write_log(stderr)
-            raise DownloadError(f'Download failed.\nLog path: {log_path}')
-
-    def _write_log(self, stderr):
-        with open(self.LOGTXT_CONST, 'w', encoding='utf-8') as file:
-            file.write(stderr.decode('utf-8', errors='ignore'))
-        return os.path.abspath(self.LOGTXT_CONST)
-
-    def _download_success(self, cache):
+    def _resume_ui(self):
         self.window_manager.current_view.enable_widgets()
         self.window_manager.current_view.progress_bar.stop()
         self.window_manager.current_view.progress_bar['value'] = 0
         self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
+
+    def _download_success(self, cache):
+        self._resume_ui()
         if self.controller.app_state.playlist_state == 'off':
             success_msg(f"File successfully downloaded to {cache}")
         else:
             success_msg(f"Playlist successfully downloaded to {self.controller.app_state.playlist_directory}")
-
-    def _download_error(self, error, unexpected=False):
-        self.window_manager.current_view.enable_widgets()
-        self.window_manager.current_view.progress_bar.stop()
-        self.window_manager.current_view.progress_bar['value'] = 0
-        self.window_manager.current_view.progress_bar.configure(progress_color="#808080", fg_color="#808080")
-        
-        if unexpected:
-            err_msg(f'Unexpected error: {error}')
-        else:
-            err_msg(f'Error: {error}')
 
 class SettingsService:
     def __init__(self, controller, app_state, window_manager):
@@ -824,7 +801,7 @@ class SettingsService:
             self.app_state.playlist_directory = str(self.controller.filedialog_askdir(title='Choose the download location for the playlist')).strip()
         else:
             self.app_state.playlist_directory = ''
-            
+
         if self.app_state.playlist_directory != '':
             if not os.path.exists(self.app_state.playlist_directory):
                 err_msg(text='This directory does not exist.')
@@ -894,11 +871,11 @@ class UpdateService:
                 print(f"Thread {inputted_thread} finished successfully!")
                 if inputted_thread == self.thread1:
                     check_update()
-        
+
         self.thread1 = threading.Thread(target=self.auto_version_fetch)
         self.thread1.start()
         update_thread(self.thread1)
-        
+
         def check_update():
             if self.app_state.different_version:
                 msg = CTkMessagebox(message="A newer version has been detected, would you like to update the app?", title='Update Detected', option_1="Yes", option_2="No", option_focus=2, button_color="#950808", button_hover_color="#630202")
@@ -938,7 +915,7 @@ class CacheService:
 
     def cache_enter(self, cache_entry:str):
         path = cache_entry.strip()
-        
+
         try:
             self.cache_model.cache_enter(path)
             self.window_manager.show_cookie_window()
@@ -948,8 +925,8 @@ class CacheService:
             err_msg(f"Unexpected error: {e}")
 
     def write_cache(self, rewrite:bool):
-        path = self.controller.filedialog_askdir(title='Select your YT-DLP folder')
-        
+        path = self.controller.filedialog_askdir(title='Select the destination for your downloads')
+
         if rewrite:
             try:
                 self.cache_model.write_cache(path=path)
@@ -969,7 +946,7 @@ class CookieService:
 
     def handle_cookie_next(self):
         selection = self.app_state.cookie_selection
-        
+
         if selection and selection != 'None':
             self.msg = CTkMessagebox(title='Information', message='Tip: You might want to keep your browser of choice closed while downloading.', icon="info", option_focus=1, button_color="#950808", button_hover_color="#630202")
             self.msg.get()
@@ -994,6 +971,42 @@ class DownloadError(UserError):
 
 class URLLibError(UserError):
     pass
+
+# ---------------- LOGGER ---------------- #
+
+class Logger:
+    def __init__(self):
+        self.error_filename = 'EDLP.log'
+
+        if os.path.exists(os.path.abspath(self.error_filename)):
+            self.error_path = os.path.abspath(self.error_filename)
+        else:
+            cwd = get_app_directory()
+            self.error_path = os.path.join(cwd, self.error_filename)
+
+        if os.path.exists(self.error_path):
+            try:
+                os.remove(self.error_path)
+            except Exception:
+                pass
+
+    def debug(self, msg):
+        if msg.startswith('[debug] '):
+            pass
+        else:
+            self.info(msg)
+
+    def info(self, msg):
+        with open(self.error_filename, 'a', encoding='utf-8') as file:
+            file.write(f'info: {msg}\n')
+
+    def warning(self, msg):
+        with open(self.error_filename, 'a', encoding='utf-8') as file:
+            file.write(f'WARNING: {msg}\n')
+
+    def error(self, msg):
+        with open(self.error_filename, 'a', encoding='utf-8') as file:
+            file.write(f'ERROR: {msg}\n')
 
 if __name__ == "__main__":
     main()
