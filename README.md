@@ -4,9 +4,9 @@
 ![GitHub release](https://img.shields.io/github/v/release/Guilherme-A-Garcia/Easy-DLP)
 
 # Easy-DLP
-Easy-DLP is a clean and simple GUI wrapper for **YT-DLP**. Download videos easily with browser cookie support.<br>
-This application is but a humble Python wrapper, using the following libraries: CustomTkinter, CTkMessagebox, PIL, urllib, subprocess, requests, threading, os and sys.<br>
-The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are currently compiled with [Nuitka](https://nuitka.net/).
+Easy-DLP is a clean and simple GUI wrapper for **YT-DLP**. Download videos easily with cookie import support.<br>
+This application is but a humble Python wrapper, using the following libraries: CustomTkinter, CTkMessagebox, PIL, bs4, urllib, subprocess, requests, threading, os and sys.<br>
+The Windows [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are currently compiled with [Nuitka](https://nuitka.net/), along with the Linux ones,<br> which are turned into AppImages, all of that streamlined through my tool [AutoAppImage](https://github.com/Guilherme-A-Garcia/AutoAppImage).
 
 >[!CAUTION]
 >By using this GUI, you agree to abide by local copyright laws. This project does not condone or encourage the unauthorized distribution of copyrighted material.
@@ -28,20 +28,26 @@ The [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are curr
 ## Current Features
 - Simple and easily manageable GUI
 - Browser cookie import (for age-restricted content)
-- Remembers the last YT-DLP binary location (simple .txt soft-cache system)
+- Remembers the downloads directory (simple .txt soft-cache system)
 - Error handling with user-friendly message boxes
 - Dark/Light theme switch
 - Binaries for both Windows and Linux
 - Support for downloading playlists
 - Settings centralized in a window
 - Automatic binary updates
+- YT-DLP API integration
 
 ## Requirements
-First and foremost, you will need a [YT-DLP](https://github.com/yt-dlp/yt-dlp) binary and [FFMPEG](https://www.ffmpeg.org/download.html).<br>
+First and foremost, you will need [FFMPEG](https://www.ffmpeg.org/download.html) and a JS runtime from this list:
+* [QuickJS](https://bellard.org/quickjs/)
+* [Bun](https://bun.com/)
+* [Node](https://nodejs.org/en)
+* [Deno](https://deno.com/)
 
-If you use Windows, Windows 8 (or newer) is needed, as it is the minimum requirement to run YT-DLP.<br>
+If you use Windows, Windows 8 (or newer) is needed, as it is the minimum requirement to be able to use the YT-DLP API.<br>
 
-For Linux users, you will need to install [Node](https://nodejs.org/en) to use cookie importation, as sometimes<br> it's very tricky to fetch cookies due to rigid browser security.<br>
+Keep in mind that sometimes it's tricky to fetch cookies due to rigid browser security and constant security measures in certain websites..<br>
+
 And most importantly, don't forget to grant executable permissions to the .AppImage binary with `chmod +x`!<br>
 
 If you plan on using the source code version, you must install the [latest Python version](https://www.python.org/downloads/). 🐍
@@ -49,12 +55,12 @@ If you plan on using the source code version, you must install the [latest Pytho
 ## How to Use
 1. Download the latest release of this project;<br>
 2. Execute the .exe binary (or the .AppImage if you are using Linux);<br>
-3. Paste your YT-DLP file path in the "YT-DLP Path Directory Cache" window. For example, "C:/Users/YourName/Downloads/" if your YT-DLP binary is located in the 'Downloads' folder;<br>
+3. Paste your preferred download destination in the "Download Directory Cache" window. For example, "C:/Users/YourName/Downloads/";<br>
 4. If you wish to download an age-restricted video from YouTube, log into your YouTube account and select your browser in the drop-down menu, clicking save after the process. Leave the selector at "None" if you don't need cookie importation;<br>
 5. Insert the URL of the video you're going to download and press "Download".<br>
 
 >[!TIP]
-> You are able to clear the YT-DLP file path you provided by clicking "Clear path", doing this will close the application,<br>
+> You are able to clear the download folder path you provided by clicking "Clear path", doing this will close the application,<br>
   and will generate a new cache file once you open it up again.<br>
 > If you are importing cookies, it MIGHT be preferable to close your browser before downloading any video.
 > And if you're downloading a playlist, simply click the 'Playlist mode' check-box in the top right corner, select the directory and insert the playlist link.
