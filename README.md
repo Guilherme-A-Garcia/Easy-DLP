@@ -46,7 +46,7 @@ First and foremost, you will need [FFMPEG](https://www.ffmpeg.org/download.html)
 
 If you use Windows, Windows 8 (or newer) is needed, as it is the minimum requirement to be able to use the YT-DLP API.<br>
 
-Keep in mind that sometimes it's tricky to fetch cookies due to rigid browser security and constant security measures in certain websites..<br>
+Keep in mind that sometimes it's tricky to fetch cookies due to rigid browser security and constant security measures being updated in certain websites.<br>
 
 And most importantly, don't forget to grant executable permissions to the .AppImage binary with `chmod +x`!<br>
 
