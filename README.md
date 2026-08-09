@@ -4,7 +4,7 @@
 ![GitHub release](https://img.shields.io/github/v/release/Guilherme-A-Garcia/Easy-DLP)
 
 # Easy-DLP
-Easy-DLP is a clean and simple GUI wrapper for **YT-DLP**. Download videos easily with cookie import support.<br>
+Easy-DLP is a clean and simple GUI wrapper for [**YT-DLP**](https://github.com/yt-dlp/yt-dlp). Download videos easily with cookie import support.<br>
 This application is but a humble Python wrapper, using the following libraries: CustomTkinter, CTkMessagebox, PIL, bs4, urllib, subprocess, requests, threading, os and sys.<br>
 The Windows [binaries](https://github.com/Guilherme-A-Garcia/Easy-DLP/releases) are currently compiled with [Nuitka](https://nuitka.net/), along with the Linux ones,<br> which are turned into AppImages, all of that streamlined through my tool [AutoAppImage](https://github.com/Guilherme-A-Garcia/AutoAppImage).
 
